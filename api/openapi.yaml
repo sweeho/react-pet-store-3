@@ -1,0 +1,332 @@
+# EXTRACTED FROM LEGACY SOURCE — evidence of what exists, not a build target. Where this disagrees with a capability delta spec, the delta spec wins.
+openapi: 3.0.0
+info:
+  title: J2EE Petstore API
+  description: Extracted from legacy Petstore 1.3.2 J2EE application
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Legacy Petstore Application Server
+
+tags:
+  - name: Customer Management
+    description: Customer authentication, registration, and profile management
+  - name: Shopping Cart
+    description: Shopping cart operations and item management
+  - name: Order Processing
+    description: Order checkout, creation, and workflow
+  - name: Supplier Integration
+    description: Supplier portal and inventory management
+
+paths:
+  /signin.screen:
+    get:
+      tags:
+        - Customer Management
+      summary: Display sign-on form
+      operationId: getSignOnForm
+      responses:
+        '200':
+          description: Sign-on form page
+        '403':
+          description: Already authenticated user redirected
+
+  /register.screen:
+    get:
+      tags:
+        - Customer Management
+      summary: Display registration form
+      operationId: getRegistrationForm
+      responses:
+        '200':
+          description: Customer registration form
+
+  /customer/{action}:
+    post:
+      tags:
+        - Customer Management
+      summary: Process customer action (signin, register)
+      operationId: processCustomerAction
+      parameters:
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [signin, register]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+      responses:
+        '200':
+          description: Action successful
+        '400':
+          description: Validation error
+
+  /cart.do:
+    get:
+      tags:
+        - Shopping Cart
+      summary: Display shopping cart
+      operationId: getCart
+      responses:
+        '200':
+          description: Shopping cart contents
+    post:
+      tags:
+        - Shopping Cart
+      summary: Modify cart (add, remove, update)
+      operationId: modifyCart
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [purchase, remove, update]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: string
+      responses:
+        '200':
+          description: Cart modified successfully
+
+  /enter_order_information.screen:
+    get:
+      tags:
+        - Order Processing
+      summary: Display order checkout form
+      operationId: getCheckoutForm
+      responses:
+        '200':
+          description: Order checkout form with address and payment fields
+    post:
+      tags:
+        - Order Processing
+      summary: Submit order with address and payment information
+      operationId: submitOrder
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                family_name_a:
+                  type: string
+                given_name_a:
+                  type: string
+                address_1_a:
+                  type: string
+                city_a:
+                  type: string
+                state_a:
+                  type: string
+                zipcode_a:
+                  type: string
+                country_a:
+                  type: string
+                cardNumber:
+                  type: string
+                cardType:
+                  type: string
+                expiryMonth:
+                  type: string
+                expiryYear:
+                  type: string
+      responses:
+        '200':
+          description: Order created successfully
+
+  /RcvrRequestProcessor:
+    get:
+      tags:
+        - Supplier Integration
+      summary: Display supplier portal screen
+      operationId: getSupplierScreen
+      parameters:
+        - name: currentScreen
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [displayinventory]
+      responses:
+        '200':
+          description: Supplier inventory display
+    post:
+      tags:
+        - Supplier Integration
+      summary: Process supplier request (inventory update, order processing)
+      operationId: processSupplierRequest
+      parameters:
+        - name: currentScreen
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [updateinventory]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+      responses:
+        '200':
+          description: Request processed successfully
+        '403':
+          description: Unauthorized - administrator role required
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        customerId:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+
+    Address:
+      type: object
+      properties:
+        familyName:
+          type: string
+        givenName:
+          type: string
+        street1:
+          type: string
+        street2:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+        email:
+          type: string
+        telephone:
+          type: string
+
+    CartItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+        productId:
+          type: string
+        productName:
+          type: string
+        category:
+          type: string
+        attribute:
+          type: string
+        quantity:
+          type: integer
+        unitCost:
+          type: number
+        lineTotal:
+          type: number
+
+    PurchaseOrder:
+      type: object
+      properties:
+        orderId:
+          type: string
+        orderDate:
+          type: string
+          format: date-time
+        customerId:
+          type: string
+        customerEmail:
+          type: string
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineItem'
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, confirmed, allocated, shipped, delivered, completed]
+
+    OrderLineItem:
+      type: object
+      properties:
+        lineNumber:
+          type: integer
+        itemId:
+          type: string
+        productId:
+          type: string
+        categoryId:
+          type: string
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+        lineTotal:
+          type: number
+
+    InventoryItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+        quantity:
+          type: integer
+
+    SupplierOrder:
+      type: object
+      properties:
+        poId:
+          type: string
+        poDate:
+          type: string
+          format: date-time
+        poStatus:
+          type: string
+          enum: [pending, processing, completed]
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineItem'
+        shippingInfo:
+          $ref: '#/components/schemas/Address'

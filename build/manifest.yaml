@@ -1,0 +1,238 @@
+schemaVersion: 1
+program:
+  key: sx-0001
+  title: Spec Extraction SX-0001 - J2EE Petstore Capabilities
+  source: extraction
+  generator: vortex-spec-extraction
+  sourceRef: vortex/legacy-spec/sx-0001
+capabilities:
+  - slug: customer-management
+    title: Customer Management and Authentication
+    order: 1
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-customer-management
+      specCapabilities:
+        - customer-management
+    canvas:
+      problem: Users need to authenticate, register, and manage their customer profiles to access the petstore system
+      solution: Implement user sign-on, registration, session management, and customer profile maintenance using Struts actions and EJB session beans
+      userStories:
+        - As a new customer, I want to register with the system so that I can create an account
+        - As an existing customer, I want to sign on to access my account and shopping features
+        - As a customer, I want to manage my profile information including addresses and preferences
+        - As a system administrator, I want to enforce authentication for protected resources
+      acceptanceCriteria:
+        - "User registration captures name, email, and password with form validation"
+        - "Sign-on authenticates users via Struts action with session management"
+        - "Protected resources enforce authentication via web.xml security constraints"
+        - "Customer profile displays and allows updates to personal information"
+        - "Session timeout and logout functions clear user context"
+      outOfScope:
+        - Password reset or recovery flows
+        - Multi-factor authentication
+        - LDAP or external authentication integration
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+      screens:
+        - "Sign-on form: displays login fields for email and password with sign-on button"
+        - "Registration error page: displays error message when registration fails"
+        - "Create customer form: displays fields for customer name, email, password with create button"
+        - "Sign-on form: displays email and password input fields with submit button"
+        - "Error screen: displays error message with link to return to previous page"
+        - "Customer profile page: displays and allows editing of customer information including name, email, contact details"
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: order-approval
+    title: Order Approval and Status Management
+    order: 2
+    dependsOn: [customer-management]
+    priority: 0
+    change:
+      dir: openspec/changes/sx-order-approval
+      specCapabilities:
+        - order-approval
+    canvas:
+      problem: Orders need to be reviewed, approved, and tracked through their lifecycle with status visibility
+      solution: Implement order status management, approval workflows, and batch update capabilities using EJB session beans and stateful processing
+      userStories:
+        - As an administrator, I want to view pending orders for approval
+        - As an administrator, I want to approve or reject orders in batch
+        - As an administrator, I want to see the current status of all orders
+      acceptanceCriteria:
+        - "Order status displays as pending, approved, processing, or completed"
+        - "Administrators can update order status via batch form with validation"
+        - "System warns when uncommitted changes exist on the order form"
+        - "Order approval state transitions are enforced and logged"
+      outOfScope:
+        - Customer-facing order tracking
+        - Partial order fulfillment
+        - Automatic approval rules or workflows
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: order-checkout
+    title: Order Checkout and Payment Processing
+    order: 3
+    dependsOn: [customer-management, shopping-cart]
+    priority: 0
+    change:
+      dir: openspec/changes/sx-order-checkout
+      specCapabilities:
+        - order-checkout
+    canvas:
+      problem: Customers need to complete purchases by providing billing/shipping addresses and credit card information
+      solution: Implement checkout form handling with address collection, credit card validation, and order creation using Struts actions and EJB entities
+      userStories:
+        - As a customer, I want to enter billing and shipping addresses during checkout
+        - As a customer, I want to provide credit card information securely for payment
+        - As a customer, I want to review my order details before final submission
+        - As the system, I want to validate addresses and payment information before order creation
+      acceptanceCriteria:
+        - "Checkout form collects billing and shipping addresses with required field validation"
+        - "Credit card fields accept card number, type, and expiry date"
+        - "Order is created with unique ID and current date upon submission"
+        - "Customer email from billing address is captured with order"
+        - "Empty cart prevents order creation with error message"
+      outOfScope:
+        - Credit card processing or payment authorization
+        - Order confirmation emails
+        - Address standardization or validation against postal databases
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: order-workflow
+    title: Order Processing and Fulfillment Workflow
+    order: 4
+    dependsOn: [order-checkout]
+    priority: 0
+    change:
+      dir: openspec/changes/sx-order-workflow
+      specCapabilities:
+        - order-workflow
+    canvas:
+      problem: Orders must be processed through multiple stages including payment, inventory allocation, and supplier coordination
+      solution: Implement order orchestration, line item management, inventory integration, and supplier PO generation using EJB facades and state machines
+      userStories:
+        - As the order system, I want to create purchase orders with line items and validate cart contents
+        - As the order system, I want to process payments and track order status through completion
+        - As the order system, I want to reserve inventory and coordinate with suppliers for fulfillment
+        - As the order system, I want to send notifications at each order status change
+      acceptanceCriteria:
+        - "Orders are created with validation, unique ID, and order date"
+        - "Line items are created for each cart item with quantities and prices"
+        - "Order status progresses through defined state machine (pending, paid, allocated, shipped, completed)"
+        - "Inventory is reserved and supplier purchase orders are generated"
+        - "Order confirmation notifications are queued for customer communication"
+        - "Transaction atomicity ensures all order components succeed or all fail"
+      outOfScope:
+        - Shipment tracking or carrier integration
+        - Order modification or cancellation after creation
+        - Partial fulfillment or backordering
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: shopping-cart
+    title: Shopping Cart and Item Management
+    order: 5
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-shopping-cart
+      specCapabilities:
+        - shopping-cart
+    canvas:
+      problem: Customers need a persistent shopping cart to browse, add items, and prepare for checkout
+      solution: Implement stateful shopping cart using EJB session beans with item add/remove, quantity updates, and catalog enrichment
+      userStories:
+        - As a customer, I want to add items to a shopping cart during browsing
+        - As a customer, I want to update quantities and remove items before checkout
+        - As a customer, I want to see the cart subtotal and proceed to checkout
+        - As the system, I want to enrich cart items with current catalog details (name, price, category)
+      acceptanceCriteria:
+        - "Items can be added with default quantity 1 or specified quantity"
+        - "Item quantities can be updated; quantities of 0 or less remove the item"
+        - "Cart displays item name, quantity, unit price, and line total"
+        - "Cart subtotal is calculated as sum of all line totals"
+        - "Locale preference is propagated to catalog lookups for product details"
+        - "All cart operations execute within container-managed transactions"
+      outOfScope:
+        - Saved or abandoned cart recovery
+        - Wish lists or product comparisons
+        - Cart persistence across sessions
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+      screens:
+        - "Empty shopping cart screen: displays 'Your Shopping Cart is Empty' message when no items present"
+        - "Shopping cart display: shows table with item name/attribute, remove link, quantity input, unit price, line total; includes subtotal and 'Update Cart' button and 'Check Out' link"
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: supplier-integration
+    title: Supplier Portal and Inventory Management
+    order: 6
+    dependsOn: [order-workflow]
+    priority: 0
+    change:
+      dir: openspec/changes/sx-supplier-integration
+      specCapabilities:
+        - supplier-integration
+    canvas:
+      problem: Suppliers need to manage inventory levels and process purchase orders from the petstore
+      solution: Implement supplier portal with inventory display/update, order processing, and invoice generation using servlet request routing and EJB entities
+      userStories:
+        - As a supplier administrator, I want to view current inventory levels for all items
+        - As a supplier administrator, I want to update inventory quantities and trigger order reprocessing
+        - As the supplier system, I want to receive orders via JMS, check inventory, reduce stock, and generate invoices
+        - As the supplier system, I want to send invoices back to the order processing center for fulfillment tracking
+      acceptanceCriteria:
+        - "Supplier portal displays inventory with itemId and current quantity for authorized users"
+        - "Administrators can update quantities and select items for update via checkbox form"
+        - "Inventory updates trigger automatic reprocessing of all pending orders"
+        - "Supplier purchase orders are created with contact information and delivery addresses"
+        - "Orders progress through fulfillment states (pending, processing, completed)"
+        - "Invoices are generated for fulfilled orders and sent via JMS Topic to order processing center"
+      outOfScope:
+        - Supplier authentication or account management
+        - Shipment tracking or carrier integration
+        - Return or defect management
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+      screens:
+        - "Inventory display screen: shows table with itemId and current quantity for all inventory items; restricted to authenticated administrators"
+        - "Inventory update form: displays table with itemId, existing quantity, input field for new quantity, and checkbox to mark items for update; submit updates quantities and reprocesses pending orders"
+        - "Inventory update page: displays all current inventory items with itemId, existing quantity, new quantity input field, and update checkbox; allows bulk update of quantities and automatic retry of pending orders"
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+artifacts:
+  openapi: api/openapi.yaml
+  erd: architecture/erd.mermaid
+  schema: architecture/schema.sql
+  agents: AGENTS.md

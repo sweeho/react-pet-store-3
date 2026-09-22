@@ -1,0 +1,655 @@
+records:
+  - record_key: CAT-ENTITY-0001
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL provide a Category entity with three attributes: id, name,
+      and description. Categories form the top level of the product hierarchy.
+    confidence: high
+    confidence_basis: >
+      The Category class is fully implemented and used consistently across catalog
+      queries. The entity is declared in the EJB configuration and enforced by
+      the DAO layer.
+    risk_class: operational
+    basis: >
+      Category.java (lines 50-74) defines a serializable entity with three private
+      fields (id, name, description) and getter methods. The category is retrieved
+      from the database via getCategory() in GenericCatalogDAO (lines 159-180) and
+      used in getCategories() pagination (lines 182-210).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Category.java
+        line_start: 49
+        line_end: 74
+        excerpt: |
+          public class Category implements java.io.Serializable {
+              private String id;
+              private String name;
+              private String description;
+
+              public Category(String id, String name, String description) {
+                  this.id = id;
+                  this.name = name;
+                  this.description = description;
+              }
+
+              public String getId() { return id; }
+              public String getName() { return name; }
+              public String getDescription() { return description; }
+    stack_metadata:
+      framework: java.beans (serializable entity)
+      db.object: Category
+
+  - record_key: CAT-ENTITY-0002
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL provide a Product entity with three attributes: id, name,
+      and description. Products belong to a Category and contain multiple Items.
+    confidence: high
+    confidence_basis: >
+      The Product class is fully implemented and is the intermediate level in the
+      three-tier product hierarchy (Category > Product > Item).
+    risk_class: operational
+    basis: >
+      Product.java (lines 45-70) defines a serializable entity with three private
+      fields (id, name, description). Products are retrieved via getProduct() and
+      getProducts() in GenericCatalogDAO (lines 212-264).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Product.java
+        line_start: 45
+        line_end: 70
+        excerpt: |
+          public class Product implements java.io.Serializable {
+              private String id;
+              private String name;
+              private String description;
+
+              public Product(String id, String name, String description) {
+                  this.id = id;
+                  this.name = name;
+                  this.description = description;
+              }
+
+              public String getId() { return id; }
+              public String getName() { return name; }
+              public String getDescription() { return description; }
+    stack_metadata:
+      framework: java.beans (serializable entity)
+      db.object: Product
+
+  - record_key: CAT-ENTITY-0003
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL provide an Item entity with 13 attributes: category, productId,
+      productName, itemId, description, listPrice, unitCost, imageLocation, and five
+      generic attributes (attribute1-5). Items are the leaf level of the product hierarchy.
+    confidence: high
+    confidence_basis: >
+      The Item class is fully implemented with all fields used in the DAO layer
+      result set mapping. Items are retrieved and constructed consistently across
+      all search and browse operations.
+    risk_class: operational
+    basis: >
+      Item.java (lines 47-141) defines 13 fields on the Item entity, including five
+      generic attributes. GenericCatalogDAO constructs Item objects from result sets
+      in getItem() (lines 266-300), getItems() (lines 302-341), and searchItems()
+      (lines 343-398).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Item.java
+        line_start: 47
+        line_end: 141
+        excerpt: |
+          public class Item implements Serializable {
+              private String category;
+              private String productId;
+              private String productName;
+              private String attribute1;
+              private String attribute2;
+              private String attribute3;
+              private String attribute4;
+              private String attribute5;
+              private String itemId;
+              private String description = "none";
+              private double listPrice;
+              private double unitCost;
+              private String imageLocation;
+
+              public Item(String category, String productId, String productName,
+                          String itemId, String imageLocation, String description,
+                          String attribute1, String attribute2, String attribute3,
+                          String attribute4, String attribute5,
+                          double listPrice, double unitCost) { /* ... */ }
+    stack_metadata:
+      framework: java.beans (serializable entity)
+      db.object: Item
+
+  - record_key: CAT-ENTITY-0004
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL provide a Page entity to represent a paginated result set,
+      with attributes: objects (List of results), start (starting index), and hasNext
+      (boolean indicating more results). Page supports both forward and backward navigation.
+    confidence: high
+    confidence_basis: >
+      The Page class is fully implemented with methods to check pagination state
+      and calculate next/previous page offsets. It is used consistently in all DAO
+      methods that return collections.
+    risk_class: operational
+    basis: >
+      Page.java (lines 45-94) defines the pagination container with List objects,
+      int start, and boolean hasNext. Methods isNextPageAvailable() and
+      isPreviousPageAvailable() determine navigation availability. Methods
+      getStartOfNextPage() and getStartOfPreviousPage() calculate offsets.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Page.java
+        line_start: 45
+        line_end: 94
+        excerpt: |
+          public class Page implements Serializable {
+              public static final Page EMPTY_PAGE =
+                  new Page(Collections.EMPTY_LIST, 0, false);
+
+              List objects;
+              int start;
+              boolean hasNext;
+
+              public Page(List l, int s, boolean hasNext) {
+                  objects = new ArrayList(l);
+                  start = s;
+                  this.hasNext = hasNext;
+              }
+
+              public List getList() { return objects; }
+              public boolean isNextPageAvailable() { return hasNext; }
+              public boolean isPreviousPageAvailable() { return start > 0; }
+              public int getStartOfNextPage() { return start + objects.size(); }
+              public int getStartOfPreviousPage() {
+                  return Math.max(start-objects.size(), 0);
+              }
+    stack_metadata:
+      framework: java.beans (serializable entity)
+      db.object: Page (pagination container)
+
+  - record_key: CAT-BEAN-0005
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL provide a Catalog EJB as a stateless session bean that
+      encapsulates all catalog browsing operations. All methods are transactional
+      with trans-attribute=Required.
+    confidence: high
+    confidence_basis: >
+      The EJB configuration declares CatalogEJB as stateless with explicit transaction
+      declarations for all methods. The ejbCreate() method initializes the DAO,
+      confirming proper lifecycle management.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml (lines 48-79) declares CatalogEJB as a stateless session bean with
+      transaction-type=Container. All seven business methods (lines 92-181 in
+      ejb-jar.xml) are declared with trans-attribute=Required. CatalogEJB.java
+      (lines 61-150) implements SessionBean interface with ejbCreate(), destroy(),
+      and all business methods delegating to DAO.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 48
+        line_end: 79
+        excerpt: |
+          <session>
+            <description>This is the Catalog ejb</description>
+            <display-name>CatalogEB</display-name>
+            <ejb-name>CatalogEJB</ejb-name>
+            <local-home>com.sun.j2ee.blueprints.catalog.ejb.CatalogLocalHome</local-home>
+            <local>com.sun.j2ee.blueprints.catalog.ejb.CatalogLocal</local>
+            <ejb-class>com.sun.j2ee.blueprints.catalog.ejb.CatalogEJB</ejb-class>
+            <session-type>Stateless</session-type>
+            <transaction-type>Container</transaction-type>
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 61
+        line_end: 83
+        excerpt: |
+          public class CatalogEJB implements SessionBean {
+              protected CatalogDAO dao;
+
+              public void ejbCreate() {
+                  try {
+                      dao = CatalogDAOFactory.getDAO();
+                  }
+                  catch (CatalogDAOSysException se) {
+                      throw new EJBException(se.getMessage());
+                  }
+              }
+
+              public void destroy() { dao = null; }
+    stack_metadata:
+      ejb.bean: CatalogEJB
+      ejb.type: stateless-session
+      ejb.transaction: Required
+
+  - record_key: CAT-REQUIREMENT-0006
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support multi-locale catalog browsing. All catalog operations
+      accept a Locale parameter that determines the language and formatting of
+      retrieved category, product, and item descriptions.
+    confidence: high
+    confidence_basis: >
+      Every catalog query method in both the EJB interface and DAO layer accepts
+      a Locale parameter. The DAO constructs parameterized SQL queries with locale
+      as the first parameter, confirming locale-specific database queries.
+    risk_class: operational
+    basis: >
+      CatalogLocal interface declares all seven methods with Locale parameter.
+      GenericCatalogDAO (lines 159-398) passes locale.toString() as the first
+      SQL parameter in all six data access methods: getCategory(), getCategories(),
+      getProduct(), getProducts(), getItem(), getItems(), and searchItems().
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogLocal.java
+        line_start: 1
+        line_end: 20
+        excerpt: |
+          public interface CatalogLocal {
+              public Category getCategory(String categoryID, Locale l);
+              public Page getCategories(int start, int count, Locale l);
+              public Product getProduct(String productID, Locale l);
+              public Page getProducts(String categoryID, int start, int count, Locale l);
+              public Item getItem(String itemID, Locale l);
+              public Page getItems(String productID, int start, int count, Locale l);
+              public Page searchItems(String searchQuery, int start, int count, Locale l);
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 159
+        line_end: 180
+        excerpt: |
+          public Category getCategory(String categoryID, Locale locale) throws CatalogDAOSysException {
+              Connection connection = null;
+              ResultSet resultSet = null;
+              PreparedStatement statement = null;
+              try {
+                  connection = getDataSource().getConnection();
+                  String[] parameterValues = new String[] { locale.toString(), categoryID };
+    stack_metadata:
+      ejb.bean: CatalogEJB
+      dao: GenericCatalogDAO
+      i18n.support: Locale-aware queries
+
+  - record_key: CAT-REQUIREMENT-0007
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support pagination for all multi-result operations (getCategories,
+      getProducts, getItems, searchItems) using start index and count parameters.
+      Pagination includes bidirectional navigation: forward via getStartOfNextPage()
+      and backward via getStartOfPreviousPage().
+    confidence: high
+    confidence_basis: >
+      All DAO methods use identical pagination logic with ResultSet.absolute(start+1)
+      positioning and count-based row limiting. The Page object provides both
+      forward and backward navigation methods.
+    risk_class: operational
+    basis: >
+      GenericCatalogDAO implements pagination consistently across all methods
+      (lines 182-210, 236-264, 302-341, 343-398). Each uses ResultSet.absolute()
+      to position to the start index and iterates while count > 0. Page.java
+      provides isPreviousPageAvailable(), isNextPageAvailable(), getStartOfNextPage(),
+      and getStartOfPreviousPage() for bidirectional navigation.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 182
+        line_end: 210
+        excerpt: |
+          public Page getCategories(int start, int count, Locale locale) throws CatalogDAOSysException {
+              Connection connection = null;
+              PreparedStatement statement = null;
+              ResultSet resultSet = null;
+              try {
+                  connection = getDataSource().getConnection();
+                  String[] parameterValues = new String[] { locale.toString() };
+                  statement = buildSQLStatement(connection, sqlStatements, XML_GET_CATEGORIES, parameterValues);
+                  resultSet = statement.executeQuery();
+                  if (start >= 0 && resultSet.absolute(start + 1)) {
+                      boolean hasNext = false;
+                      List categories = new ArrayList();
+                      do {
+                          categories.add(new Category(resultSet.getString(1).trim(),
+                                                      resultSet.getString(2),
+                                                      resultSet.getString(3)));
+                      } while ((hasNext = resultSet.next()) && (--count > 0));
+                      return new Page(categories, start, hasNext);
+                  }
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Page.java
+        line_start: 75
+        line_end: 94
+        excerpt: |
+          public boolean isNextPageAvailable() { return hasNext; }
+          public boolean isPreviousPageAvailable() { return start > 0; }
+          public int getStartOfNextPage() { return start + objects.size(); }
+          public int getStartOfPreviousPage() {
+              return Math.max(start-objects.size(), 0);
+          }
+    stack_metadata:
+      dao: GenericCatalogDAO
+      pagination.strategy: offset-based with ResultSet.absolute()
+
+  - record_key: CAT-REQUIREMENT-0008
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support full-text search on Item fields (description, name, attributes)
+      via searchItems(searchQuery, start, count, locale). Search queries are tokenized on
+      whitespace and each token is matched as a substring against item descriptions, names,
+      and attributes using SQL LIKE patterns with wildcards.
+    confidence: high
+    confidence_basis: >
+      The searchItems() implementation explicitly tokenizes the search query and applies
+      wildcard LIKE matching for each token across three fields. The SQL construction
+      with parameterized queries confirms the search logic.
+    risk_class: operational
+    basis: >
+      GenericCatalogDAO.searchItems() (lines 343-398) tokenizes the searchQuery on
+      whitespace using StringTokenizer (line 346). For each keyword, it creates LIKE
+      patterns with wildcards (lines 362-365): "%" + keyword + "%" applied to three
+      fields. The SQL is parameterized to prevent injection.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 343
+        line_end: 369
+        excerpt: |
+          public Page searchItems(String searchQuery, int start, int count, Locale locale)
+            throws CatalogDAOSysException {
+              Collection keywordSet = new HashSet();
+              StringTokenizer tokenizer = new StringTokenizer(searchQuery);
+              while (tokenizer.hasMoreTokens()) {
+                keywordSet.add(tokenizer.nextToken());
+              }
+              if (keywordSet.isEmpty()) {
+                return Page.EMPTY_PAGE;
+              }
+              String[] keywords = (String[]) keywordSet.toArray(new String[0]);
+              Connection connection = null;
+              PreparedStatement statement = null;
+              ResultSet resultSet = null;
+              try {
+                  connection = getDataSource().getConnection();
+                  String[] parameterValues = new String[1 + (keywords.length * 3)];
+                  parameterValues[0] = locale.toString();
+                  for (int i = 0; i < keywords.length; i++) {
+                    parameterValues[(i * 3) + 1] = "%" + keywords[i] + "%";
+                    parameterValues[(i * 3) + 2] = "%" + keywords[i] + "%";
+                    parameterValues[(i * 3) + 3] = "%" + keywords[i] + "%";
+                  }
+    stack_metadata:
+      dao: GenericCatalogDAO
+      search.type: substring (LIKE %pattern%)
+
+  - record_key: CAT-REQUIREMENT-0009
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL use a DAO Factory pattern (CatalogDAOFactory) to create database-specific
+      DAO implementations. The factory is configured via JNDI environment entries that specify
+      the DAO class name and database type, allowing multiple database backends (e.g., Oracle,
+      Cloudscape) without code changes.
+    confidence: high
+    confidence_basis: >
+      The ejb-jar.xml declares two env-entry configuration parameters: param/CatalogDAOClass
+      and param/CatalogDAODatabase. The CatalogEJB initialization calls
+      CatalogDAOFactory.getDAO() to obtain the configured DAO implementation.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml (lines 57-68) declares two env-entry elements for DAO configuration.
+      CatalogEJB.ejbCreate() (lines 65-73 in CatalogEJB.java) calls
+      CatalogDAOFactory.getDAO() to instantiate the DAO, which reads these configuration
+      entries. GenericCatalogDAO and CloudscapeCatalogDAO are available implementations.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 57
+        line_end: 68
+        excerpt: |
+          <env-entry>
+            <env-entry-name>param/CatalogDAOClass</env-entry-name>
+            <env-entry-type>java.lang.String</env-entry-type>
+            <env-entry-value>«REDACTED:secret-finding-65»</env-entry-value>
+          </env-entry>
+          <env-entry>
+            <env-entry-name>param/CatalogDAODatabase</env-entry-name>
+            <env-entry-type>java.lang.String</env-entry-type>
+            <env-entry-value>«REDACTED:secret-finding-66»</env-entry-value>
+          </env-entry>
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 65
+        line_end: 73
+        excerpt: |
+          public void ejbCreate() {
+              try {
+                  dao = CatalogDAOFactory.getDAO();
+              }
+              catch (CatalogDAOSysException se) {
+                  Debug.println("Exception getting dao " + se);
+                  throw new EJBException(se.getMessage());
+              }
+          }
+    stack_metadata:
+      dao.pattern: Factory
+      dao.interface: CatalogDAO
+      dao.config: JNDI environment entries
+
+  - record_key: CAT-REQUIREMENT-0010
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL enforce container-managed transactions on all Catalog EJB methods.
+      All business methods (getCategory, getCategories, getProduct, getProducts, getItem,
+      getItems, searchItems) SHALL operate within a transaction with attribute=Required,
+      meaning each invocation either commits within an existing transaction or creates
+      a new one.
+    confidence: high
+    confidence_basis: >
+      All seven business methods are explicitly declared in the ejb-jar.xml
+      assembly-descriptor with trans-attribute=Required (lines 92-181).
+      The EJB container enforces this declaratively.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml assembly-descriptor (lines 92-181) contains seven container-transaction
+      entries, one for each business method (getItem, searchItems, getProduct, getProducts,
+      getCategory, getItems, getCategories), all with trans-attribute=Required. This ensures
+      all catalog operations are atomic and consistent.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 92
+        line_end: 181
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>CatalogEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>getItem</method-name>
+              <method-params>
+                <method-param>java.lang.String</method-param>
+                <method-param>java.util.Locale</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+          <container-transaction>
+            <method>
+              <ejb-name>CatalogEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>searchItems</method-name>
+              <method-params>
+                <method-param>java.lang.String</method-param>
+                <method-param>int</method-param>
+                <method-param>int</method-param>
+                <method-param>java.util.Locale</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+    stack_metadata:
+      ejb.bean: CatalogEJB
+      ejb.transaction: Required (all methods)
+
+  - record_key: CAT-REQUIREMENT-0011
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL allow unrestricted access to all Catalog EJB methods.
+      All methods are declared with unchecked permission, allowing any caller
+      to invoke catalog operations without authentication or authorization checks.
+    confidence: high
+    confidence_basis: >
+      The ejb-jar.xml assembly-descriptor explicitly declares unchecked permission
+      for all methods on CatalogEJB, confirmed by the method-name=* wildcard.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml assembly-descriptor (lines 84-90) declares method-permission with
+      unchecked element and method name="*" for CatalogEJB, granting unrestricted
+      access to all catalog browsing methods.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 84
+        line_end: 90
+        excerpt: |
+          <method-permission>
+            <unchecked />
+            <method>
+              <ejb-name>CatalogEJB</ejb-name>
+              <method-name>*</method-name>
+            </method>
+          </method-permission>
+    stack_metadata:
+      ejb.bean: CatalogEJB
+      ejb.security: unchecked (all methods public)
+
+  - record_key: CAT-REQUIREMENT-0012
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support retrieval of individual catalog entities by ID: getCategory(categoryID),
+      getProduct(productID), and getItem(itemID). Each method returns the single matching entity
+      or null if not found. All operations are locale-aware.
+    confidence: high
+    confidence_basis: >
+      All three single-entity retrieval methods are implemented in both the EJB
+      interface and DAO layer with identical logic: connect, query by ID, construct
+      entity from result set (or return null if no match).
+    risk_class: operational
+    basis: >
+      CatalogLocal interface declares getCategory(String, Locale), getProduct(String, Locale),
+      and getItem(String, Locale). GenericCatalogDAO implements each method (lines 159-180,
+      212-234, 266-300) with similar structure: get connection, build parameterized SQL
+      with ID and locale, execute query, construct entity from first result row, return
+      null if no results.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CatalogDAO.java
+        line_start: 59
+        line_end: 72
+        excerpt: |
+          public Category getCategory(String categoryID, Locale l)
+              throws CatalogDAOSysException;
+          public Product getProduct(String productID, Locale l)
+              throws CatalogDAOSysException;
+          public Item getItem(String itemID, Locale l)
+              throws CatalogDAOSysException;
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 266
+        line_end: 300
+        excerpt: |
+          public Item getItem(String itemID, Locale locale) throws CatalogDAOSysException {
+              Connection connection = null;
+              PreparedStatement statement = null;
+              ResultSet resultSet = null;
+              try {
+                  connection = getDataSource().getConnection();
+                  String[] parameterValues = new String[] { locale.toString(), itemID };
+                  statement = buildSQLStatement(connection, sqlStatements, XML_GET_ITEM, parameterValues);
+                  resultSet = statement.executeQuery();
+                  if (resultSet.first()) {
+                      int i = 1;
+                      return new Item(resultSet.getString(i++).trim(), /* ... */);
+                  }
+                  return null;
+    stack_metadata:
+      dao: GenericCatalogDAO
+      operation.type: single-entity retrieval by ID
+
+  - record_key: CAT-REQUIREMENT-0013
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support hierarchical catalog browsing: retrieving all products within
+      a category via getProducts(categoryID, start, count, locale) and all items within a
+      product via getItems(productID, start, count, locale). Both operations return paginated
+      results.
+    confidence: high
+    confidence_basis: >
+      Both methods are declared in the EJB interface and DAO layer with consistent
+      implementation patterns. Hierarchical relationships are enforced through parameterized
+      SQL queries that filter by parent ID.
+    risk_class: operational
+    basis: >
+      CatalogLocal declares getProducts(String categoryID, int start, int count, Locale l)
+      and getItems(String productID, int start, int count, Locale l). GenericCatalogDAO
+      implements both (lines 236-264, 302-341) with similar structure: parameterized SQL
+      filtering by categoryID or productID, pagination, and result set mapping to Product
+      or Item objects.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 236
+        line_end: 264
+        excerpt: |
+          public Page getProducts(String categoryID, int start, int count, Locale locale) throws CatalogDAOSysException {
+              Connection connection = null;
+              PreparedStatement statement = null;
+              ResultSet resultSet = null;
+              try {
+                  connection = getDataSource().getConnection();
+                  String[] parameterValues = new String[] { locale.toString(), categoryID };
+                  statement = buildSQLStatement(connection, sqlStatements, XML_GET_PRODUCTS, parameterValues);
+                  resultSet = statement.executeQuery();
+                  if (start >= 0 && resultSet.absolute(start + 1)) {
+                      boolean hasNext = false;
+                      List products = new ArrayList();
+                      do {
+                          products.add(new Product(resultSet.getString(1).trim(), /* ... */));
+                      } while ((hasNext = resultSet.next()) && (--count > 0));
+                      return new Page(products, start, hasNext);
+    stack_metadata:
+      dao: GenericCatalogDAO
+      hierarchy: Category -> Product -> Item
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Item.java
+    description: >
+      The Item class defines five generic attributes (attribute1-5) without documentation of
+      their semantic meaning or intended use. It is unclear whether these attributes represent
+      product variants, specifications, or configuration flags. The getAttribute(int index)
+      method uses switch-case with default returning attribute1, suggesting no validation
+      of attribute index bounds.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+    description: >
+      The searchItems() method applies wildcard LIKE matching to search keywords but does not
+      document the database-specific LIKE escape behavior or whether case sensitivity is
+      configurable. The implementation tokenizes on whitespace but does not document whether
+      multi-word queries are combined with AND or OR logic in the generated SQL.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+    description: >
+      The DAO factory configuration is stored in ejb-jar.xml environment entries that are
+      REDACTED in the source tree. The exact database implementations supported
+      (CloudscapeCatalogDAO vs. generic) and the DAO class selection logic cannot be fully
+      verified from the available source code.
+
+  - kind: unparseable
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+    description: >
+      The buildSQLStatement() method (called on lines 169, 192, 222, 246, 276, 312, 369) is
+      not defined in the visible source code. It is called with sqlStatements map,
+      SQL fragment name, and parameterized values, suggesting it constructs SQL dynamically
+      from XML configuration. The SQL construction logic and potential for SQL injection
+      cannot be assessed without access to this method or the XML configuration file.

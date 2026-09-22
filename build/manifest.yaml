@@ -83,7 +83,7 @@ capabilities:
 
   - slug: order-checkout
     title: Order Checkout and Payment Processing
-    order: 3
+    order: 4
     dependsOn: [customer-management, shopping-cart]
     priority: 0
     change:
@@ -118,7 +118,7 @@ capabilities:
 
   - slug: order-workflow
     title: Order Processing and Fulfillment Workflow
-    order: 4
+    order: 5
     dependsOn: [order-checkout]
     priority: 0
     change:
@@ -154,7 +154,7 @@ capabilities:
 
   - slug: shopping-cart
     title: Shopping Cart and Item Management
-    order: 5
+    order: 3
     dependsOn: []
     priority: 0
     change:

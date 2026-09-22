@@ -1,0 +1,715 @@
+records:
+  - record_key: WAF-WORKFLOW-0001
+    kind: workflow
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL process HTTP requests through a front controller (MainServlet)
+      that routes requests to URL-mapped actions (HTMLAction implementations) and
+      thereafter to screen templates for rendering.
+    confidence: high
+    confidence_basis: >
+      Declaratively configured via web.xml servlet mapping (*.do pattern) and
+      mappings.xml URL-to-action/screen mappings. Both passes would confirm this
+      as it is the core framework flow, enforced in two places (declarative + code).
+    risk_class: operational
+    basis: >
+      MainServlet receives all *.do requests, uses URLMappingsXmlDAO to load
+      mappings, instantiates URLMapping objects containing action class and screen
+      references. RequestProcessor extracts the action from URLMapping and invokes
+      it, then ScreenFlowManager forwards to the mapped screen.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 95
+        line_end: 98
+        excerpt: |
+          <servlet-mapping>
+            <servlet-name>webTierEntryPoint</servlet-name>
+            <url-pattern>*.do</url-pattern>
+          </servlet-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 108
+        line_end: 132
+        excerpt: |
+          private void doProcess(HttpServletRequest request, HttpServletResponse response)
+                     throws IOException, ServletException {
+              // set the locale of the user to default if not set
+              if (request.getSession().getAttribute(WebKeys.LOCALE) == null) {
+                  request.getSession().setAttribute(WebKeys.LOCALE, defaultLocale);
+              }
+              try {
+                       getRequestProcessor().processRequest(request);
+                       getScreenFlowManager().forwardToNextScreen(request,response);
+              } catch (Throwable ex) {
+                  String className = ex.getClass().getName();
+                  String nextScreen = getScreenFlowManager().getExceptionScreen(ex);
+                  request.setAttribute("javax.servlet.jsp.jspException", ex);
+                  if (nextScreen == null) {
+                      ex.printStackTrace();
+                      throw new ServletException("MainServlet: unknown exception: " + className);
+                  }
+                  context.getRequestDispatcher(nextScreen).forward(request, response);
+            }
+          }
+    stack_metadata:
+      framework: Java EE Servlet API
+      servlet.entry-point: MainServlet
+      servlet.mapping-pattern: "*.do"
+
+  - record_key: WAF-WORKFLOW-0002
+    kind: workflow
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL invoke HTMLAction instances in a lifecycle pattern:
+      doStart() to initialize, perform() to execute business logic and
+      generate events, and doEnd() to finalize with the event response.
+    confidence: high
+    confidence_basis: >
+      Explicitly coded in RequestProcessor.processRequest() method with clear
+      sequence. Method visibility and signature are enforced by interface
+      contract (HTMLActionSupport base class), so both passes will find it.
+    risk_class: operational
+    basis: >
+      RequestProcessor retrieves an HTMLAction from the URLMapping and invokes
+      the lifecycle in sequence: action.doStart(request), then action.perform(request)
+      to generate an Event, then action.doEnd(request, eventResponse).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+        line_start: 117
+        line_end: 145
+        excerpt: |
+          public void processRequest(HttpServletRequest request) throws HTMLActionException, EventException, ServletException {
+              Event ev = null;
+              String fullURL = request.getRequestURI();
+              String selectedURL = null;
+              int lastPathSeparator = fullURL.lastIndexOf("/") + 1;
+              if (lastPathSeparator != -1) {
+                  selectedURL = fullURL.substring(lastPathSeparator, fullURL.length());
+              }
+              URLMapping urlMapping = getURLMapping(selectedURL);
+              HTMLAction action = getAction(urlMapping);
+              if (action != null) {
+                  action.setServletContext(request.getSession().getServletContext());
+                  action.doStart(request);
+                  ev = action.perform(request);
+                  EventResponse eventResponse = null;
+                  if (ev != null) {
+                     EventMapping eventMapping = getEventMapping(ev);
+                     if (eventMapping != null) {
+                             ev.setEJBActionClassName(eventMapping.getEJBActionClassName());
+                     }
+                     ComponentManager sl = (ComponentManager)request.getSession().getAttribute(WebKeys.COMPONENT_MANAGER);
+                     WebController wcc =  sl.getWebController(request.getSession());
+                     eventResponse  = wcc.handleEvent(ev, request.getSession());
+                 }
+                 action.doEnd(request, eventResponse);
+              }
+          }
+    stack_metadata:
+      ejb.transaction: "not applicable at this tier"
+      design-pattern: Template Method
+
+  - record_key: WAF-WORKFLOW-0003
+    kind: workflow
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL resolve Events generated by HTMLActions to their
+      corresponding EJBAction handler classes via a declarative event-to-action
+      mapping, then invoke the EJBAction to process the event in the business tier.
+    confidence: high
+    confidence_basis: >
+      Mapping is declarative (mappings.xml event-mapping elements) and enforced
+      in code (EventMapping class and getEventMapping method). Dual source
+      (declarative + code) confirms high confidence.
+    risk_class: operational
+    basis: >
+      mappings.xml defines event-mapping elements binding event class to EJBAction
+      class. RequestProcessor loads these via URLMappingsXmlDAO and stores in eventMappings
+      HashMap. When an Event is generated, RequestProcessor uses getEventMapping(ev)
+      to look up the EJBActionClassName, sets it on the Event, then passes the Event
+      to WebController.handleEvent().
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/mappings.xml
+        line_start: 43
+        line_end: 46
+        excerpt: |
+          <event-mapping>
+              <event-class>com.sun.j2ee.blueprints.waf.event.events.ChangeLocaleEvent</event-class>
+              <ejb-action-class>com.sun.j2ee.blueprints.waf.controller.ejb.action.actions.ChangeLocaleEJBAction</ejb-action-class>
+          </event-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+        line_start: 132
+        line_end: 142
+        excerpt: |
+          if (ev != null) {
+             // set the ejb action class name on the event
+              EventMapping eventMapping = getEventMapping(ev);
+              if (eventMapping != null) {
+                      ev.setEJBActionClassName(eventMapping.getEJBActionClassName());
+              }
+             ComponentManager sl = (ComponentManager)request.getSession().getAttribute(WebKeys.COMPONENT_MANAGER);
+             WebController wcc =  sl.getWebController(request.getSession());
+             eventResponse  = wcc.handleEvent(ev, request.getSession());
+         }
+    stack_metadata:
+      framework: custom WAF event framework
+      pattern: event-driven architecture
+
+  - record_key: WAF-WORKFLOW-0004
+    kind: workflow
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL process events through a Stateful EJB session bean
+      (EJBController) under container-managed transactions with isolation level
+      REQUIRED, routing each event to its mapped EJBAction handler.
+    confidence: high
+    confidence_basis: >
+      Declared in ejb-jar.xml with transaction attribute and bean type. Both
+      ejb-jar.xml (declarative) and code (EJBControllerLocalEJB.processEvent)
+      confirm this is enforced infrastructure.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml declares EJBController as a Stateful session bean with
+      transaction-type Container and trans-attribute Required on the processEvent
+      method. EJBControllerLocalEJB.processEvent delegates to StateMachine.processEvent.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/ejb-jar.xml
+        line_start: 50
+        line_end: 73
+        excerpt: |
+          <session>
+            <display-name>EJBController</display-name>
+            <ejb-name>EJBController</ejb-name>
+            <local-home>com.sun.j2ee.blueprints.waf.controller.ejb.EJBControllerLocalHome</local-home>
+            <local>com.sun.j2ee.blueprints.waf.controller.ejb.EJBControllerLocal</local>
+            <ejb-class>com.sun.j2ee.blueprints.waf.controller.ejb.EJBControllerLocalEJB</ejb-class>
+            <session-type>Stateful</session-type>
+            <transaction-type>Container</transaction-type>
+          </session>
+          ...
+          <container-transaction>
+            <method>
+              <ejb-name>EJBController</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>processEvent</method-name>
+              <method-params>
+                <method-param>com.sun.j2ee.blueprints.waf.event.Event</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/ejb/EJBControllerLocalEJB.java
+        line_start: 61
+        line_end: 70
+        excerpt: |
+          public void ejbCreate() {
+              sm = new StateMachine(this, sc);
+          }
+
+          /** returns an EventResponse */
+
+          public EventResponse processEvent(Event ev)
+              throws EventException {
+                return (sm.processEvent(ev));
+          }
+    stack_metadata:
+      ejb.bean: EJBController
+      ejb.bean-type: Stateful Session Bean
+      ejb.transaction: Required
+      ejb.invocation: Local
+
+  - record_key: WAF-WORKFLOW-0005
+    kind: workflow
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL forward HTTP requests to screen templates (JSP pages)
+      after action processing, using either static URL-to-screen mappings or
+      dynamic FlowHandler-computed screen selections.
+    confidence: high
+    confidence_basis: >
+      Screen forwarding is declared in mappings.xml (url-mapping screen attribute)
+      and enforced in code (ScreenFlowManager.forwardToNextScreen). Dual evidence
+      from config + implementation.
+    risk_class: operational
+    basis: >
+      ScreenFlowManager.forwardToNextScreen() retrieves the URLMapping for the
+      request URL. If the mapping does not use a FlowHandler, it returns the
+      static screen name. If it does use a FlowHandler, it instantiates and invokes
+      the handler's doStart(), processFlow(), doEnd() methods to compute the screen.
+      Then it forwards to the resolved screen via RequestDispatcher.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/mappings.xml
+        line_start: 48
+        line_end: 55
+        excerpt: |
+          <url-mapping url="changelocale.do" screen="locale_change_success.screen" >
+              <web-action-class>com.sun.j2ee.blueprints.waf.controller.web.action.actions.ChangeLocaleHTMLAction</web-action-class>
+         </url-mapping>
+
+          <url-mapping url="changeclientchachelinklocale.do"  useFlowHandler="true" >
+              <web-action-class>com.sun.j2ee.blueprints.waf.controller.web.action.actions.ChangeLocaleHTMLAction</web-action-class>
+               <flow-handler class="com.sun.j2ee.blueprints.waf.controller.web.flow.handlers.ClientStateFlowHandler"/>
+         </url-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/flow/ScreenFlowManager.java
+        line_start: 119
+        line_end: 158
+        excerpt: |
+          public void forwardToNextScreen(HttpServletRequest request, HttpServletResponse response)
+                    throws java.io.IOException, FlowHandlerException, javax.servlet.ServletException {
+              String fullURL = request.getRequestURI();
+              String selectedURL = defaultScreen;
+              int lastPathSeparator = fullURL.lastIndexOf("/") + 1;
+              if (lastPathSeparator != -1) {
+                  selectedURL = fullURL.substring(lastPathSeparator, fullURL.length());
+              }
+              String currentScreen = "";
+              URLMapping urlMapping = getURLMapping(selectedURL);
+              if (urlMapping != null) {
+                  if (!urlMapping.useFlowHandler()) {
+                      currentScreen = urlMapping.getScreen();
+                  } else {
+                      FlowHandler handler = null;
+                      String flowHandlerString = urlMapping.getFlowHandler();
+                      try {
+                          handler = (FlowHandler)getClass().getClassLoader().loadClass(flowHandlerString).newInstance();
+                          handler.doStart(request);
+                          String flowResult = handler.processFlow(request);
+                          handler.doEnd(request);
+                          currentScreen = urlMapping.getResultScreen(flowResult);
+                          if (currentScreen == null) currentScreen = flowResult;
+                     } catch (Exception ex) {
+                         System.err.println("ScreenFlowManager caught loading handler: " + ex);
+                     }
+                  }
+              }
+              if (currentScreen == null) {
+                  System.err.println("ScreenFlowManager: Screen not found for " + selectedURL);
+                  throw new RuntimeException("Screen not found for " + selectedURL);
+              }
+              context.getRequestDispatcher("/" + currentScreen).forward(request, response);
+          }
+    stack_metadata:
+      servlet.dispatcher: RequestDispatcher
+      pattern: Front Controller + Screen Template
+
+  - record_key: WAF-WORKFLOW-0006
+    kind: workflow
+    capability_key: customer-communications
+    requirement: >
+      The system SHALL map exceptions thrown during request processing to
+      designated error screens and forward the request to those screens,
+      preserving the exception in the request attributes.
+    confidence: medium
+    confidence_basis: >
+      Exception mapping is declared in mappings.xml (exception-mapping elements)
+      and the forwarding is coded in MainServlet.doProcess(). The mapping config
+      itself (exception-mapping) has only one source in the provided files, so
+      confidence is medium rather than high.
+    risk_class: operational
+    basis: >
+      mappings.xml declares exception-mapping elements binding exception class names
+      to screen names. MainServlet catches all Throwables during processing, looks up
+      the exception screen name via ScreenFlowManager.getExceptionScreen(Throwable),
+      stores the exception in request.setAttribute("javax.servlet.jsp.jspException", ex),
+      then forwards to the mapped error screen.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/mappings.xml
+        line_start: 57
+        line_end: 57
+        excerpt: |
+          <exception-mapping exception-class="com.sun.j2ee.blueprints.petstore.controller.exceptions.GeneralFailureException" screen="error.screen"/>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 114
+        line_end: 128
+        excerpt: |
+          try {
+                   getRequestProcessor().processRequest(request);
+                   getScreenFlowManager().forwardToNextScreen(request,response);
+          } catch (Throwable ex) {
+              String className = ex.getClass().getName();
+              String nextScreen = getScreenFlowManager().getExceptionScreen(ex);
+              request.setAttribute("javax.servlet.jsp.jspException", ex);
+              if (nextScreen == null) {
+                  ex.printStackTrace();
+                  throw new ServletException("MainServlet: unknown exception: " + className);
+              }
+              context.getRequestDispatcher(nextScreen).forward(request, response);
+        }
+    stack_metadata:
+      error-handling: exception-to-screen mapping
+
+  - record_key: WAF-REQUIREMENT-0001
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL initialize every user session with a default locale
+      (en_US) if no locale is already set in the session.
+    confidence: high
+    confidence_basis: >
+      Declared in web.xml init-param (default_locale=en_US) and enforced in code
+      (MainServlet.doProcess() checks WebKeys.LOCALE, sets it if null). Dual evidence.
+    risk_class: presentational
+    basis: >
+      MainServlet init() reads the default_locale parameter from web.xml (value en_US)
+      and sets it as defaultLocale field. On each request, doProcess() checks if
+      request.getSession().getAttribute(WebKeys.LOCALE) is null; if so, it sets
+      it to defaultLocale.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 57
+        line_end: 60
+        excerpt: |
+          <init-param>
+            <param-name>default_locale</param-name>
+            <param-value>en_US</param-value>
+          </init-param>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 79
+        line_end: 82
+        excerpt: |
+          public void init(ServletConfig config) throws ServletException {
+              String defaultLocaleString = config.getInitParameter("default_locale");
+              defaultLocale = I18nUtil.getLocaleFromString(defaultLocaleString);
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 110
+        line_end: 113
+        excerpt: |
+          if (request.getSession().getAttribute(WebKeys.LOCALE) == null) {
+              request.getSession().setAttribute(WebKeys.LOCALE, defaultLocale);
+          }
+    stack_metadata:
+      session.scope: per-session
+      i18n.default-locale: en_US
+
+  - record_key: WAF-REQUIREMENT-0002
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL expire HTTP sessions after 30 minutes of inactivity.
+    confidence: high
+    confidence_basis: >
+      Session timeout is declared in web.xml session-config element. This is
+      a declarative J2EE standard and is enforced at the container level;
+      both passes will find it.
+    risk_class: operational
+    basis: >
+      web.xml declares session-config/session-timeout value of 30 minutes.
+      This is a J2EE servlet container setting that applies globally to all
+      sessions for the application.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 100
+        line_end: 102
+        excerpt: |
+          <session-config>
+            <session-timeout>30</session-timeout>
+          </session-config>
+    stack_metadata:
+      servlet.session: HttpSession
+      timeout-minutes: 30
+
+  - record_key: WAF-REQUIREMENT-0003
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide JSP custom tag libraries to support form generation,
+      including form tag, input tag, checkbox tag, select tag, and hidden state
+      encoding tags for client-side state persistence.
+    confidence: high
+    confidence_basis: >
+      JSP tag library descriptor (waftags.tld) declaratively defines all tags.
+      Corresponding Java tag class implementations exist (FormTag, InputTag, etc.).
+      Both declarative (TLD) and programmatic (tag classes) confirm this.
+    risk_class: presentational
+    basis: >
+      waftags.tld defines tag library with tags for form, input, checkbox, select,
+      option, checked, name, value, client_cache_link, param, and cache. Each tag
+      has a tagclass attribute pointing to the implementation class in
+      com.sun.j2ee.blueprints.taglibs.smart.* package.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/waftags.tld
+        line_start: 8
+        line_end: 18
+        excerpt: |
+          <taglib>
+            <tlibversion>1.0</tlibversion>
+            <jspversion>1.1</jspversion>
+            <shortname>WafTags</shortname>
+            <uri></uri>
+            <info>
+              BluePrints Web Application Framework Tags
+            </info>
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/waftags.tld
+        line_start: 139
+        line_end: 165
+        excerpt: |
+          <tag>
+            <name>form</name>
+            <tagclass>com.sun.j2ee.blueprints.waf.view.taglibs.smart.FormTag</tagclass>
+            <bodycontent>JSP</bodycontent>
+            <info>
+              Provides a form that can have input validated upon submission
+            </info>
+            <attribute>
+              <name>name</name>
+              <required>true</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+            <attribute>
+              <name>action</name>
+              <required>true</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+            <attribute>
+              <name>method</name>
+              <required>true</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+          </tag>
+    stack_metadata:
+      jsp.taglib: waftags
+      tag-library-version: 1.0
+      jsp-version: 1.1
+
+  - record_key: WAF-REQUIREMENT-0004
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide a client-state caching tag (client_cache_link) that
+      encodes request parameters and request attributes as Base64-serialized hidden
+      form variables to preserve state across navigation.
+    confidence: high
+    confidence_basis: >
+      Tag is declared in waftags.tld with detailed documentation. Implementation
+      class ClientStateTag exists. Dual evidence of declaration + implementation.
+    risk_class: presentational
+    basis: >
+      waftags.tld defines tag client_cache_link with tagclass
+      com.sun.j2ee.blueprints.waf.view.taglibs.smart.ClientStateTag. The tag
+      documentation states: "This tag caches state in the page and provides a
+      button or image link within a form with the current page parameters and
+      the page request attributes by encoding them as hidden form variables that
+      are serialized using Base 64 Encoded Strings."
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/waftags.tld
+        line_start: 20
+        line_end: 81
+        excerpt: |
+          <!-- client  cache link tag -->
+          <tag>
+            <name>client_cache_link</name>
+            <tagclass>com.sun.j2ee.blueprints.waf.view.taglibs.smart.ClientStateTag</tagclass>
+            <bodycontent>JSP</bodycontent>
+            <info>
+             This tag caches state in the page and provides a button or
+             image link within a form with the current page parameters
+             and the page request attributes by encoding them as hidden
+             form variables that are serialized using Base 64 Encoded Strings.
+
+             This tag when used along with a front controller such as the
+             one provided in the WAF can utilize a flow handler to forward
+             a request page to a page with the same attributes it recieved
+             when the original request was made.
+            </info>
+    stack_metadata:
+      state-encoding: Base64
+      mechanism: hidden form variables
+
+  - record_key: WAF-REQUIREMENT-0005
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide a cache tag to enable content refresh only after
+      a specified duration has elapsed, with scope (session/application) and
+      duration attributes.
+    confidence: medium
+    confidence_basis: >
+      Tag is declared in waftags.tld. Implementation class CacheTag exists but
+      was not fully examined. Declarative evidence is clear; implementation details
+      are not visible, so confidence is medium.
+    risk_class: operational
+    basis: >
+      waftags.tld defines tag cache with tagclass CacheTag and attributes scope,
+      duration, and name. Documentation states: "Enables content to be refresh
+      only after a specific amount of time."
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/waftags.tld
+        line_start: 107
+        line_end: 134
+        excerpt: |
+          <!-- cache tag -->
+          <tag>
+            <name>cache</name>
+            <tagclass>com.sun.j2ee.blueprints.waf.view.taglibs.smart.CacheTag</tagclass>
+            <bodycontent>JSP</bodycontent>
+            <info>
+              Enables content to be refresh only after a specific amount of time.
+            </info>
+            <attribute>
+              <name>scope</name>
+              <required>true</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+            <attribute>
+              <name>duration</name>
+              <required>false</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+            <attribute>
+              <name>name</name>
+              <required>true</required>
+              <rtexprvalue>true</rtexprvalue>
+            </attribute>
+          </tag>
+    stack_metadata:
+      caching-mechanism: tag-based
+      scopes: session, application
+
+  - record_key: WAF-ENTITY-0001
+    kind: entity
+    capability_key: admin-dashboard
+    requirement: >
+      Event objects SHALL contain an EJBActionClassName property that is set
+      by the RequestProcessor based on the event-mapping configuration, and SHALL
+      be used by the EJB tier to route events to the appropriate handler.
+    confidence: high
+    confidence_basis: >
+      Event class is explicitly constructed and used in RequestProcessor.processRequest().
+      The EJBActionClassName property is set and read from mappings. Code shows this
+      clearly as a two-pass operation: find mapping, set class name, pass to controller.
+    risk_class: operational
+    basis: >
+      RequestProcessor retrieves the EventMapping for the generated Event using
+      getEventMapping(ev), then calls ev.setEJBActionClassName(eventMapping.getEJBActionClassName())
+      before passing it to the WebController. The Event class carries this property
+      to the EJB tier for routing.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+        line_start: 103
+        line_end: 111
+        excerpt: |
+          private EventMapping getEventMapping(Event eventClass) {
+              // get the fully qualified name of the event class
+              String eventClassName = eventClass.getClass().getName();
+              if ((eventMappings != null) && eventMappings.containsKey(eventClassName)) {
+                  return (EventMapping)eventMappings.get(eventClassName);
+              } else {
+                  return null;
+              }
+          }
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+        line_start: 132
+        line_end: 138
+        excerpt: |
+          if (ev != null) {
+             // set the ejb action class name on the event
+              EventMapping eventMapping = getEventMapping(ev);
+              if (eventMapping != null) {
+                      ev.setEJBActionClassName(eventMapping.getEJBActionClassName());
+              }
+    stack_metadata:
+      domain-object: Event
+      properties: ["EJBActionClassName"]
+
+  - record_key: WAF-SCREEN-0001
+    kind: screen
+    capability_key: admin-dashboard
+    requirement: >
+      The TemplateServlet SHALL render screen definitions referenced by URL mappings,
+      accepting a *.screen extension, and MAY optionally cache previous screen
+      attributes and parameters if configured.
+    confidence: high
+    confidence_basis: >
+      TemplateServlet is declared in web.xml with servlet-mapping for *.screen.
+      Init parameters control caching behavior (cache_previous_screen_attributes,
+      cache_previous_screen_parameters). Both config + code confirm this.
+    risk_class: presentational
+    basis: >
+      web.xml declares TemplateServlet with servlet-name TemplateServlet and
+      servlet-mapping to *.screen pattern. TemplateServlet init() reads
+      cache_previous_screen_attributes and cache_previous_screen_parameters
+      init parameters to conditionally enable state caching.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 63
+        line_end: 93
+        excerpt: |
+          <!-- Template Servlet Configuration -->
+          <servlet>
+            <servlet-name>TemplateServlet</servlet-name>
+            <display-name>TemplateServlet</display-name>
+            <servlet-class>com.sun.j2ee.blueprints.waf.view.template.TemplateServlet</servlet-class>
+            <init-param>
+              <param-name>locales</param-name>
+              <param-value>en_US</param-value>
+            </init-param>
+            <init-param>
+              <param-name>default_locale</param-name>
+              <param-value>en_US</param-value>
+            </init-param>
+            <init-param>
+              <param-name>cache_previous_screen_attributes</param-name>
+              <param-value>false</param-value>
+            </init-param>
+            <init-param>
+              <param-name>cache_previous_screen_parameters</param-name>
+              <param-value>false</param-value>
+            </init-param>
+            <load-on-startup>2</load-on-startup>
+          </servlet>
+          <!-- Template Servlet Mapping -->
+          <servlet-mapping>
+            <servlet-name>TemplateServlet</servlet-name>
+            <url-pattern>*.screen</url-pattern>
+          </servlet-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/view/template/com/sun/j2ee/blueprints/waf/view/template/TemplateServlet.java
+        line_start: 81
+        line_end: 99
+        excerpt: |
+          public void init(ServletConfig config) throws ServletException {
+              super.init(config);
+              this.config = config;
+              this.context = config.getServletContext();
+              // enable the caching of previous screen attributes
+              String cachePreviousScreenAttributesString = config.getInitParameter("cache_previous_screen_attributes");
+              if (cachePreviousScreenAttributesString != null) {
+                  if (cachePreviousScreenAttributesString.toLowerCase().equals("true")) {
+                      System.out.println("TemplateServlet: Enabled caching of previous screen attributes.");
+                      cachePreviousScreenAttributes = true;
+                  }
+              }
+              // enable the caching of previous screen parameters
+              String cachePreviousScreenParametersString = config.getInitParameter("cache_previous_screen_parameters");
+              if (cachePreviousScreenParametersString != null) {
+                  if (cachePreviousScreenParametersString.toLowerCase().equals("true")) {
+                      System.out.println("TemplateServlet: Enabled caching of previous screen parameters.");
+                      cachePreviousScreenParameters = true;
+                  }
+              }
+    stack_metadata:
+      servlet.screen-extension: "*.screen"
+      screen-caching-attributes: "false"
+      screen-caching-parameters: "false"
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+    description: >
+      The getAction() method catches Exception during class.forName() and newInstance()
+      but only prints to stderr and returns null. The caller (processRequest) does not
+      check if action is null before calling action.doStart() or invoke lifecycle methods.
+      If the action class cannot be loaded or instantiated, the request is silently
+      skipped with no event generated and no error screen shown. It is unclear whether
+      this is intentional (designed to skip missing actions) or a defect (should throw
+      or forward to error screen). This silent path could mask configuration errors
+      (incorrect action class name in mappings.xml).
+    confidence: medium
+
+  - kind: unparseable
+    path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+    description: >
+      Lines 112 and 120 contain placeholder text «REDACTED:secret-finding-73» and
+      «REDACTED:secret-finding-74» instead of the actual class names for
+      param/ComponentManager and param/WebController env-entry-value elements.
+      The correct class names cannot be determined from the provided source;
+      the implementation classes are referenced but their actual values are redacted.
+      Future requirements depending on these classes will need the actual class names.

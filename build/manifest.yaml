@@ -335,7 +335,7 @@ capabilities:
         - As the system, I want to serialize credit card data to XML for integration scenarios
         - As the system, I want to enforce transactional integrity on all card operations
       acceptanceCriteria:
-        - Credit card entity supports three card types: Java Card, Duke Express, Meow Card
+        - "Credit card entity supports three card types: Java Card, Duke Express, Meow Card"
         - Expiry date parsed from MM/YYYY format with component extraction and validation
         - Card number stored as string field (up to 30 characters based on form constraints)
         - Container-managed persistence via CMP 2.x with Required transaction semantics

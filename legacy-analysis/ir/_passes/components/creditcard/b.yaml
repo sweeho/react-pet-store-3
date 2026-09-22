@@ -1,0 +1,443 @@
+records:
+  - record_key: creditcard-validation-entity-0001
+    kind: entity
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL maintain a CreditCard entity with three persistent fields:
+      card number, card type, and expiry date in MM/YYYY format.
+    confidence: high
+    confidence_basis: >
+      Both passes confirm CreditCard entity exists with three CMP (Container-Managed
+      Persistence) fields declared in ejb-jar.xml and implemented as abstract getter/setter
+      methods in CreditCardEJB. The entity is deployed as an EJB 2.0 local entity bean with
+      container-managed persistence 2.x.
+    risk_class: financial
+    basis: >
+      CreditCardEJB defines abstract methods for cardNumber, cardType, and expiryDate.
+      ejb-jar.xml declares these as CMP fields in <cmp-field> elements. Local interface
+      CreditCardLocal exposes all three fields as getters and setters.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCardEJB.java
+        line_start: 50
+        line_end: 57
+        excerpt: |
+          public abstract String getCardNumber();
+          public abstract void setCardNumber(String cardNumber);
+
+          public abstract String getCardType();
+          public abstract void setCardType(String cardType);
+
+          public abstract String getExpiryDate();
+          public abstract void setExpiryDate(String expiryDate);
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/ejb-jar.xml
+        line_start: 52
+        line_end: 68
+        excerpt: |
+          <persistence-type>Container</persistence-type>
+          <prim-key-class>java.lang.Object</prim-key-class>
+          <reentrant>False</reentrant>
+          <cmp-version>2.x</cmp-version>
+          <abstract-schema-name>CreditCard</abstract-schema-name>
+          <cmp-field>
+            <field-name>expiryDate</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>cardType</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>cardNumber</field-name>
+          </cmp-field>
+
+  - record_key: creditcard-validation-req-0001
+    kind: requirement
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL accept credit card information during order checkout consisting
+      of card number, card type, and expiry date.
+    confidence: high
+    confidence_basis: >
+      OrderEvent class explicitly carries creditCard object. OrderEJBAction receives
+      credit card from event and stores it in PurchaseOrder. CustomerHTMLAction
+      extracts credit card fields from request parameters and creates CreditCard object.
+    risk_class: financial
+    basis: >
+      OrderEvent constructor takes CreditCard parameter. OrderEJBAction.perform() calls
+      purchaseOrder.setCreditCard(creditCard). CustomerHTMLAction.extractCreditCard()
+      extracts credit_card_number, credit_card_type, credit_card_expiry_month, and
+      credit_card_expiry_year from request parameters.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/events/OrderEvent.java
+        line_start: 57
+        line_end: 63
+        excerpt: |
+          public OrderEvent(ContactInfo billTo,
+                            ContactInfo shipTo,
+                            CreditCard creditCard) {
+            this.billTo = billTo;
+            this.shipTo = shipTo;
+            this.creditCard = creditCard;
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/OrderEJBAction.java
+        line_start: 94
+        line_end: 96
+        excerpt: |
+          ContactInfo billTo = oe.getBillTo();
+          ContactInfo shipTo = oe.getShipTo();
+          CreditCard creditCard = oe.getCreditCard();
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/web/actions/CustomerHTMLAction.java
+        line_start: 140
+        line_end: 178
+        excerpt: |
+          private CreditCard extractCreditCard(HttpServletRequest request)
+              throws HTMLActionException {
+              ArrayList missingFields = null;
+              String creditCardNumber = request.getParameter("credit_card_number").trim();
+              String creditCardType = request.getParameter("credit_card_type").trim();
+              String creditCardExpiryMonth = request.getParameter("credit_card_expiry_month").trim();
+              String creditCardExpiryYear = request.getParameter("credit_card_expiry_year").trim();
+              String expiryDate = creditCardExpiryMonth + "/" + creditCardExpiryYear;
+              return new CreditCard(creditCardNumber,
+                                                creditCardType,
+                                                expiryDate);
+
+  - record_key: creditcard-validation-req-0002
+    kind: requirement
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL parse the expiry date from combined month and year components
+      into MM/YYYY format.
+    confidence: high
+    confidence_basis: >
+      CustomerHTMLAction concatenates expiry month and year with "/" separator.
+      CreditCardEJB provides getExpiryMonth() and getExpiryYear() methods that parse
+      the stored expiryDate string by finding the "/" delimiter.
+    risk_class: financial
+    basis: >
+      CustomerHTMLAction line 175 constructs expiryDate = creditCardExpiryMonth + "/" + creditCardExpiryYear.
+      CreditCardEJB.getExpiryMonth() finds "/" index and returns substring before it.
+      CreditCardEJB.getExpiryYear() finds "/" index and returns substring after it.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/web/actions/CustomerHTMLAction.java
+        line_start: 159
+        line_end: 178
+        excerpt: |
+          String creditCardExpiryMonth =  request.getParameter("credit_card_expiry_month").trim();
+          String creditCardExpiryYear =  request.getParameter("credit_card_expiry_year").trim();
+          String expiryDate = creditCardExpiryMonth + "/" + creditCardExpiryYear;
+          return new CreditCard(creditCardNumber,
+                                                creditCardType,
+                                                expiryDate);
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCardEJB.java
+        line_start: 88
+        line_end: 107
+        excerpt: |
+          public String getExpiryMonth() {
+            String dateString = getExpiryDate();
+            if (dateString != null) {
+              int slashStart = dateString.indexOf("/");
+              if (slashStart != -1) return dateString.substring(0,slashStart);
+            }
+            return "01";
+          }
+
+          public String getExpiryYear() {
+            String dateString = getExpiryDate();
+            if (dateString != null) {
+              int slashStart = dateString.indexOf("/");
+              if (slashStart != -1) return dateString.substring(slashStart +1, dateString.length());
+            }
+            return "2010";
+          }
+
+  - record_key: creditcard-validation-req-0003
+    kind: requirement
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL provide a data transfer object for CreditCard that supports
+      XML serialization and deserialization.
+    confidence: high
+    confidence_basis: >
+      CreditCard class implements toDOM() and fromDOM() methods using XMLDocumentUtils.
+      PurchaseOrder invokes creditCard.toDOM(document) to serialize and CreditCard.fromDOM()
+      to deserialize. Both methods reference constants for XML element names.
+    risk_class: operational
+    basis: >
+      CreditCard class defines XML_CREDITCARD, XML_CARD_NUMBER, XML_CARD_TYPE, and
+      XML_EXPIRYDATE constants. toDOM() method creates XML elements for each field.
+      fromDOM() static method reconstructs CreditCard from DOM node. PurchaseOrder.toXML()
+      calls creditCard.toDOM(document) and fromDOM() calls CreditCard.fromDOM(child).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCard.java
+        line_start: 54
+        line_end: 62
+        excerpt: |
+          public static final String DTD_PUBLIC_ID = "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD CreditCard 1.1//EN";
+          public static final String DTD_SYSTEM_ID = "/com/sun/j2ee/blueprints/creditcard/rsrc/schemas/CreditCard.dtd";
+          public static final String XML_CREDITCARD = "CreditCard";
+          public static final String XML_CARD_NUMBER = "CardNumber";
+          public static final String XML_EXPIRYDATE = "ExpiryDate";
+          public static final String XML_CARD_TYPE = "CardType";
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCard.java
+        line_start: 108
+        line_end: 130
+        excerpt: |
+          public Node toDOM(Document document) {
+            Element root = document.createElement(XML_CREDITCARD);
+            XMLDocumentUtils.appendChild(document, root, XML_CARD_NUMBER, cardNumber);
+            XMLDocumentUtils.appendChild(document, root, XML_CARD_TYPE, cardType);
+            XMLDocumentUtils.appendChild(document, root, XML_EXPIRYDATE, expiryDate);
+            return root;
+          }
+
+          public static CreditCard fromDOM(Node node) throws XMLDocumentException {
+            Element element;
+            if (node.getNodeType() == Node.ELEMENT_NODE && (element = ((Element) node)).getTagName().equals(XML_CREDITCARD)) {
+              Element child;
+              CreditCard creditCard = new CreditCard();
+              child = XMLDocumentUtils.getFirstChild(element, XML_CARD_NUMBER, false);
+              creditCard.cardNumber = XMLDocumentUtils.getContentAsString(child, false);
+
+  - record_key: creditcard-validation-business-rule-0001
+    kind: business-rule
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL require credit card number, type, and expiry date as mandatory fields
+      with no null values allowed.
+    confidence: medium
+    confidence_basis: >
+      CMP fields are defined without optional indicators, suggesting required status.
+      CustomerHTMLAction performs presence validation on all three fields before constructing
+      CreditCard, adding missing fields to a missingFields list. However, validation logic
+      contains a bug (checking creditCardNumber instead of type and expiry fields).
+    risk_class: operational
+    basis: >
+      CustomerHTMLAction checks if creditCardNumber, creditCardType, and creditCardExpiryMonth/Year
+      are empty strings and adds them to missingFields collection. CreditCardEJB abstract
+      methods do not declare null handling, and entity is defined with no optional modifiers.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/web/actions/CustomerHTMLAction.java
+        line_start: 140
+        line_end: 174
+        excerpt: |
+          private CreditCard extractCreditCard(HttpServletRequest request)
+              throws HTMLActionException {
+              ArrayList missingFields = null;
+              String creditCardNumber =  request.getParameter("credit_card_number").trim();
+              if (creditCardNumber.equals("")) {
+                  missingFields.add("Credit Card");
+              }
+              String creditCardType =  request.getParameter("credit_card_type").trim();
+              if (creditCardNumber.equals("")) {
+                  missingFields.add("Credit Card Type");
+              }
+              String creditCardExpiryMonth =  request.getParameter("credit_card_expiry_month").trim();
+              if (creditCardNumber.equals("")) {
+                  missingFields.add("Credit Card Expiry Month");
+              }
+              String creditCardExpiryYear =  request.getParameter("credit_card_expiry_year").trim();
+              if (creditCardNumber.equals("")) {
+                  missingFields.add("Credit Card Expiry Month");
+
+  - record_key: creditcard-validation-business-rule-0002
+    kind: business-rule
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL require ACID transaction support for all credit card entity operations,
+      with transaction attribute set to Required at both LocalHome and Local interface levels.
+    confidence: high
+    confidence_basis: >
+      ejb-jar.xml declaratively specifies container-transaction elements for all methods
+      with trans-attribute=Required. This appears consistently for all get/set operations,
+      create operations, and remove operations.
+    risk_class: financial
+    basis: >
+      ejb-jar.xml assembly-descriptor section defines container-transaction declarations
+      with trans-attribute="Required" for each method on LocalHome and Local interfaces.
+      All CRUD operations (create, get, set, remove) carry this attribute.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/ejb-jar.xml
+        line_start: 83
+        line_end: 102
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>CreditCardEJB</ejb-name>
+              <method-intf>LocalHome</method-intf>
+              <method-name>remove</method-name>
+              <method-params>
+                <method-param>java.lang.Object</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+          <container-transaction>
+            <method>
+              <ejb-name>CreditCardEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>getExpiryDate</method-name>
+              <method-params />
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+
+  - record_key: creditcard-validation-business-rule-0003
+    kind: business-rule
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL allow unrestricted access to all CreditCard entity methods,
+      with no role-based authorization enforced.
+    confidence: high
+    confidence_basis: >
+      ejb-jar.xml declares method-permission with unchecked element for all methods on
+      the CreditCardEJB entity, meaning no authentication is required.
+    risk_class: financial
+    basis: >
+      assembly-descriptor contains a method-permission element with an unchecked tag,
+      applying to all methods (method-name=*) on CreditCardEJB entity.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/ejb-jar.xml
+        line_start: 75
+        line_end: 82
+        excerpt: |
+          <assembly-descriptor>
+            <method-permission>
+              <unchecked />
+              <method>
+                <ejb-name>CreditCardEJB</ejb-name>
+                <method-name>*</method-name>
+              </method>
+            </method-permission>
+
+  - record_key: creditcard-validation-req-0004
+    kind: requirement
+    capability_key: creditcard-validation
+    requirement: >
+      The system SHALL provide default values for expiry month and year when the
+      expiry date string does not contain a "/" delimiter or is null.
+    confidence: medium
+    confidence_basis: >
+      CreditCardEJB.getExpiryMonth() returns "01" as default and getExpiryYear()
+      returns "2010" as default when parsing fails. These are hardcoded literals
+      with no configuration or test evidence of their intended use.
+    risk_class: financial
+    basis: >
+      CreditCardEJB lines 88-107 show that when indexOf("/") returns -1 or dateString
+      is null, the methods return hardcoded defaults "01" and "2010" respectively.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCardEJB.java
+        line_start: 88
+        line_end: 107
+        excerpt: |
+          public String getExpiryMonth() {
+            String dateString = getExpiryDate();
+            if (dateString != null) {
+              int slashStart = dateString.indexOf("/");
+              if (slashStart != -1) return dateString.substring(0,slashStart);
+            }
+            return "01";
+          }
+
+          public String getExpiryYear() {
+            String dateString = getExpiryDate();
+            if (dateString != null) {
+              int slashStart = dateString.indexOf("/");
+              if (slashStart != -1) return dateString.substring(slashStart +1, dateString.length());
+            }
+            return "2010";
+          }
+
+  - record_key: creditcard-validation-workflow-0001
+    kind: workflow
+    capability_key: creditcard-validation
+    requirement: >
+      GIVEN a customer signs up or modifies their profile, WHEN credit card information
+      is submitted via the web form, THEN the CustomerHTMLAction extracts credit card fields
+      and creates a CustomerEvent containing the CreditCard object for downstream processing.
+    confidence: high
+    confidence_basis: >
+      CustomerHTMLAction.perform() method explicitly shows the flow: extract credit card
+      via extractCreditCard(), create CustomerEvent with the CreditCard object passed to
+      constructor.
+    risk_class: operational
+    basis: >
+      CustomerHTMLAction.perform() line 96 calls extractCreditCard(request) and line 98
+      creates CustomerEvent(CustomerEvent.CREATE, info, profileInfo, creditCard). The
+      similar flow at line 102-104 handles UPDATE action.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/web/actions/CustomerHTMLAction.java
+        line_start: 86
+        line_end: 107
+        excerpt: |
+          public Event perform(HttpServletRequest request)
+              throws HTMLActionException {
+              String actionType= (String)request.getParameter("action");
+              CustomerEvent event = null;
+              if (actionType == null) return null;
+              if (actionType.equals("create")) {
+                  ContactInfo info = extractContactInfo(request, "_a");
+                  CreditCard creditCard = extractCreditCard(request);
+                  ProfileInfo profileInfo  = extractProfileInfo(request);
+                  event = new CustomerEvent(CustomerEvent.CREATE, info, profileInfo, creditCard);
+              } else if (actionType.equals("update")) {
+                  ContactInfo info = extractContactInfo(request, "_a");
+                  CreditCard creditCard = extractCreditCard(request);
+                  ProfileInfo profileInfo  = extractProfileInfo(request);
+                  event = new CustomerEvent(CustomerEvent.UPDATE, info, profileInfo, creditCard);
+              }
+              return event;
+
+  - record_key: creditcard-validation-workflow-0002
+    kind: workflow
+    capability_key: creditcard-validation
+    requirement: >
+      GIVEN an order is placed with billing, shipping, and payment information, WHEN
+      OrderEJBAction processes the order event, THEN it extracts the CreditCard from
+      the OrderEvent, stores it in the PurchaseOrder object, and serializes the complete
+      order (including credit card) to XML for async message sending.
+    confidence: high
+    confidence_basis: >
+      OrderEJBAction.perform() explicitly extracts creditCard from OrderEvent (line 95),
+      calls purchaseOrder.setCreditCard(creditCard) (line 121), and then sends
+      purchaseOrder.toXML() via AsyncSender (line 153).
+    risk_class: financial
+    basis: >
+      OrderEJBAction lines 91-95 retrieve billTo, shipTo, and creditCard from OrderEvent.
+      Line 121 calls purchaseOrder.setCreditCard(creditCard). Line 153 calls
+      sender.sendAMessage(purchaseOrder.toXML()).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/OrderEJBAction.java
+        line_start: 90
+        line_end: 121
+        excerpt: |
+          public EventResponse perform(Event e) throws EventException {
+            OrderEvent oe = (OrderEvent)e;
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
+            ContactInfo billTo = oe.getBillTo();
+            ContactInfo shipTo = oe.getShipTo();
+            CreditCard creditCard = oe.getCreditCard();
+            ...
+            purchaseOrder.setOrderId(orderIdString);
+            purchaseOrder.setUserId(userId);
+            purchaseOrder.setEmailId(billTo.getEmail());
+            purchaseOrder.setOrderDate(new Date());
+            purchaseOrder.setShippingInfo(shipTo);
+            purchaseOrder.setBillingInfo(billTo);
+            purchaseOrder.setCreditCard(creditCard);
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/web/actions/CustomerHTMLAction.java
+    description: >
+      Credit card field validation logic contains apparent bug: lines 152, 160, and 168
+      all check creditCardNumber.equals("") instead of checking creditCardType, creditCardExpiryMonth,
+      and creditCardExpiryYear respectively. This suggests either incomplete implementation
+      or that validation was never actually enforced. Unclear whether missing field errors
+      are actually caught or if all three branches execute only when cardNumber is empty.
+
+  - kind: unparseable
+    path: legacy-source/petstore1.3.2/src/components/creditcard/src/com/sun/j2ee/blueprints/creditcard/ejb/CreditCardEJB.java
+    description: >
+      Hardcoded default values for expiry month ("01") and year ("2010") in
+      getExpiryMonth() and getExpiryYear() methods lack any documented rationale or
+      configuration. The year "2010" is in the past relative to the 2002 copyright,
+      making the intent unclear. Uncertain whether these defaults are ever used in
+      practice or if this is unreachable code.

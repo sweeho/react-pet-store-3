@@ -1,0 +1,115 @@
+%% EXTRACTED FROM LEGACY SOURCE — evidence of what exists, not a build target. Where this disagrees with a capability delta spec, the delta spec wins.
+erDiagram
+    CUSTOMER ||--o{ PURCHASE_ORDER : places
+    CUSTOMER ||--o{ SHOPPING_CART : owns
+    PURCHASE_ORDER ||--|{ ORDER_LINE_ITEM : contains
+    PURCHASE_ORDER ||--o{ CONTACT_INFO : "bill to"
+    PURCHASE_ORDER ||--o{ CONTACT_INFO : "ship to"
+    SHOPPING_CART ||--|{ CART_ITEM : contains
+    ORDER_LINE_ITEM ||--o{ INVENTORY : "fulfills from"
+    SUPPLIER_ORDER ||--|{ ORDER_LINE_ITEM : "fulfills"
+    SUPPLIER_ORDER ||--o{ CONTACT_INFO : "ship to"
+    CONTACT_INFO ||--o{ ADDRESS : "lives at"
+    INVENTORY ||--o{ ITEM : tracks
+    ITEM ||--o{ PRODUCT : "is a"
+    SUPPLIER_ORDER ||--|{ SUPPLIER_PO : generates
+
+    CUSTOMER {
+        string customerId PK
+        string email UK
+        string familyName
+        string givenName
+        string password
+        string status
+    }
+
+    SHOPPING_CART {
+        string shoppingCartId PK
+        string customerId FK
+        int itemCount
+        double subtotal
+    }
+
+    CART_ITEM {
+        string cartItemId PK
+        string shoppingCartId FK
+        string itemId FK
+        string productId
+        string category
+        string productName
+        string attribute
+        int quantity
+        double unitCost
+    }
+
+    PURCHASE_ORDER {
+        string orderId PK
+        string customerId FK
+        timestamp orderDate
+        string emailId
+        double totalAmount
+        string status
+        string poStatus
+    }
+
+    ORDER_LINE_ITEM {
+        string lineItemId PK
+        string orderId FK
+        string itemId
+        string productId
+        string categoryId
+        int quantity
+        double unitPrice
+        int quantityShipped
+    }
+
+    CONTACT_INFO {
+        string contactInfoId PK
+        string givenName
+        string familyName
+        string email
+        string telephone
+    }
+
+    ADDRESS {
+        string addressId PK
+        string street1
+        string street2
+        string city
+        string state
+        string postalCode
+        string country
+    }
+
+    INVENTORY {
+        string itemId PK
+        int quantity
+    }
+
+    ITEM {
+        string itemId PK
+        string productId FK
+        string categoryId
+        string attribute
+        double listCost
+    }
+
+    PRODUCT {
+        string productId PK
+        string productName
+        string category
+    }
+
+    SUPPLIER_ORDER {
+        string poId PK
+        timestamp poDate
+        string poStatus
+    }
+
+    SUPPLIER_PO {
+        string supplierPoId PK
+        string supplierId
+        timestamp orderDate
+        timestamp deliveryDate
+        string status
+    }

@@ -1,0 +1,606 @@
+records:
+  - record_key: CAT-ENTITY-0001
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL maintain a Category entity with id, name, and description
+      attributes. Categories organize products into logical groupings.
+    confidence: high
+    confidence_basis: >
+      The Category model class is fully defined in both Java and SQL schema across
+      multiple DAO implementations. Both passes would find this consistently.
+    risk_class: operational
+    basis: >
+      Category.java defines id, name, description fields. CloudscapeCatalogDAO shows
+      category table with catid and category_details table with locale-specific
+      name and descn fields.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Category.java
+        line_start: 49
+        line_end: 74
+        excerpt: |
+          public class Category implements java.io.Serializable {
+              private String id;
+              private String name;
+              private String description;
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 66
+        line_end: 69
+        excerpt: |
+          public static String GET_CATEGORY_STATEMENT
+          = "select name, descn "
+          + " from (category a join category_details b on a.catid=b.catid) "
+          + " where locale = ? and a.catid = ?";
+
+  - record_key: CAT-ENTITY-0002
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL maintain a Product entity with id, name, and description
+      attributes. Products belong to a Category and represent specific types of pets.
+    confidence: high
+    confidence_basis: >
+      Product model class is fully specified. Schema is visible in both DAO
+      implementations with consistent product and product_details tables.
+    risk_class: operational
+    basis: >
+      Product.java defines id, name, description. CloudscapeCatalogDAO shows product
+      and product_details tables with locale-specific name and descn fields.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Product.java
+        line_start: 45
+        line_end: 70
+        excerpt: |
+          public class Product implements java.io.Serializable {
+              private String id;
+              private String name;
+              private String description;
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 74
+        line_end: 81
+        excerpt: |
+          public static String GET_PRODUCT_STATEMENT
+          = "select name, descn "
+          + " from (product a join product_details b on a.productid=b.productid) "
+          + " where locale = ? and a.productid = ? ";
+
+  - record_key: CAT-ENTITY-0003
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL maintain an Item entity with itemId, productId, category,
+      name, imageLocation, description, five custom attributes (attr1-5), listPrice,
+      and unitCost.
+    confidence: high
+    confidence_basis: >
+      Item model class fully specifies all fields with constructor and getters.
+      SQL schema clearly shows item and item_details tables with all attributes.
+    risk_class: operational
+    basis: >
+      Item.java constructor takes 13 parameters defining all fields. CloudscapeCatalogDAO
+      shows item and item_details tables with attributes 1-5, image, listprice, unitcost.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Item.java
+        line_start: 63
+        line_end: 90
+        excerpt: |
+          public Item(String category,
+                      String productId,
+                      String productName,
+                      String itemId,
+                      String imageLocation,
+                      String description,
+                      String attribute1,
+                      String attribute2,
+                      String attribute3,
+                      String attribute4,
+                      String attribute5,
+                      double listPrice,
+                      double unitCost) {
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 82
+        line_end: 88
+        excerpt: |
+          public static String GET_ITEM_STATEMENT
+          = "select catid, a.productid, name, b.image, b.descn, attr1, "
+          + "  attr2, attr3, attr4, attr5, listprice, unitcost "
+
+  - record_key: CAT-ENTITY-0004
+    kind: entity
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL maintain a Page entity representing a paginated result set
+      with a list of objects, start position, and a hasNext flag indicating whether
+      more results are available.
+    confidence: high
+    confidence_basis: >
+      Page model is fully defined with clear semantics. All DAO methods return Page
+      objects constructed consistently with the hasNext flag.
+    risk_class: operational
+    basis: >
+      Page.java defines objects list, start position, and hasNext boolean flag.
+      Multiple DAO implementations consistently create Page objects with these fields.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/model/Page.java
+        line_start: 45
+        line_end: 94
+        excerpt: |
+          public class Page implements Serializable {
+              List objects;
+              int start;
+              boolean hasNext;
+              public Page(List l, int s, boolean hasNext) {
+                  objects = new ArrayList(l);
+                  start = s;
+                  this.hasNext = hasNext;
+              }
+              public boolean isNextPageAvailable() {
+                  return hasNext;
+              }
+              public boolean isPreviousPageAvailable() {
+                  return start > 0;
+              }
+
+  - record_key: CAT-REQ-0001
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support retrieving a single Category by its ID in a specified
+      Locale. If the category does not exist, null SHALL be returned.
+    confidence: high
+    confidence_basis: >
+      Both passes would find this declared in CatalogEJB and CatalogDAO interfaces,
+      with clear implementation and SQL in both CloudscapeCatalogDAO and
+      GenericCatalogDAO.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getCategory(categoryID, locale) and GenericCatalogDAO.getCategory
+      implement this. SQL uses category table joined with category_details filtered
+      by locale and catid.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 147
+        line_end: 154
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>CatalogEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>getCategory</method-name>
+              <method-params>
+                <method-param>java.lang.String</method-param>
+                <method-param>java.util.Locale</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 85
+        line_end: 92
+        excerpt: |
+          public Category getCategory(String categoryID, Locale l) {
+              try {
+                  return dao.getCategory(categoryID, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+
+  - record_key: CAT-REQ-0002
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support browsing Categories with pagination. The getCategories
+      method SHALL accept start position and count parameters and return a Page
+      containing up to count categories ordered by name.
+    confidence: high
+    confidence_basis: >
+      Method signature and pagination logic are clearly declared in both the EJB
+      interface and both DAO implementations with consistent behavior.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getCategories(start, count, locale) delegates to DAO.
+      GenericCatalogDAO and CloudscapeCatalogDAO both implement pagination using
+      ResultSet.absolute(start+1) and loading up to count items.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 94
+        line_end: 101
+        excerpt: |
+          public Page getCategories(int start, int count, Locale l) {
+              try {
+                  return dao.getCategories(start, count, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 182
+        line_end: 210
+        excerpt: |
+          public Page getCategories(int start, int count, Locale locale) throws CatalogDAOSysException {
+              ...
+              if (start >= 0 && resultSet.absolute(start + 1)) {
+                  boolean hasNext = false;
+                  List categories = new ArrayList();
+                  do {
+                      categories.add(new Category(...));
+                  } while ((hasNext = resultSet.next()) && (--count > 0));
+                  return new Page(categories, start, hasNext);
+              }
+              return Page.EMPTY_PAGE;
+
+  - record_key: CAT-REQ-0003
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support retrieving a single Product by its ID in a specified
+      Locale. If the product does not exist, null SHALL be returned.
+    confidence: high
+    confidence_basis: >
+      Method is declared in EJB and both DAO implementations with consistent
+      implementation and error handling.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getProduct(productID, locale) and DAOs implement this.
+      SQL joins product with product_details filtered by locale and productid.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 113
+        line_end: 120
+        excerpt: |
+          public Product getProduct(String productID, Locale l) {
+              try {
+                  return dao.getProduct(productID, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+
+  - record_key: CAT-REQ-0004
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support browsing Products within a Category with pagination.
+      The getProducts method SHALL accept a categoryID, start position, and count
+      parameters and return a Page containing up to count products ordered by name.
+    confidence: high
+    confidence_basis: >
+      Method signature and pagination implementation are consistent across both
+      DAO implementations with identical pagination logic.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getProducts(categoryID, start, count, locale) delegates to DAO.
+      Both DAOs implement pagination identical to getCategories using
+      ResultSet.absolute(start+1).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 103
+        line_end: 111
+        excerpt: |
+          public Page getProducts(String categoryID, int start,
+                                  int count, Locale l) {
+              try {
+                  return dao.getProducts(categoryID, start, count, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+
+  - record_key: CAT-REQ-0005
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support retrieving a single Item by its ID in a specified
+      Locale. If the item does not exist, null SHALL be returned. The item SHALL
+      include category, product name, and all pricing and attribute information.
+    confidence: high
+    confidence_basis: >
+      Item retrieval is fully specified with detailed constructor matching result
+      set projection in both DAO implementations.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getItem(itemID, locale) and both DAOs implement this.
+      SQL joins item with item_details, product_details, and product tables
+      to retrieve all required fields.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 132
+        line_end: 139
+        excerpt: |
+          public Item getItem(String itemID, Locale l) {
+              try {
+                  return dao.getItem(itemID, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 82
+        line_end: 88
+        excerpt: |
+          public static String GET_ITEM_STATEMENT
+          = "select catid, a.productid, name, b.image, b.descn, attr1, "
+          + "  attr2, attr3, attr4, attr5, listprice, unitcost "
+
+  - record_key: CAT-REQ-0006
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support browsing Items within a Product with pagination.
+      The getItems method SHALL accept a productID, start position, and count
+      parameters and return a Page containing up to count items.
+    confidence: high
+    confidence_basis: >
+      Method is consistently implemented in both DAO classes with identical
+      pagination pattern.
+    risk_class: operational
+    basis: >
+      CatalogEJB.getItems(productID, start, count, locale) delegates to DAO.
+      Both DAOs use identical pagination: ResultSet.absolute(start+1), loop
+      decrementing count while hasNext flag is updated.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 122
+        line_end: 130
+        excerpt: |
+          public Page getItems(String productID, int start,
+                               int count, Locale l) {
+              try {
+                  return dao.getItems(productID, start, count, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+
+  - record_key: CAT-REQ-0007
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support searching items by keywords. The searchItems method
+      SHALL accept a search query string, start position, and count parameters and
+      return a Page containing up to count matching items.
+    confidence: medium
+    confidence_basis: >
+      Search is implemented in both DAOs, but the search strategy (tokenization,
+      LIKE matching fields) is only visible in the code implementation, not in
+      declared interfaces or schema constraints. Implementation is consistent.
+    risk_class: operational
+    basis: >
+      CatalogEJB.searchItems(query, start, count, locale) delegates to DAO.
+      Both GenericCatalogDAO and CloudscapeCatalogDAO implement keyword search
+      with pagination.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/ejb/CatalogEJB.java
+        line_start: 141
+        line_end: 149
+        excerpt: |
+          public Page searchItems(String searchQuery, int start,
+                                  int count, Locale l) {
+              try {
+                  return dao.searchItems(searchQuery, start, count, l);
+              }
+              catch (CatalogDAOSysException se) {
+                  throw new EJBException(se.getMessage());
+              }
+          }
+
+  - record_key: CAT-RULE-0001
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      Search queries SHALL be tokenized on whitespace, with each token treated as
+      a separate keyword. An empty token set returns an empty page.
+    confidence: medium
+    confidence_basis: >
+      Implementation in GenericCatalogDAO.searchItems is clear. No configuration
+      or declarative specification of this behavior was found, but both DAO
+      implementations would implement the same parsing.
+    risk_class: operational
+    basis: >
+      GenericCatalogDAO.searchItems uses StringTokenizer to split on whitespace.
+      If keywordSet.isEmpty(), it returns Page.EMPTY_PAGE.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 343
+        line_end: 352
+        excerpt: |
+          public Page searchItems(String searchQuery, int start, int count, Locale locale)
+              throws CatalogDAOSysException {
+              Collection keywordSet = new HashSet();
+              StringTokenizer tokenizer = new StringTokenizer(searchQuery);
+              while (tokenizer.hasMoreTokens()) {
+                keywordSet.add(tokenizer.nextToken());
+              }
+              if (keywordSet.isEmpty()) {
+                return Page.EMPTY_PAGE;
+              }
+
+  - record_key: CAT-RULE-0002
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      Search queries SHALL match keywords across item name, product name, category
+      ID, and item description fields using case-insensitive LIKE wildcards. Each
+      keyword is wrapped with % wildcards on both sides.
+    confidence: medium
+    confidence_basis: >
+      SQL implementation in CloudscapeCatalogDAO shows LIKE matching with
+      lower(field) and % wildcards. GenericCatalogDAO abstracts this into XML
+      configuration, but the same logic applies. Implementation across both is
+      consistent.
+    risk_class: operational
+    basis: >
+      CloudscapeCatalogDAO.searchItems constructs OR'd LIKE clauses matching
+      lowercase name, catid, and descn. GenericCatalogDAO parameterizes keywords
+      with % wildcards for substitution into configured SQL.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 96
+        line_end: 110
+        excerpt: |
+          public static String[] SEARCH_ITEMS_STATEMENT_FRAGMENTS
+          = { "select catid, a.productid, name, a.itemid, b.image, b.descn, attr1,"
+              ...
+              + " where b.locale = ? ",
+              "    and ((lower(name) like ? ",
+              "          or lower(name) like ? ",
+              "    ) or (lower(catid) like ? ",
+              "          or lower(catid) like ? ",
+              "    ) or (lower(b.descn) like ? ",
+              "          or lower(b.descn) like ? ",
+              ") )"
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 359
+        line_end: 365
+        excerpt: |
+          for (int i = 0; i < keywords.length; i++) {
+            parameterValues[(i * 3) + 1] = "%" + keywords[i] + "%";
+            parameterValues[(i * 3) + 2] = "%" + keywords[i] + "%";
+            parameterValues[(i * 3) + 3] = "%" + keywords[i] + "%";
+          }
+
+  - record_key: CAT-RULE-0003
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      Pagination SHALL use ResultSet.absolute(start + 1) to position the cursor
+      at the start row. If start < 0 or the position is invalid, an empty page
+      SHALL be returned. Rows are loaded until count is exhausted or no more results
+      exist. The hasNext flag SHALL indicate whether additional results follow.
+    confidence: high
+    confidence_basis: >
+      This pagination implementation is identical in both GenericCatalogDAO and
+      CloudscapeCatalogDAO, present across all list methods. Both passes would
+      identify this consistently.
+    risk_class: operational
+    basis: >
+      All pagination methods (getCategories, getProducts, getItems, searchItems)
+      in both DAOs use the same pattern: check start >= 0, call
+      resultSet.absolute(start + 1), loop while decrementing count and tracking
+      hasNext.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 194
+        line_end: 202
+        excerpt: |
+          if (start >= 0 && resultSet.absolute(start + 1)) {
+            boolean hasNext = false;
+            List categories = new ArrayList();
+            do {
+              categories.add(new Category(...));
+            } while ((hasNext = resultSet.next()) && (--count > 0));
+            return new Page(categories, start, hasNext);
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+        line_start: 168
+        line_end: 176
+        excerpt: |
+          if (start >= 0 && rs.absolute(start+1)) {
+            boolean hasNext = false;
+            List items = new ArrayList();
+            do {
+              items.add(new Category(...));
+            } while ((hasNext = rs.next()) && (--count > 0));
+            ret = new Page(items, start, hasNext);
+
+  - record_key: CAT-RULE-0004
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      All catalog queries SHALL be executed within a container-managed transaction
+      with transaction attribute Required. Each operation requires a new or existing
+      transaction context.
+    confidence: high
+    confidence_basis: >
+      This is declared in ejb-jar.xml with explicit <trans-attribute>Required
+      </trans-attribute> for every declared method. This is declarative and
+      authoritative.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml assembly-descriptor defines container-transaction elements for
+      all seven public methods of CatalogEJB with Required attribute.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/ejb-jar.xml
+        line_start: 91
+        line_end: 142
+        excerpt: |
+          <assembly-descriptor>
+            ...
+            <container-transaction>
+              <method>
+                <ejb-name>CatalogEJB</ejb-name>
+                <method-intf>Local</method-intf>
+                <method-name>getItem</method-name>
+                ...
+              </method>
+              <trans-attribute>Required</trans-attribute>
+            </container-transaction>
+
+  - record_key: CAT-RULE-0005
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      All catalog operations SHALL support locale-aware queries. The Locale parameter
+      is passed to all DAO methods and used to determine which locale-specific database
+      tables to query. Supported locales include US (default), Japan (ja), and China (zh).
+    confidence: high
+    confidence_basis: >
+      Locale support is consistently implemented across all methods in both DAO
+      implementations. DatabaseNames.getTableName() shows locale-specific table
+      suffixes.
+    risk_class: operational
+    basis: >
+      All seven CatalogEJB methods accept Locale parameter and pass it to DAO.
+      All DAO methods use locale.toString() in SQL parameters or table name
+      construction. DatabaseNames class shows table naming: default, _ja, _zh.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/util/DatabaseNames.java
+        line_start: 55
+        line_end: 65
+        excerpt: |
+          public static String getTableName(String tableName, Locale locale) {
+              if (locale.equals(Locale.US)) {
+                  return tableName;
+              } else if (locale.equals(Locale.JAPAN)) {
+                  return tableName + "_ja";
+              }else if (locale.equals(Locale.CHINA)) {
+                  return tableName + "_zh";
+              }
+              return tableName;
+          }
+      - path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+        line_start: 159
+        line_end: 174
+        excerpt: |
+          public Category getCategory(String categoryID, Locale locale) throws CatalogDAOSysException {
+              ...
+              String[] parameterValues = new String[] { locale.toString(), categoryID };
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/CloudscapeCatalogDAO.java
+    description: >
+      The getItems() method constructs Item objects passing productID as the first
+      parameter (line 319), but the SQL SELECT does not explicitly retrieve the
+      productID field — it retrieves catid as the first column. The Item constructor
+      expects (category, productID, productName, ...) but the DAO appears to pass
+      productID as a method parameter rather than from the result set. This discrepancy
+      should be verified: is productID being passed correctly or is there a bug in
+      the Item construction?
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/catalog/src/com/sun/j2ee/blueprints/catalog/dao/GenericCatalogDAO.java
+    description: >
+      The searchItems() implementation allocates 1 + (keywords.length * 3) parameter
+      values, suggesting each keyword uses 3 parameter positions. However, the
+      keyword wrapping logic shows keywords are wrapped with % wildcards but the
+      assignment pattern (lines 362-365) appears to assign the same keyword three
+      times with wildcards. Without seeing the actual SQL template from XML configuration,
+      it is unclear whether this represents searching three different fields or
+      three variations of wildcarding for the same field.

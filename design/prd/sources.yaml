@@ -1,0 +1,48 @@
+sections:
+  - section: Summary
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p5-p9
+      - design/sources/markdown/java-pet-store-1-3-2-user-manual/extracted.md#p1-p21
+
+  - section: Context
+    from:
+      - legacy-analysis/discovery/report.md#p1-p11
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p11-p41
+
+  - section: Goals
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p19-p28
+
+  - section: Non-goals
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p29-p41
+
+  - section: Users
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p42-p71
+      - design/sources/markdown/java-pet-store-1-3-2-user-manual/extracted.md#p22-p50
+
+  - section: User journeys
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-user-manual/extracted.md#p51-p200+
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p108-p250+
+
+  - section: Capability map
+    from:
+      - legacy-analysis/discovery/capabilities.csv
+
+  - section: Screens
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p108-p300+
+      - design/sources/markdown/java-pet-store-1-3-2-user-manual/extracted.md#p51-p200+
+      - design/sources/html/java-pet-store-screen-mockups/extracted.md
+
+  - section: Constraints and assumptions
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p72-p300+
+      - legacy-analysis/discovery/report.md#p65-p150+
+
+  - section: Open questions
+    from:
+      - design/sources/markdown/java-pet-store-1-3-2-product-requirements-document/extracted.md#p214-p220+
+      - legacy-analysis/discovery/report.md#p154-p189

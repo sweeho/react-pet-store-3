@@ -1,0 +1,182 @@
+records:
+  - record_key: ENCF-REQ-0001
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL set the character encoding on incoming HTTP servlet requests to
+      a configurable target encoding value to ensure proper character handling in request processing.
+    confidence: high
+    confidence_basis: >
+      Both code and configuration corroborate this requirement. The EncodingFilter.java
+      calls request.setCharacterEncoding(targetEncoding) in all request paths (line 75).
+      The web.xml declares a filter mapping to all URL patterns (/*) with an init-parameter
+      specifying the encoding. Two independent implementations confirm the requirement.
+    risk_class: operational
+    basis: >
+      The filter is a servlet Filter that intercepts all HTTP requests and sets the character
+      encoding on the request object using the doFilter() method. The encoding is obtained
+      from the filter configuration's init-parameter named "encoding".
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/encodingfilter/src/com/sun/j2ee/blueprints/encodingfilter/web/EncodingFilter.java
+        line_start: 71
+        line_end: 78
+        excerpt: |
+          public  void doFilter(ServletRequest srequest, ServletResponse  sresponse, FilterChain chain)
+             throws IOException, ServletException {
+             HttpServletRequest request = (HttpServletRequest)srequest;
+             request.setCharacterEncoding(targetEncoding);
+             // move on to the next
+            chain.doFilter(srequest,sresponse);
+          }
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/docroot/WEB-INF/web.xml
+        line_start: 61
+        line_end: 69
+        excerpt: |
+          <filter>
+            <filter-name>EncodingFilter</filter-name>
+            <display-name>EncodingFilter</display-name>
+            <description>no description</description>
+            <filter-class>com.sun.j2ee.blueprints.encodingfilter.web.EncodingFilter</filter-class>
+            <init-param>
+              <param-name>encoding</param-name>
+              <param-value>UTF-8</param-value>
+            </init-param>
+          </filter>
+    stack_metadata:
+      framework: servlet-filter
+      filter.init-parameter: encoding
+
+  - record_key: ENCF-REQ-0002
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL initialize the target encoding with a default value of ASCII if no
+      encoding init-parameter is provided in the filter configuration.
+    confidence: high
+    confidence_basis: >
+      The default value is explicitly declared in the source code (line 59) as a class field
+      with assignment. There is no configuration or test evidence of this being overridden
+      or modified, indicating this is a stable implementation detail.
+    risk_class: operational
+    basis: >
+      The EncodingFilter class declares a private String field targetEncoding initialized
+      to "ASCII" (line 59). This default is used when no init-parameter is provided.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/encodingfilter/src/com/sun/j2ee/blueprints/encodingfilter/web/EncodingFilter.java
+        line_start: 57
+        line_end: 64
+        excerpt: |
+          private FilterConfig config = null;
+          // default to ASCII
+          private String targetEncoding = "ASCII";
+
+          public void init(FilterConfig config) throws ServletException {
+              this.config = config;
+              this.targetEncoding = config.getInitParameter("encoding");
+          }
+    stack_metadata:
+      framework: servlet-filter
+      default_value: ASCII
+
+  - record_key: ENCF-REQ-0003
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL apply the character encoding filter to all incoming HTTP requests
+      by mapping the filter to the root URL pattern (/*).
+    confidence: high
+    confidence_basis: >
+      The web.xml filter-mapping is declared with url-pattern set to /* (all URLs).
+      This is the declarative configuration that governs request routing. The filter is
+      applied universally across the application.
+    risk_class: operational
+    basis: >
+      The web.xml declares a filter-mapping element that associates the EncodingFilter
+      to the URL pattern /*. This ensures the filter processes all requests to the application.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/docroot/WEB-INF/web.xml
+        line_start: 72
+        line_end: 75
+        excerpt: |
+          <!-- Encoding Filter Mapping Start-->
+          <filter-mapping>
+            <filter-name>EncodingFilter</filter-name>
+            <url-pattern>/*</url-pattern>
+          </filter-mapping>
+    stack_metadata:
+      framework: servlet-filter
+      filter.mapping: "/*"
+
+  - record_key: ENCF-REQ-0004
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL pass control to the next filter in the filter chain after setting
+      the character encoding on the request.
+    confidence: high
+    confidence_basis: >
+      The doFilter method explicitly calls chain.doFilter(srequest, sresponse) at line 77.
+      This is a standard servlet filter contract and is the only path through the method.
+    risk_class: operational
+    basis: >
+      The EncodingFilter.doFilter() method calls chain.doFilter() to pass control to the
+      next filter or servlet in the chain. This is required for proper servlet filter behavior.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/encodingfilter/src/com/sun/j2ee/blueprints/encodingfilter/web/EncodingFilter.java
+        line_start: 71
+        line_end: 78
+        excerpt: |
+          public  void doFilter(ServletRequest srequest, ServletResponse  sresponse, FilterChain chain)
+             throws IOException, ServletException {
+             HttpServletRequest request = (HttpServletRequest)srequest;
+             request.setCharacterEncoding(targetEncoding);
+             // move on to the next
+            chain.doFilter(srequest,sresponse);
+          }
+    stack_metadata:
+      framework: servlet-filter
+      chain.responsibility: next-filter
+
+  - record_key: ENCF-REQ-0005
+    kind: business-rule
+    capability_key: customer-management
+    requirement: >
+      The encoding filter SHALL be applied to all HTTP request paths in the petstore
+      application, using UTF-8 as the configured encoding.
+    confidence: medium
+    confidence_basis: >
+      The web.xml configuration shows UTF-8 is explicitly set for the petstore application.
+      However, the rule is application-specific rather than a requirement of the filter component
+      itself, which supports any encoding. This represents a deployment-time configuration choice.
+    risk_class: operational
+    basis: >
+      The petstore application's web.xml configures the EncodingFilter with encoding=UTF-8.
+      This is a business decision to support international character data in the petstore application.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/docroot/WEB-INF/web.xml
+        line_start: 61
+        line_end: 69
+        excerpt: |
+          <filter>
+            <filter-name>EncodingFilter</filter-name>
+            <display-name>EncodingFilter</display-name>
+            <description>no description</description>
+            <filter-class>com.sun.j2ee.blueprints.encodingfilter.web.EncodingFilter</filter-class>
+            <init-param>
+              <param-name>encoding</param-name>
+              <param-value>UTF-8</param-value>
+            </init-param>
+          </filter>
+    stack_metadata:
+      framework: servlet-filter
+      deployment.encoding: UTF-8
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/encodingfilter/src/com/sun/j2ee/blueprints/encodingfilter/web/EncodingFilter.java
+    description: >
+      The init method (line 63) calls config.getInitParameter("encoding") without null-checking the result.
+      If the init-parameter is not provided, targetEncoding will be set to null, overriding the default
+      value of "ASCII" initialized at line 59. The actual behavior depends on how request.setCharacterEncoding(null)
+      behaves in the servlet container, which is undefined in the code. This could either use a default
+      encoding, throw an exception, or leave the encoding unset. A human should verify the intended behavior.

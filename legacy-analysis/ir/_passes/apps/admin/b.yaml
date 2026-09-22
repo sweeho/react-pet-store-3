@@ -1,0 +1,591 @@
+records:
+  - record_key: order-approval-0001
+    kind: requirement
+    capability_key: order-approval
+    requirement: >
+      The system SHALL provide administrators with access to retrieve all
+      purchase orders matching a given status (PENDING, APPROVED, DENIED,
+      SHIPPED_PART, or COMPLETED) through a remote EJB facade service.
+    confidence: high
+    confidence_basis: >
+      OPCAdminFacade EJB is explicitly configured in web.xml with remote
+      reference binding. AdminRequestBD and ApplRequestProcessor both invoke
+      getOrdersByStatus() method. Code path is straightforward and
+      deterministic. Both passes would identify this requirement from
+      configuration and code.
+    risk_class: operational
+    basis: >
+      web.xml declares ejb-ref to OPCAdminFacadeRemote. AdminRequestBD creates
+      remote home via ServiceLocator and calls opcAdminEJB.getOrdersByStatus(status).
+      ApplRequestProcessor receives XML request with Status element, parses it,
+      calls AdminRequestBD.getOrdersByStatus(), and returns orders as XML with
+      OrderId, UserId, OrderDate, OrderAmount, OrderStatus.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/docroot/WEB-INF/web.xml
+        line_start: 103
+        line_end: 108
+        excerpt: |
+          <ejb-ref>
+            <ejb-ref-name>ejb/OPCAdminFacadeRemote</ejb-ref-name>
+            <ejb-ref-type>Session</ejb-ref-type>
+            <home>com.sun.j2ee.blueprints.opc.admin.ejb.OPCAdminFacadeHome</home>
+            <remote>com.sun.j2ee.blueprints.opc.admin.ejb.OPCAdminFacade</remote>
+          </ejb-ref>
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/AdminRequestBD.java
+        line_start: 101
+        line_end: 113
+        excerpt: |
+          public OrdersTO getOrdersByStatus(String status)
+              throws AdminBDException {
+              try {
+                  return opcAdminEJB.getOrdersByStatus(status);
+              } catch (RemoteException re) {
+                  re.printStackTrace();
+                  throw new AdminBDException(re.getMessage());
+
+  - record_key: order-approval-0002
+    kind: workflow
+    capability_key: order-approval
+    requirement: >
+      The system SHALL allow administrators to change the status of PENDING
+      orders to either APPROVED or DENIED through a rich client interface.
+      Status changes SHALL be collected and committed together through an
+      asynchronous message-based workflow that updates the order processing
+      system.
+    confidence: high
+    confidence_basis: >
+      OrdersApprovePanel provides UI with Approve, Deny, and Commit buttons.
+      Multiple orders can be selected and status changed before committing.
+      Commit action calls tableModel.commit() which sends accumulated changes.
+      ApplRequestProcessor.updateOrders() receives XML of changed orders,
+      builds OrderApproval XML document, and sends to AsyncSender EJB for
+      asynchronous processing. Workflow is clear and deterministic.
+    risk_class: operational
+    basis: >
+      OrdersApprovePanel.createButtonPanel() creates Approve button that sets
+      selected rows to APPROVED status, Deny button sets to DENIED status.
+      Commit button calls tableModel.commit() which sends changed orders via
+      AdminRequestBD.updateOrders(OrderApproval). ApplRequestProcessor.
+      updateOrders() parses XML request, extracts OrderId and OrderStatus for
+      each changed order, creates OrderApproval document with list of changed
+      orders. AsyncSender receives XML and sends to order processing queue
+      for transition.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/client/com/sun/j2ee/blueprints/admin/client/OrdersApprovePanel.java
+        line_start: 92
+        line_end: 139
+        excerpt: |
+          private JPanel createButtonPanel() {
+              JPanel panel = new JPanel(new FlowLayout());
+              approveButton =
+                  new JButton(PetStoreAdminClient.getString("ApproveButton.label"));
+              approveButton.addActionListener(new ActionListener() {
+                  public void actionPerformed(ActionEvent e) {
+                      int[] rows = orderTable.getSelectedRows();
+                      for (int i = 0; i < rows.length; i++) {
+                          sorter.setValueAt(PetStoreProxy.Order.APPROVED,
+                              rows[i], 4);
+                          orderTable.repaint();
+                      }
+                  }
+              });
+              panel.add(approveButton);
+              // ... denyButton and commitButton ...
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+        line_start: 205
+        line_end: 237
+        excerpt: |
+          String updateOrders(Element root) {
+              OrderApproval oa = new OrderApproval();
+              NodeList nl = root.getElementsByTagName("Order");
+              for (int i = 0; i < nl.getLength(); i++) {
+                  Element e = (Element) nl.item(i);
+                  String orderId =
+                      getValue((Element) e.getElementsByTagName("OrderId").item(0));
+                  String orderStatus =
+                      getValue((Element) e.getElementsByTagName("OrderStatus").item(0));
+                  if (orderId != null && orderStatus != null) {
+                      oa.addOrder(new ChangedOrder(orderId, orderStatus));
+                  }
+              }
+              try {
+                  AdminRequestBD bd = new AdminRequestBD();
+                  bd.updateOrders(oa);
+                  return replyHeader + "<Type>UPDATEORDERS</Type>\n"
+
+  - record_key: order-approval-0003
+    kind: business-rule
+    capability_key: order-approval
+    requirement: >
+      The system SHALL restrict access to the order approval interface to
+      users with the administrator role. Any request to the order management
+      functionality (ApplRequestProcessor) from a user without an active
+      administrator session SHALL be rejected with a session timeout error.
+    confidence: high
+    confidence_basis: >
+      web.xml defines <security-constraint> on AdminRequestProcessor servlet
+      with auth-constraint role-name=administrator. Form-based login is
+      configured with login/error JSP pages. ApplRequestProcessor checks
+      session existence and returns error if null. Both configuration and
+      code implement this consistently.
+    risk_class: operational
+    basis: >
+      web.xml declares security-constraint with url-pattern /AdminRequestProcessor
+      restricted to administrator role. Form-based login configured with
+      form-login-page /login.jsp and form-error-page /error.jsp. login.jsp
+      submits to j_security_check with credentials. ApplRequestProcessor.doPost()
+      retrieves session with req.getSession(false) and returns error message
+      "Session Timed Out; Please exit and login as admin from the login page"
+      if session is null.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/docroot/WEB-INF/web.xml
+        line_start: 75
+        line_end: 101
+        excerpt: |
+          <security-constraint>
+            <web-resource-collection>
+              <web-resource-name>MySecureBit0</web-resource-name>
+              <url-pattern>/AdminRequestProcessor</url-pattern>
+              <http-method>GET</http-method>
+              <http-method>POST</http-method>
+            </web-resource-collection>
+            <auth-constraint>
+              <role-name>administrator</role-name>
+            </auth-constraint>
+            <user-data-constraint>
+              <transport-guarantee>NONE</transport-guarantee>
+            </user-data-constraint>
+          </security-constraint>
+          <login-config>
+            <auth-method>FORM</auth-method>
+            <realm-name>default</realm-name>
+            <form-login-config>
+              <form-login-page>/login.jsp</form-login-page>
+              <form-error-page>/error.jsp</form-error-page>
+            </form-login-config>
+          </login-config>
+          <security-role>
+            <role-name>administrator</role-name>
+          </security-role>
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+        line_start: 85
+        line_end: 115
+        excerpt: |
+          public void doPost(HttpServletRequest req, HttpServletResponse resp)
+              throws java.io.IOException, javax.servlet.ServletException {
+              HttpSession session = req.getSession(false);
+              ServletOutputStream out = resp.getOutputStream();
+              if(session == null) {
+                  out.println(replyHeader +
+                              "<Error>Session Timed Out; Please exit and " +
+                              "login as admin from the login page</Error>\n" +
+                              "</Response>\n");
+
+  - record_key: admin-dashboard-0001
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide analytics functionality that aggregates order
+      and revenue data for a specified date range. For REVENUE request type,
+      the system SHALL sum the product of (quantity × unit price) for each
+      line item. For ORDERS request type, the system SHALL sum quantities.
+      Results SHALL be aggregated by product category when no category filter
+      is specified, or by individual item when a specific category is selected.
+    confidence: high
+    confidence_basis: >
+      Analytics logic is implemented in OPCAdminFacadeEJB.getChartInfo()
+      with explicit conditional logic for REVENUE vs ORDERS aggregation.
+      ApplRequestProcessor.getChartInfo() handles client requests and
+      formatting. Both implementations show clear intent and consistent
+      calculation approach. Single authoritative source but comprehensive.
+    risk_class: presentational
+    basis: >
+      OPCAdminFacadeEJB.getChartInfo() retrieves purchase orders between
+      start and end dates, iterates over line items, and accumulates values
+      into HashMap keyed by category or item ID. For REVENUE: sums
+      (quantity × unit_price). For ORDERS: sums quantity. Results returned
+      as Map. ApplRequestProcessor.getChartInfo() parses XML request with
+      Start, End, ReqCategory elements, calls getChartInfo(), iterates
+      Map entries, and returns XML with Category or Item elements containing
+      values plus TotalSales aggregate.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/AdminRequestBD.java
+        line_start: 141
+        line_end: 154
+        excerpt: |
+          public Map getChartInfo(String request, Date start, Date end,
+                                  String category)
+              throws AdminBDException {
+              try {
+                  return opcAdminEJB.getChartInfo(request, start, end, category);
+              } catch (RemoteException re) {
+                  re.printStackTrace();
+                  throw new AdminBDException(re.getMessage());
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+        line_start: 239
+        line_end: 305
+        excerpt: |
+          String getChartInfo(Element root, String request) {
+              try {
+                  Map chartInfo = null;
+                  String category = null;
+                  String start = getValue(root.getElementsByTagName("Start").item(0));
+                  String end = getValue(root.getElementsByTagName("End").item(0));
+                  AdminRequestBD bd = new AdminRequestBD();
+                  category =
+                      getValue(root.getElementsByTagName("ReqCategory").item(0));
+                  chartInfo = bd.getChartInfo(request,
+                                              getProperDate(start),
+                                              getProperDate(end),
+                                              category);
+                  StringBuffer responseBuffer = new StringBuffer(replyHeader);
+                  String xmlElement = (category == null) ? "Category" : "Item";
+                  if (request.equals("REVENUE")) {
+                      float totalAmount = 0f;
+                      for (Iterator it = chartInfo.entrySet().iterator();
+                           it.hasNext(); ) {
+                          Map.Entry e = (Map.Entry) it.next();
+                          float amount = ((Float) e.getValue()).floatValue();
+                          totalAmount += amount;
+
+  - record_key: admin-dashboard-0002
+    kind: screen
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL display two tabbed chart views for order analytics:
+      a Pie Chart panel showing data aggregated by category, and a Bar Chart
+      panel showing the same metrics. Both charts SHALL refresh when the user
+      clicks a refresh action, and SHALL display data based on selected date
+      range and category filters.
+    confidence: high
+    confidence_basis: >
+      PetStoreAdminClient creates JTabbedPane with two tabs: one containing
+      PieChartPanel and one containing BarChartPanel. Both are bound to
+      DataSource chart models. Refresh action is wired to refresh data.
+      Configuration is explicit and unambiguous in client code.
+    risk_class: presentational
+    basis: >
+      PetStoreAdminClient.createUI() creates PieChartPanel bound to
+      dataSource.getPieChartModel() and BarChartPanel bound to
+      dataSource.getBarChartModel(). Both added to salesTabbedPane with
+      titles from localized strings. DataSource refresh action propagates
+      chart data change events to update both panels. SalesAction switches
+      view from orders to sales when selected.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/client/com/sun/j2ee/blueprints/admin/client/PetStoreAdminClient.java
+        line_start: 108
+        line_end: 168
+        excerpt: |
+          private void createUI() {
+              // Create the sales orders pane.
+              OrdersViewPanel ordersViewPanel = new OrdersViewPanel(
+                  dataSource.getOrdersViewTableModel());
+              OrdersApprovePanel ordersApprovePanel = new OrdersApprovePanel(
+                  dataSource.getOrdersApproveTableModel());
+              ordersTabbedPane = new JTabbedPane();
+              ordersTabbedPane.add(getString("OrdersViewPanel.title"),
+                  ordersViewPanel);
+              ordersTabbedPane.add(getString("OrdersApprovePanel.title"),
+                  ordersApprovePanel);
+              // Create the sales tabbed pane.
+              PieChartPanel pieChartPanel =
+                  new PieChartPanel(dataSource.getPieChartModel());
+              BarChartPanel barChartPanel =
+                  new BarChartPanel(dataSource.getBarChartModel());
+              salesTabbedPane = new JTabbedPane();
+              salesTabbedPane.add(getString("PieChart.title"), pieChartPanel);
+              salesTabbedPane.add(getString("BarChart.title"), barChartPanel);
+
+  - record_key: admin-dashboard-0003
+    kind: screen
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL display two tabbed order views: an OrdersViewPanel
+      showing orders in read-only format with columns for OrderId, UserId,
+      OrderDate, OrderAmount, and OrderStatus; and an OrdersApprovePanel
+      allowing selection and status modification of PENDING orders with color
+      coding (APPROVED=green, DENIED=red, PENDING=yellow).
+    confidence: high
+    confidence_basis: >
+      OrdersViewPanel and OrdersApprovePanel are explicit UI components in
+      rich client. Both implement PropertyChangeListener and respond to
+      ORDER_DATA_CHANGED events to refresh table display. OrdersApprovePanel
+      implements status cell renderer with color coding logic. Configuration
+      is explicit and unambiguous in client code.
+    risk_class: presentational
+    basis: >
+      OrdersViewPanel displays orders from tableModel in JTable with
+      TableSorter wrapper. Columns derived from OrderDetails transfer object:
+      OrderId, UserId, OrderDate, OrderAmount, OrderStatus. OrdersApprovePanel
+      creates JTable with same columns plus editable status column. Status
+      column uses DefaultCellEditor with JComboBox containing PENDING,
+      APPROVED, DENIED options. StatusRenderer applies background colors:
+      green for APPROVED, red for DENIED, yellow for PENDING. Both panels
+      respond to DATA_CHANGED events to refresh table display.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/client/com/sun/j2ee/blueprints/admin/client/OrdersViewPanel.java
+        line_start: 53
+        line_end: 85
+        excerpt: |
+          public class OrdersViewPanel extends JPanel implements PropertyChangeListener {
+              private JTable orderTable;
+              private TableModel tableModel;
+              private TableSorter sorter;
+              public OrdersViewPanel(TableModel tableModel) {
+                  this.tableModel = tableModel;
+                  createUI();
+              }
+              private void createUI() {
+                  setLayout(new BorderLayout());
+                  setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
+                  add(createTable(), BorderLayout.CENTER);
+              }
+              public void propertyChange(PropertyChangeEvent e) {
+                  String property = e.getPropertyName();
+                  if (DataSource.ORDER_DATA_CHANGED.equals(property)) {
+                      sorter.tableChanged(null);
+                  }
+              }
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/client/com/sun/j2ee/blueprints/admin/client/OrdersApprovePanel.java
+        line_start: 141
+        line_end: 177
+        excerpt: |
+          private JComponent createTable() {
+              sorter = new TableSorter(tableModel);
+              orderTable = new JTable(sorter);
+              // ... cell editor setup ...
+              statusRenderer = new DefaultTableCellRenderer() {
+                  public void setValue(Object value) {
+                      String str = (String)value;
+                      if (PetStoreProxy.Order.APPROVED.equals(str)) {
+                          setBackground(Color.green);
+                          setText(str);
+                      } else if (PetStoreProxy.Order.DENIED.equals(str)) {
+                          setBackground(Color.red);
+                          setText(str);
+                      } else if (PetStoreProxy.Order.PENDING.equals(str)) {
+                          setBackground(Color.yellow);
+                          setText(str);
+                      } else {
+                          super.setValue(str);
+                      }
+                  }
+              };
+
+  - record_key: customer-management-0001
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL require administrators to authenticate with a username
+      and password via form-based login before accessing admin functionality.
+      The default login credentials for demonstration purposes are username
+      'jps_admin' with password 'admin'.
+    confidence: medium
+    confidence_basis: >
+      login.jsp defines form-based login with hardcoded default credentials
+      in HTML input value attributes. These appear to be demonstration values
+      rather than enforced business rules. Form posts to j_security_check
+      for J2EE realm-based authentication. Single source but clearly
+      intentional for demo purposes.
+    risk_class: operational
+    basis: >
+      login.jsp contains form with j_username input (value="jps_admin") and
+      j_password input (value="admin"). Form action is j_security_check.
+      web.xml login-config specifies FORM auth-method with form-login-page
+      /login.jsp. realm-name is "default", indicating use of container's
+      default realm for credential validation.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/docroot/login.jsp
+        line_start: 52
+        line_end: 82
+        excerpt: |
+          <form action="j_security_check" method=post>
+          <table>
+          <tr>
+           <td align="center" >
+           <table border="0">
+           <tr>
+            <td><b>User ID:</b></td>
+            <td>
+              <input type="text" size="15" name="j_username" value="jps_admin">
+            </td>
+           </tr>
+           <tr>
+            <td><b>Password:</b></td>
+             <td>
+              <input type="password" size="15" name="j_password" value="admin">
+            </td>
+           </tr>
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/docroot/WEB-INF/web.xml
+        line_start: 90
+        line_end: 97
+        excerpt: |
+          <login-config>
+            <auth-method>FORM</auth-method>
+            <realm-name>default</realm-name>
+            <form-login-config>
+              <form-login-page>/login.jsp</form-login-page>
+              <form-error-page>/error.jsp</form-error-page>
+            </form-login-config>
+          </login-config>
+
+  - record_key: integration-0001
+    kind: integration
+    capability_key: order-approval
+    requirement: >
+      The system SHALL support delivery of rich client application through
+      Java Web Start (JNLP). When an authenticated administrator requests
+      the 'manageorders' screen, the system SHALL generate a dynamic JNLP
+      file containing the client application metadata, including server
+      hostname, port, and session ID for client-server communication.
+    confidence: medium
+    confidence_basis: >
+      AdminRequestProcessor.buildJNLP() generates JNLP XML dynamically from
+      request parameters. doPost() responds to currentScreen=manageorders
+      with JNLP content-type and calls buildJNLP(). JNLP template includes
+      codebase, jar references, and application descriptor with server
+      details and session ID. Implementation is clear but represents
+      deployment mechanism rather than core business logic.
+    risk_class: operational
+    basis: >
+      AdminRequestProcessor.doPost() checks currentScreen parameter. If value
+      is "manageorders", sets response content-type to "application/x-java-jnlp-file"
+      and outputs buildJNLP(req) result. buildJNLP() constructs JNLP XML with
+      codebase from req.getServerName() and req.getServerPort(), includes
+      jar references, and application-desc with main-class
+      PetStoreAdminClient, arguments including server details and
+      req.getSession().getId().
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/AdminRequestProcessor.java
+        line_start: 63
+        line_end: 120
+        excerpt: |
+          protected String buildJNLP(HttpServletRequest req) throws ServletException {
+              String serverName = req.getServerName();
+              int serverPort = req.getServerPort();
+              StringBuffer jnlp = new StringBuffer();
+              jnlp.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+              jnlp.append("<jnlp codebase=\"http://").append(serverName).append(":").append(serverPort).append("/admin\">\n");
+              jnlp.append("<information>\n").append("<title>Pet Store Admin Rich Client</title>\n");
+              jnlp.append("<argument>com.sun.j2ee.blueprints.admin.client.HttpPostPetStoreProxy</argument>\n");
+              jnlp.append("<argument>").append(serverName).append("</argument>\n");
+              jnlp.append("<argument>").append(serverPort).append("</argument>\n");
+              jnlp.append("<argument>").append(req.getSession().getId()).append("</argument>\n");
+          public void doPost(HttpServletRequest req, HttpServletResponse resp)
+              throws IOException, ServletException {
+              String curScreen = req.getParameter("currentScreen");
+              if(curScreen.equals("manageorders")) {
+                  resp.setContentType("application/x-java-jnlp-file");
+                  ServletOutputStream out = resp.getOutputStream();
+                  out.println(buildJNLP(req));
+
+  - record_key: integration-0002
+    kind: integration
+    capability_key: order-approval
+    requirement: >
+      The system SHALL use XML as the protocol for rich client communication
+      with the admin web tier. Requests SHALL include Type element identifying
+      operation (GETORDERS, UPDATESTATUS, REVENUE, ORDERS). Responses SHALL
+      include XML elements matching the request type (e.g., Order elements
+      for GETORDERS, Category/Item elements for chart requests).
+    confidence: high
+    confidence_basis: >
+      ApplRequestProcessor is the sole handler for rich client XML requests.
+      All three request types (getOrders, updateOrders, getChartInfo) are
+      explicitly implemented with XML parsing via DocumentBuilder and
+      response generation via StringBuffer XML construction. Pattern is
+      consistent and deterministic across all operations.
+    risk_class: operational
+    basis: >
+      ApplRequestProcessor.doPost() reads request XML via BufferedReader,
+      parses with DocumentBuilder, extracts root element and Type element
+      value. Dispatches to getOrders(), updateOrders(), or getChartInfo()
+      based on Type value. getOrders() extracts Status, calls getOrdersByStatus(),
+      iterates OrderDetails objects, appends XML elements for each. updateOrders()
+      extracts Order elements with OrderId and OrderStatus, builds OrderApproval
+      XML. getChartInfo() extracts Start, End, ReqCategory, calls getChartInfo(),
+      iterates Map entries, appends Category or Item XML elements with values.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+        line_start: 85
+        line_end: 164
+        excerpt: |
+          public void doPost(HttpServletRequest req, HttpServletResponse resp)
+              throws java.io.IOException, javax.servlet.ServletException {
+              HttpSession session = req.getSession(false);
+              ServletOutputStream out = resp.getOutputStream();
+              if(session == null) {
+                  // error handling
+              } else {
+                  String sId = session.getId();
+                  resp.setContentType("text/xml");
+                  BufferedReader inp = req.getReader();
+                  StringBuffer strbuf = new StringBuffer("");
+                  while(true) {
+                      String str = inp.readLine();
+                      if(str == null) break;
+                      strbuf.append(str+"\n");
+                  }
+                  out.println(processRequest(strbuf.toString()));
+              }
+          String processRequest(String xmlString) {
+              InputSource source =
+                  new InputSource(new ByteArrayInputStream(xmlString.getBytes()));
+              DocumentBuilder db =
+                  DocumentBuilderFactory.newInstance().newDocumentBuilder();
+              Element root = db.parse(source).getDocumentElement();
+              String reqType = getValue(root.getElementsByTagName("Type").item(0));
+              if (reqType.equals("GETORDERS")) {
+                  return getOrders(root);
+              }
+              else if (reqType.equals("UPDATESTATUS")) {
+                  return updateOrders(root);
+              }
+              else if (reqType.equals("REVENUE") || reqType.equals("ORDERS")) {
+                  return getChartInfo(root, reqType);
+              }
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+    description: >
+      The getProperDate() method uses deprecated Date constructor with
+      year.intValue()-1900, month.intValue()-1, day.intValue(). This
+      indicates legacy date handling from early Java versions where years
+      required the 1900 offset and months were zero-indexed. Unclear
+      whether this handles dates correctly across all input formats or
+      century boundaries. Modern implementations would use Calendar or
+      java.time API. Date arithmetic may not handle leap years or DST
+      correctly.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/apps/admin/src/docroot/WEB-INF/web.xml
+    description: >
+      The session-config specifies a session-timeout of 54 minutes. No
+      documentation explains why this specific value was chosen. It is
+      unclear whether this timeout applies to the admin web tier session,
+      the rich client session, or both. Whether sessions are shared or
+      separate between web tier and client application is not explicit
+      in the configuration.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/apps/admin/src/client/com/sun/j2ee/blueprints/admin/client/PetStoreAdminClient.java
+    description: >
+      The comment "TODO: If no network connection is currently available the
+      data will be cached locally until a network connection is available."
+      indicates an intended feature for offline caching. No evidence that
+      this feature was implemented. Current implementation appears to
+      require network connectivity at all times. Unclear whether this is
+      a design goal or aspirational comment.
+
+  - kind: unparseable
+    path: legacy-source/petstore1.3.2/src/apps/admin/src/admin/com/sun/j2ee/blueprints/admin/web/ApplRequestProcessor.java
+    description: >
+      Error handling in ApplRequestProcessor catches exceptions but
+      frequently returns null on error (line 201-202, 303) rather than
+      meaningful error XML. This makes it unclear how the client
+      interprets processing failures. Also, some exceptions (e.g.,
+      XMLDocumentException in AdminRequestBD) are caught and wrapped
+      but their handling is not shown in processRequest error cases.
+      Path through exception handling may result in null return instead
+      of client error message.

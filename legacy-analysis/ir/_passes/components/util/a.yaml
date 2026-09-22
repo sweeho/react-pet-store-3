@@ -1,0 +1,190 @@
+records:
+  - record_key: UTIL-REQUIREMENT-0001
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide a Debug utility class that offers static helper methods
+      for conditional debug output, controlled by a static boolean flag. Debug output
+      SHALL be disabled by default and MAY be toggled via the debuggingOn flag.
+    confidence: high
+    confidence_basis: >
+      The Debug class defines a public static final boolean field debuggingOn with explicit
+      initialization to false. This is the sole mechanism for controlling debug output
+      throughout the application. The implementation is straightforward and visible in code.
+    risk_class: operational
+    basis: >
+      The Debug class in com.sun.j2ee.blueprints.util.tracer package defines the debuggingOn
+      field at the class level and checks it in every public method before producing output.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 44
+        line_end: 52
+        excerpt: |
+          public final class Debug {
+              public static final boolean debuggingOn = false;
+              public static void print(String msg) {
+                  if (debuggingOn) {
+                      System.err.print(msg);
+                  }
+              }
+
+  - record_key: UTIL-REQUIREMENT-0002
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide a print(String msg) method that writes the message to
+      System.err only when debug is enabled.
+    confidence: high
+    confidence_basis: >
+      The method is explicitly defined with guard condition. The behavior is deterministic
+      and enforced at the source level.
+    risk_class: operational
+    basis: >
+      The Debug.print(String) method contains an if (debuggingOn) check before calling
+      System.err.print().
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 48
+        line_end: 52
+        excerpt: |
+          public static void print(String msg) {
+              if (debuggingOn) {
+                  System.err.print(msg);
+              }
+          }
+
+  - record_key: UTIL-REQUIREMENT-0003
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide a println(String msg) method that writes the message
+      prefixed with ">>" to System.err only when debug is enabled.
+    confidence: high
+    confidence_basis: >
+      The method is explicitly defined with the prefix transformation visible in code.
+      The guard condition and prefix are deterministic.
+    risk_class: operational
+    basis: >
+      The Debug.println(String) method prefixes all output with ">>" and writes to
+      System.err only when debuggingOn is true.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 54
+        line_end: 58
+        excerpt: |
+          public static void println(String msg) {
+              if (debuggingOn) {
+                  System.err.println(">>" + msg);
+              }
+          }
+
+  - record_key: UTIL-REQUIREMENT-0004
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide overloaded print(Throwable t) and print(Throwable t, String msg)
+      methods that output exception stack traces to System.out only when debug is enabled.
+    confidence: high
+    confidence_basis: >
+      Two overloaded methods are explicitly defined. One delegates to the other with msg=null.
+      The behavior is enforced at the method level.
+    risk_class: operational
+    basis: >
+      The Debug class defines print(Throwable t) which calls print(t, null), and print(Throwable t, String msg)
+      which outputs the exception message via t.getMessage() and optionally msg, then calls t.printStackTrace().
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 64
+        line_end: 78
+        excerpt: |
+          public static void print(Exception e) {
+              print(e, null);
+          }
+          public static void print(Throwable t, String msg) {
+              if (debuggingOn) {
+                  System.out.println("Received throwable with Message: "+t.getMessage());
+                  if (msg != null)
+                      System.out.print(msg);
+                  t.printStackTrace();
+              }
+          }
+          public static void print(Throwable t) {
+              print(t, null);
+          }
+
+  - record_key: UTIL-REQUIREMENT-0005
+    kind: requirement
+    capability_key: admin-dashboard
+    requirement: >
+      The system SHALL provide an overloaded print(Exception e, String msg) method
+      that delegates to the Throwable variant, treating Exception as a subtype of Throwable.
+    confidence: high
+    confidence_basis: >
+      The method is explicitly defined and the delegation is visible in code. This is
+      a simple bridge method with no ambiguity.
+    risk_class: operational
+    basis: >
+      The Debug class includes print(Exception e, String msg) that calls print((Throwable)e, msg),
+      and print(Exception e) that calls print(e, null).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 60
+        line_end: 66
+        excerpt: |
+          public static void print(Exception e, String msg) {
+              print((Throwable)e, msg);
+          }
+          public static void print(Exception e) {
+              print(e, null);
+          }
+
+  - record_key: UTIL-ENTITY-0001
+    kind: entity
+    capability_key: admin-dashboard
+    requirement: >
+      The Debug utility class SHALL be a final, non-instantiable utility class containing
+      only static methods and static fields.
+    confidence: high
+    confidence_basis: >
+      The class is declared as public final class Debug, and the constructor (if any)
+      is implicitly private by convention. The class documentation states it is a helper
+      class for debug output.
+    risk_class: operational
+    basis: >
+      The Debug class is declared public final and contains no instance fields or non-static methods.
+      The javadoc comment explicitly labels it as a helper class.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+        line_start: 40
+        line_end: 46
+        excerpt: |
+          /**
+           * This class is just a helper class to make it handy
+           * to print out debug statements
+           */
+          public final class Debug {
+              public static final boolean debuggingOn = false;
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+    description: >
+      The debuggingOn flag is declared as a public static final constant set to false.
+      There is no runtime mechanism to enable debugging (no environment variable, no
+      configuration file, no JVM property check). To enable debug output, the source code
+      must be modified and recompiled. The intent is unclear: is this a development-time
+      aid that should never be enabled in production, or is there an external build variant
+      that sets debuggingOn to true? No documentation exists to clarify this design choice.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/util/tracer/src/com/sun/j2ee/blueprints/util/tracer/Debug.java
+    description: >
+      The print(Throwable t, String msg) method outputs to System.out for the exception
+      message and stack trace, while print(String msg) outputs to System.err. This
+      inconsistency (stdout vs. stderr) is not documented and may cause confusion.
+      The design intent is unclear: should all debug output go to the same stream?
+
+stack_metadata:
+  framework: J2EE
+  utility.scope: cross-cutting (used by 14+ modules in the application)
+  output.stream: System.err (for strings), System.out (for exceptions)

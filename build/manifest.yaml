@@ -232,7 +232,7 @@ capabilities:
       reviewedAt: null
 
   - slug: admin-dashboard
-    title: Admin Dashboard (Not Extracted in SX-0001)
+    title: Administrator Dashboard and Order Management
     order: 7
     dependsOn: []
     priority: 0
@@ -241,24 +241,41 @@ capabilities:
       specCapabilities:
         - admin-dashboard
     canvas:
-      problem: Placeholder entry for admin-dashboard capability
-      solution: Not extracted in this run
+      problem: Administrators need a secure interface to manage orders, approve status changes, and view sales analytics with role-based access control
+      solution: Implement administrator dashboard with JSP web tier, rich Swing-based client delivered via Java WebStart, EJB facade for data access, and XML-based communication between tiers
       userStories:
-        - Placeholder
+        - As an administrator, I want to authenticate securely and access an admin portal with extended session timeout
+        - As an administrator, I want to browse, filter, and approve order status changes through a rich client interface
+        - As an administrator, I want to view revenue and order quantity analytics aggregated by category with date range filtering
+        - As the system, I want to manage admin sessions with 54-minute timeout and deliver rich clients via JNLP
       acceptanceCriteria:
-        - Placeholder
+        - Administrator login with form-based authentication and role-based access control (administrator role required)
+        - Admin session management with 54-minute timeout for web tier
+        - Order management interface with tabs for viewing all orders by status and approving pending orders
+        - Order status filtering (PENDING, APPROVED, DENIED, COMPLETED) with table display
+        - Analytics dashboard with revenue aggregation (sum of quantity × unit_price) and order quantity by category
+        - Rich client application delivered via JNLP with state preservation using Base64-encoded hidden form variables
       outOfScope:
-        - All features pending future extraction
+        - Legacy implementation details (Struts, JSP tags, specific Java class names)
+        - Batch processing and scheduled order management
+        - Customer-facing portal (separate capability)
+        - Order processing workflow (separate order-workflow and order-approval capabilities)
       risksAssumptions: []
       techStack: []
       affectedCode: []
+      screens:
+        - "Admin login screen: displays username and password fields with sign-on button; authenticates against application security realm"
+        - "Admin home page: displays 'Launch Rich Client' button and 'logout' button after successful authentication"
+        - "Order management view tab: displays table with columns for OrderId, UserId, OrderDate, OrderAmount, OrderStatus; supports status filtering"
+        - "Order approval tab: displays pending orders with checkboxes for selection and 'Approve' button to change status"
+        - "Analytics dashboard: displays revenue and order quantity aggregated by category with date range filtering controls"
     evidence:
       irRefs: []
       reviewedBy: null
       reviewedAt: null
 
   - slug: catalog-browsing
-    title: Catalog Browsing (Not Extracted in SX-0001)
+    title: Catalog Browsing and Product Discovery
     order: 8
     dependsOn: []
     priority: 0
@@ -267,24 +284,41 @@ capabilities:
       specCapabilities:
         - catalog-browsing
     canvas:
-      problem: Placeholder entry for catalog-browsing capability
-      solution: Not extracted in this run
+      problem: Customers need a hierarchical interface to discover and browse product categories, products, and items with pagination and search capabilities
+      solution: Implement catalog service using stateless EJB facade with DAO factory pattern, supporting three-level taxonomy navigation, offset-based pagination, full-text search, and locale-aware queries
       userStories:
-        - Placeholder
+        - As a customer, I want to browse product categories in a hierarchical structure
+        - As a customer, I want to navigate products within categories and view items with details
+        - As a customer, I want to search catalog items by name or description with full-text matching
+        - As a customer, I want to paginate through large result sets with forward and backward navigation
+        - As a customer, I want to see products and items in my preferred locale
+        - As the system, I want to provide unrestricted public access to all catalog operations
       acceptanceCriteria:
-        - Placeholder
+        - Catalog provides three-level hierarchy navigation (Categories > Products > Items)
+        - Search supports full-text substring matching across item names, descriptions, and attributes
+        - Pagination uses offset-based navigation with bidirectional traversal (next/previous)
+        - All queries are parameterized with locale for multi-language support
+        - Item entity includes 13 attributes including category, productId, productName, description, listPrice, unitCost, imageLocation, and five generic attributes
+        - All operations execute within container-managed transactions with Required semantics
+        - Public access (unrestricted) with declarative security via unchecked permission
       outOfScope:
-        - All features pending future extraction
+        - Shopping cart integration (separate shopping-cart capability)
+        - Order processing (separate order-workflow capability)
+        - Product administration and catalog management
+        - Inventory management
+        - Dynamic pricing or promotional pricing
       risksAssumptions: []
       techStack: []
       affectedCode: []
+      screens:
+        - "Catalog browse screen: displays hierarchical category list with product navigation; supports pagination with offset-based positioning"
     evidence:
       irRefs: []
       reviewedBy: null
       reviewedAt: null
 
   - slug: creditcard-validation
-    title: Credit Card Validation (Not Extracted in SX-0001)
+    title: Credit Card Data Storage and Validation
     order: 9
     dependsOn: []
     priority: 0
@@ -293,14 +327,28 @@ capabilities:
       specCapabilities:
         - creditcard-validation
     canvas:
-      problem: Placeholder entry for creditcard-validation capability
-      solution: Not extracted in this run
+      problem: The system needs secure storage and management of credit card data with validation and serialization support
+      solution: Implement credit card storage using CMP 2.x EJB entity bean with field validation, MM/YYYY expiry date parsing, XML serialization, and container-managed transactions
       userStories:
-        - Placeholder
+        - As a customer, I want to provide credit card details during checkout with validation of card type and expiry date format
+        - As the system, I want to persist credit card data securely in an entity bean with multiple creation methods
+        - As the system, I want to serialize credit card data to XML for integration scenarios
+        - As the system, I want to enforce transactional integrity on all card operations
       acceptanceCriteria:
-        - Placeholder
+        - Credit card entity supports three card types: Java Card, Duke Express, Meow Card
+        - Expiry date parsed from MM/YYYY format with component extraction and validation
+        - Card number stored as string field (up to 30 characters based on form constraints)
+        - Container-managed persistence via CMP 2.x with Required transaction semantics
+        - XML serialization support via DOM-based marshalling
+        - Multiple creation paths through overloaded create() methods
+        - Unrestricted public access with declarative security (unchecked permission)
       outOfScope:
-        - All features pending future extraction
+        - Payment processing and authorization
+        - Credit card validation algorithms (Luhn, etc.)
+        - PCI compliance and encryption
+        - Fraud detection
+        - Card tokenization
+        - Integration with payment gateways
       risksAssumptions: []
       techStack: []
       affectedCode: []
@@ -310,7 +358,7 @@ capabilities:
       reviewedAt: null
 
   - slug: customer-communications
-    title: Customer Communications (Not Extracted in SX-0001)
+    title: Customer Communications and Notifications
     order: 10
     dependsOn: []
     priority: 0
@@ -319,14 +367,26 @@ capabilities:
       specCapabilities:
         - customer-communications
     canvas:
-      problem: Placeholder entry for customer-communications capability
-      solution: Not extracted in this run
+      problem: The system needs to send asynchronous customer communications and notifications for orders and status updates
+      solution: Implement customer communications using JMS-based AsyncSender EJB for decoupled asynchronous messaging, DOM-based XML serialization, and email delivery with exception handling
       userStories:
-        - Placeholder
+        - As an order system, I want to send order confirmations and status updates to customers asynchronously
+        - As the system, I want to queue customer communications via JMS for reliable delivery
+        - As the system, I want to serialize communication content to XML format
+        - As the system, I want to map delivery failures to error screens for visibility
       acceptanceCriteria:
-        - Placeholder
+        - Asynchronous messaging via JMS queue for decoupled communication
+        - Email delivery for order confirmations and status updates
+        - XML serialization using DOM-based document construction
+        - Exception handling that maps delivery failures to error screens
+        - Unrestricted public access to communication API
+        - Transactional semantics for message queuing and delivery
       outOfScope:
-        - All features pending future extraction
+        - SMS or push notifications
+        - Customer preference management for communication channels
+        - Message templating systems
+        - Delivery retry logic or queue management
+        - Email address verification or validation
       risksAssumptions: []
       techStack: []
       affectedCode: []

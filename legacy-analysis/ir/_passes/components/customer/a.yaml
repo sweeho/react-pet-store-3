@@ -1,0 +1,614 @@
+records:
+  - record_key: CUSTOMER-ENTITY-0001
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain a Customer entity with a unique userId as the primary key.
+      Each customer SHALL be associated with exactly one Account and exactly one Profile entity.
+    confidence: high
+    confidence_basis: >
+      Both EJB container-managed persistence (CMP 2.x) definitions and programmatic
+      creation logic (ejbPostCreate) enforce this structure. The relationships are
+      declared declaratively in ejb-jar.xml with cascade-delete constraints, making
+      them structural invariants.
+    risk_class: operational
+    basis: >
+      Customer EJB is declared as a CMP 2.x entity bean with userId as the primary key.
+      The ejb-jar.xml defines one-to-one relationships between Customer and Account,
+      and between Customer and Profile. AccountEJB and ProfileEJB are created in
+      ejbPostCreate when a Customer is created.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 46
+        line_end: 88
+        excerpt: |
+          <entity>
+            <display-name>CustomerEB</display-name>
+            <ejb-name>CustomerEJB</ejb-name>
+            <ejb-class>com.sun.j2ee.blueprints.customer.ejb.CustomerEJB</ejb-class>
+            <persistence-type>Container</persistence-type>
+            <prim-key-class>java.lang.String</prim-key-class>
+            <cmp-version>2.x</cmp-version>
+            <cmp-field>
+              <field-name>userId</field-name>
+            </cmp-field>
+            <primkey-field>userId</primkey-field>
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/ejb/CustomerEJB.java
+        line_start: 69
+        line_end: 89
+        excerpt: |
+          public String ejbCreate(String userId) throws CreateException {
+              setUserId(userId);
+              return null;
+          }
+          public void ejbPostCreate(String userId) throws CreateException {
+              InitialContext ic = new InitialContext();
+              AccountLocalHome alh = (AccountLocalHome) ic.lookup("java:comp/env/ejb/Account");
+              AccountLocal account = alh.create(AccountLocalHome.Active);
+              setAccount(account);
+              ProfileLocalHome plh = (ProfileLocalHome) ic.lookup("java:comp/env/ejb/Profile");
+              ProfileLocal profile = plh.create(...);
+              setProfile(profile);
+    stack_metadata:
+      ejb.bean: CustomerEJB
+      db.object: Customer
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-ENTITY-0002
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain an Account entity for each Customer with a status field.
+      Each Account SHALL be associated with exactly one ContactInfo entity and exactly one CreditCard entity.
+    confidence: high
+    confidence_basis: >
+      CMP 2.x entity declared with Container persistence. One-to-one relationships with
+      cascade-delete are declaratively enforced in ejb-jar.xml. The relationships are
+      created programmatically in AccountEJB.ejbPostCreate.
+    risk_class: operational
+    basis: >
+      Account EJB is a CMP 2.x entity with a status CMP field. ejb-jar.xml declares
+      one-to-one relationships with ContactInfo and CreditCard. AccountEJB.ejbPostCreate
+      creates default ContactInfo and CreditCard instances when an Account is created.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 229
+        line_end: 262
+        excerpt: |
+          <entity>
+            <display-name>AccountEB</display-name>
+            <ejb-name>AccountEJB</ejb-name>
+            <ejb-class>com.sun.j2ee.blueprints.customer.account.ejb.AccountEJB</ejb-class>
+            <persistence-type>Container</persistence-type>
+            <cmp-field>
+              <field-name>status</field-name>
+            </cmp-field>
+            <ejb-local-ref>
+              <ejb-ref-name>ejb/CreditCard</ejb-ref-name>
+              <ejb-link>CreditCardEJB</ejb-link>
+            </ejb-local-ref>
+            <ejb-local-ref>
+              <ejb-ref-name>ejb/ContactInfo</ejb-ref-name>
+              <ejb-link>ContactInfoEJB</ejb-link>
+            </ejb-local-ref>
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/account/ejb/AccountEJB.java
+        line_start: 75
+        line_end: 93
+        excerpt: |
+          public Object ejbCreate(String status) throws CreateException {
+              setStatus(status);
+              return null;
+          }
+          public void ejbPostCreate(String status) throws CreateException {
+              setStatus(status);
+              try {
+                  InitialContext ic = new InitialContext();
+                  ContactInfoLocalHome cih = (ContactInfoLocalHome) ic.lookup("java:comp/env/ejb/ContactInfo");
+                  ContactInfoLocal contactInfo = cih.create();
+                  setContactInfo(contactInfo);
+                  CreditCardLocalHome cch = (CreditCardLocalHome) ic.lookup("java:comp/env/ejb/CreditCard");
+                  CreditCardLocal creditCard = cch.create();
+                  setCreditCard(creditCard);
+    stack_metadata:
+      ejb.bean: AccountEJB
+      db.object: Account
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-ENTITY-0003
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain a Profile entity for each Customer with fields for
+      preferredLanguage, favoriteCategory, myListPreference (boolean), and bannerPreference (boolean).
+    confidence: high
+    confidence_basis: >
+      CMP 2.x entity declared with four CMP fields. Profile creation parameters are
+      enforced by the EJB container at ejbCreate time. The fields are accessed in
+      multiple places (ejbPostCreate and SignOnEJBAction) confirming their necessity.
+    risk_class: operational
+    basis: >
+      ProfileEJB declares four CMP fields. ejb-jar.xml defines the fields and their
+      create parameters. SignOnEJBAction accesses profile.getPreferredLanguage() to
+      set user locale. CustomerEJBAction sets all four fields during customer updates.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 90
+        line_end: 121
+        excerpt: |
+          <entity>
+            <display-name>ProfileEB</display-name>
+            <ejb-name>ProfileEJB</ejb-name>
+            <cmp-field><field-name>preferredLanguage</field-name></cmp-field>
+            <cmp-field><field-name>myListPreference</field-name></cmp-field>
+            <cmp-field><field-name>favoriteCategory</field-name></cmp-field>
+            <cmp-field><field-name>bannerPreference</field-name></cmp-field>
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/profile/ejb/ProfileEJB.java
+        line_start: 50
+        line_end: 73
+        excerpt: |
+          public abstract String getPreferredLanguage();
+          public abstract void setPreferredLanguage(String preferredLanguage);
+          public abstract String getFavoriteCategory();
+          public abstract void setFavoriteCategory(String category);
+          public abstract boolean getMyListPreference();
+          public abstract void setMyListPreference(boolean myListPreference);
+          public abstract boolean getBannerPreference();
+          public abstract void setBannerPreference(boolean bannerPreference);
+          public Object ejbCreate(String preferredLanguage, String favoriteCategory,
+          boolean myListPreference, boolean bannerPreference) throws CreateException {
+    stack_metadata:
+      ejb.bean: ProfileEJB
+      db.object: Profile
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-ENTITY-0004
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain a ContactInfo entity with fields for familyName, givenName,
+      telephone, and email. Each ContactInfo SHALL be associated with exactly one Address entity.
+    confidence: high
+    confidence_basis: >
+      ContactInfo is declared as CMP 2.x entity with four CMP fields. One-to-one
+      relationship with Address is declared in ejb-jar.xml with cascade-delete.
+      CustomerEJBAction accesses all four fields during customer updates, confirming
+      their use.
+    risk_class: operational
+    basis: >
+      ContactInfoEJB declares four CMP fields. ejb-jar.xml defines the entity and its
+      one-to-one relationship with AddressEJB. CustomerEJBAction.updateCustomer()
+      sets familyName, givenName, telephone, and email on the ContactInfo instance.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 150
+        line_end: 188
+        excerpt: |
+          <entity>
+            <display-name>ContactInfoEB</display-name>
+            <ejb-name>ContactInfoEJB</ejb-name>
+            <cmp-field><field-name>familyName</field-name></cmp-field>
+            <cmp-field><field-name>telephone</field-name></cmp-field>
+            <cmp-field><field-name>givenName</field-name></cmp-field>
+            <cmp-field><field-name>email</field-name></cmp-field>
+            <ejb-local-ref>
+              <ejb-ref-name>ejb/Address</ejb-ref-name>
+              <ejb-link>AddressEJB</ejb-link>
+            </ejb-local-ref>
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CustomerEJBAction.java
+        line_start: 114
+        line_end: 128
+        excerpt: |
+          ContactInfo contactInfo = ce.getContactInfo();
+          contactInfoLocal.setFamilyName(contactInfo.getFamilyName());
+          contactInfoLocal.setGivenName(contactInfo.getGivenName());
+          contactInfoLocal.setTelephone(contactInfo.getPhone());
+          contactInfoLocal.setEmail(contactInfo.getEmail());
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      db.object: ContactInfo
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-ENTITY-0005
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain an Address entity with fields for streetName1, streetName2,
+      city, zipCode, state, and country.
+    confidence: high
+    confidence_basis: >
+      AddressEJB declares six CMP fields. They are set programmatically in
+      CustomerEJBAction.updateCustomer(), confirming all six fields are required.
+      One-to-one relationship with ContactInfo is declaratively enforced.
+    risk_class: operational
+    basis: >
+      AddressEJB declares six CMP fields in ejb-jar.xml. CustomerEJBAction.updateCustomer()
+      accesses and sets all six address fields via the AddressLocal interface.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 189
+        line_end: 228
+        excerpt: |
+          <entity>
+            <display-name>AddressEB</display-name>
+            <ejb-name>AddressEJB</ejb-name>
+            <cmp-field><field-name>zipCode</field-name></cmp-field>
+            <cmp-field><field-name>state</field-name></cmp-field>
+            <cmp-field><field-name>streetName2</field-name></cmp-field>
+            <cmp-field><field-name>streetName1</field-name></cmp-field>
+            <cmp-field><field-name>country</field-name></cmp-field>
+            <cmp-field><field-name>city</field-name></cmp-field>
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CustomerEJBAction.java
+        line_start: 121
+        line_end: 128
+        excerpt: |
+          addressLocal.setStreetName1(address.getStreetName1());
+          addressLocal.setStreetName2(address.getStreetName2());
+          addressLocal.setCity(address.getCity());
+          addressLocal.setZipCode(address.getZipCode());
+          addressLocal.setState(address.getState());
+          addressLocal.setCountry(address.getCountry());
+    stack_metadata:
+      ejb.bean: AddressEJB
+      db.object: Address
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-ENTITY-0006
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain a CreditCard entity with fields for cardType, cardNumber, and expiryDate.
+    confidence: high
+    confidence_basis: >
+      CreditCardEJB declares three CMP fields. The expiryDate field is accessed in multiple
+      ways (getExpiryDate, getExpiryMonth, getExpiryYear methods declared in ejb-jar.xml),
+      indicating it is parsed as a string in MMYY format. All three fields are set in
+      CustomerEJBAction during customer updates.
+    risk_class: financial
+    basis: >
+      CreditCardEJB declares three CMP fields: cardType, cardNumber, expiryDate.
+      The ejb-jar.xml declares methods getExpiryMonth() and getExpiryYear() suggesting
+      the expiryDate field is parsed as MMYY or similar format. CustomerEJBAction sets
+      all three fields during customer updates.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/ejb-jar.xml
+        line_start: 122
+        line_end: 149
+        excerpt: |
+          <entity>
+            <display-name>CreditCardEB</display-name>
+            <ejb-name>CreditCardEJB</ejb-name>
+            <cmp-field><field-name>cardType</field-name></cmp-field>
+            <cmp-field><field-name>expiryDate</field-name></cmp-field>
+            <cmp-field><field-name>cardNumber</field-name></cmp-field>
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CustomerEJBAction.java
+        line_start: 130
+        line_end: 134
+        excerpt: |
+          CreditCard creditCard = ce.getCreditCard();
+          CreditCardLocal creditCardLocal = account.getCreditCard();
+          creditCardLocal.setCardNumber(creditCard.getCardNumber());
+          creditCardLocal.setCardType(creditCard.getCardType());
+          creditCardLocal.setExpiryDate(creditCard.getExpiryDate());
+    stack_metadata:
+      ejb.bean: CreditCardEJB
+      db.object: CreditCard
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-WORKFLOW-0001
+    kind: workflow
+    capability_key: customer-management
+    requirement: >
+      The system SHALL support a customer creation workflow:
+      1. Create a user identity in the SignOn system (CreateUserEJBAction)
+      2. Create a new Customer entity with a userId
+      3. The Customer creation SHALL automatically create an associated Account entity with status ACTIVE
+      4. The Customer creation SHALL automatically create an associated Profile entity with default preferences
+      5. Update the customer's Account with contact information, address, and credit card details (CustomerEJBAction)
+    confidence: high
+    confidence_basis: >
+      The workflow is enacted across two action classes (CreateUserEJBAction and CustomerEJBAction)
+      and the ejbPostCreate methods of CustomerEJB and AccountEJB. CreateUserEJBAction is called
+      first to create the SignOn user, then CustomerEJBAction is called to update the new customer.
+      The automatic creation of Account and Profile is declaratively enforced via ejbPostCreate
+      and container-managed relationships.
+    risk_class: operational
+    basis: >
+      CreateUserEJBAction.perform() creates a SignOn user and sets the userId in ShoppingClientFacadeLocal.
+      CustomerEJBAction.perform() handles CREATE and UPDATE actions. For CREATE, it calls
+      scf.createCustomer(userId), then calls updateCustomer(). For UPDATE, it calls updateCustomer().
+      CustomerEJB.ejbPostCreate() automatically creates Account and Profile.
+      AccountEJB.ejbPostCreate() automatically creates ContactInfo and CreditCard.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CreateUserEJBAction.java
+        line_start: 78
+        line_end: 103
+        excerpt: |
+          public EventResponse perform(Event e) throws EventException {
+              CreateUserEvent cue = (CreateUserEvent)e;
+              SignOnLocal signOn = null;
+              String userName = cue.getUserName();
+              try {
+                  ServiceLocator sl = new ServiceLocator();
+                  SignOnLocalHome home =(SignOnLocalHome)sl.getLocalHome(JNDINames.SIGN_ON_EJBHOME);
+                  signOn = home.create();
+              } catch (ServiceLocatorException  slx) {
+                  throw new DuplicateAccountException("Failed to Create SignOn EJB: caught " + slx);
+              }
+              try {
+                  signOn.createUser(userName, password);
+                  ShoppingClientFacadeLocal scf = null;
+                  scf = (ShoppingClientFacadeLocal)machine.getAttribute(PetstoreKeys.SHOPPING_CLIENT_FACADE);
+                  scf.setUserId(userName);
+              } catch (CreateException ce) {
+                  throw new DuplicateAccountException("Bad UserName or password");
+              }
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CustomerEJBAction.java
+        line_start: 80
+        line_end: 96
+        excerpt: |
+          public EventResponse perform(Event e) throws EventException {
+              CustomerEvent ce = (CustomerEvent)e;
+              scf = (ShoppingClientFacadeLocal)machine.getAttribute(PetstoreKeys.SHOPPING_CLIENT_FACADE);
+              switch (ce.getActionType()) {
+                  case CustomerEvent.CREATE : {
+                    String userId = scf.getUserId();
+                    scf.createCustomer(userId);
+                    updateCustomer(ce);
+                    break;
+                  }
+                  case CustomerEvent.UPDATE : {
+                    updateCustomer(ce);
+                    break;
+                  }
+              }
+              return null;
+          }
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/ejb/CustomerEJB.java
+        line_start: 74
+        line_end: 89
+        excerpt: |
+          public void ejbPostCreate(String userId) throws CreateException {
+              try {
+              InitialContext ic = new InitialContext();
+              AccountLocalHome alh = (AccountLocalHome) ic.lookup("java:comp/env/ejb/Account");
+              AccountLocal account = alh.create(AccountLocalHome.Active);
+              setAccount(account);
+              ProfileLocalHome plh = (ProfileLocalHome) ic.lookup("java:comp/env/ejb/Profile");
+              ProfileLocal profile = plh.create(ProfileLocalHome.DefaultPreferredLanguage,
+              ProfileLocalHome.DefaultFavoriteCategory, ProfileLocalHome.DefaultMyListPreference,
+              ProfileLocalHome.DefaultBannerPreference);
+              setProfile(profile);
+    stack_metadata:
+      framework: Struts-based MVC
+      ejb.bean: CustomerEJB, AccountEJB, ProfileEJB
+
+  - record_key: CUSTOMER-BUSINESS-RULE-0001
+    kind: business-rule
+    capability_key: customer-management
+    requirement: >
+      When a Customer entity is created, an associated Account entity SHALL be automatically
+      created with status = ACTIVE (or "Active" based on AccountLocalHome.Active constant).
+    confidence: high
+    confidence_basis: >
+      The account creation is hardcoded in CustomerEJB.ejbPostCreate() with the status
+      passed as AccountLocalHome.Active. This is a structural invariant enforced at the
+      EJB container level every time a Customer is created.
+    risk_class: operational
+    basis: >
+      CustomerEJB.ejbPostCreate() contains the line:
+      AccountLocal account = alh.create(AccountLocalHome.Active);
+      This hardcodes the initial account status to the Active constant, ensuring every
+      customer has an active account.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/ejb/CustomerEJB.java
+        line_start: 74
+        line_end: 85
+        excerpt: |
+          public void ejbPostCreate(String userId) throws CreateException {
+              try {
+              InitialContext ic = new InitialContext();
+              AccountLocalHome alh = (AccountLocalHome) ic.lookup("java:comp/env/ejb/Account");
+              AccountLocal account = alh.create(AccountLocalHome.Active);
+              setAccount(account);
+    stack_metadata:
+      ejb.bean: CustomerEJB
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-BUSINESS-RULE-0002
+    kind: business-rule
+    capability_key: customer-management
+    requirement: >
+      When an Account entity is created, associated ContactInfo and CreditCard entities
+      SHALL be automatically created with default (empty) values.
+    confidence: high
+    confidence_basis: >
+      AccountEJB.ejbPostCreate() explicitly creates both ContactInfo and CreditCard
+      entities using lookup and create() calls. This is a structural invariant enforced
+      at account creation time.
+    risk_class: operational
+    basis: >
+      AccountEJB.ejbPostCreate() contains explicit creation of ContactInfo and CreditCard:
+      ContactInfoLocal contactInfo = cih.create();
+      CreditCardLocal creditCard = cch.create();
+      Both are created without arguments, resulting in default/empty values.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/account/ejb/AccountEJB.java
+        line_start: 80
+        line_end: 94
+        excerpt: |
+          public void ejbPostCreate(String status) throws CreateException {
+              setStatus(status);
+              try {
+                  InitialContext ic = new InitialContext();
+                  ContactInfoLocalHome cih = (ContactInfoLocalHome) ic.lookup("java:comp/env/ejb/ContactInfo");
+                  ContactInfoLocal contactInfo = cih.create();
+                  setContactInfo(contactInfo);
+                  CreditCardLocalHome cch = (CreditCardLocalHome) ic.lookup("java:comp/env/ejb/CreditCard");
+                  CreditCardLocal creditCard = cch.create();
+                  setCreditCard(creditCard);
+    stack_metadata:
+      ejb.bean: AccountEJB
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-BUSINESS-RULE-0003
+    kind: business-rule
+    capability_key: customer-management
+    requirement: >
+      When a Customer entity is created, an associated Profile entity SHALL be automatically
+      created with default values:
+      preferredLanguage = ProfileLocalHome.DefaultPreferredLanguage
+      favoriteCategory = ProfileLocalHome.DefaultFavoriteCategory
+      myListPreference = ProfileLocalHome.DefaultMyListPreference
+      bannerPreference = ProfileLocalHome.DefaultBannerPreference
+    confidence: high
+    confidence_basis: >
+      The profile creation is hardcoded in CustomerEJB.ejbPostCreate() with explicit
+      default constant values passed to the create method. This is an invariant enforced
+      at EJB container level.
+    risk_class: operational
+    basis: >
+      CustomerEJB.ejbPostCreate() creates Profile with hardcoded defaults:
+      ProfileLocal profile = plh.create(ProfileLocalHome.DefaultPreferredLanguage,
+      ProfileLocalHome.DefaultFavoriteCategory, ProfileLocalHome.DefaultMyListPreference,
+      ProfileLocalHome.DefaultBannerPreference);
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/customer/src/com/sun/j2ee/blueprints/customer/ejb/CustomerEJB.java
+        line_start: 81
+        line_end: 85
+        excerpt: |
+          ProfileLocalHome plh = (ProfileLocalHome) ic.lookup("java:comp/env/ejb/Profile");
+          ProfileLocal profile = plh.create(ProfileLocalHome.DefaultPreferredLanguage,
+          ProfileLocalHome.DefaultFavoriteCategory, ProfileLocalHome.DefaultMyListPreference,
+          ProfileLocalHome.DefaultBannerPreference);
+          setProfile(profile);
+    stack_metadata:
+      ejb.bean: ProfileEJB
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-BUSINESS-RULE-0004
+    kind: business-rule
+    capability_key: customer-management
+    requirement: >
+      Customer account updates SHALL deep-copy data from transfer objects (ContactInfo, CreditCard, ProfileInfo)
+      to the corresponding EJB entity instances. Each nested object (Address within ContactInfo) SHALL also
+      be deep-copied.
+    confidence: high
+    confidence_basis: >
+      CustomerEJBAction.updateCustomer() explicitly performs field-by-field copying from
+      transfer objects to EJB entities. The pattern is repeated for ContactInfo, Address,
+      CreditCard, and Profile, confirming this is an intentional design pattern.
+    risk_class: operational
+    basis: >
+      CustomerEJBAction.updateCustomer() contains explicit setter calls copying each field
+      from transfer objects to local EJB instances. No automatic mapping or serialization is used.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CustomerEJBAction.java
+        line_start: 114
+        line_end: 141
+        excerpt: |
+          ContactInfo contactInfo = ce.getContactInfo();
+          contactInfoLocal.setFamilyName(contactInfo.getFamilyName());
+          contactInfoLocal.setGivenName(contactInfo.getGivenName());
+          contactInfoLocal.setTelephone(contactInfo.getPhone());
+          contactInfoLocal.setEmail(contactInfo.getEmail());
+          Address address = contactInfo.getAddress();
+          AddressLocal addressLocal = contactInfoLocal.getAddress();
+          addressLocal.setStreetName1(address.getStreetName1());
+          addressLocal.setStreetName2(address.getStreetName2());
+          addressLocal.setCity(address.getCity());
+          addressLocal.setZipCode(address.getZipCode());
+          addressLocal.setState(address.getState());
+          addressLocal.setCountry(address.getCountry());
+          CreditCard creditCard = ce.getCreditCard();
+          CreditCardLocal creditCardLocal = account.getCreditCard();
+          creditCardLocal.setCardNumber(creditCard.getCardNumber());
+          creditCardLocal.setCardType(creditCard.getCardType());
+          creditCardLocal.setExpiryDate(creditCard.getExpiryDate());
+          ProfileInfo profileInfo = ce.getProfileInfo();
+          ProfileLocal profileLocal = customer.getProfile();
+          profileLocal.setPreferredLanguage(profileInfo.getPreferredLanguage());
+          profileLocal.setFavoriteCategory(profileInfo.getFavoriteCategory());
+          profileLocal.setMyListPreference(profileInfo.getMyListPreference());
+          profileLocal.setBannerPreference(profileInfo.getBannerPreference());
+    stack_metadata:
+      framework: EJB local interface pattern
+      ejb.transaction: Required
+
+  - record_key: CUSTOMER-SCREEN-0001
+    kind: screen
+    capability_key: customer-management
+    requirement: >
+      The system SHALL present a Create Customer screen that collects:
+      Contact Information: first name, last name, street address (2 lines), city, state/province,
+      postal code, country, telephone number, email
+      Credit Card Information: card number, card type, expiry date (month and year as separate dropdowns)
+      Profile Information: preferred language (dropdown), favorite category (dropdown),
+      checkboxes for MyList feature and pet tips banners
+    confidence: high
+    confidence_basis: >
+      The create_customer.jsp displays exactly these form fields with the specified input
+      types and options. The JSP is the canonical form for customer creation.
+    risk_class: presentational
+    basis: >
+      The create_customer.jsp form contains all these fields with the specified input
+      types and layout. It submits to createcustomer.do with action=create.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/docroot/create_customer.jsp
+        line_start: 44
+        line_end: 229
+        excerpt: |
+          <p class="petstore_title">Your Account Information</p>
+          <form method="POST" action="createcustomer.do">
+          <table cellpadding="5" cellspacing="0" width="100%" border="0">
+          <tr><td colspan="3"><p class="petstore_title">Contact Information</p></td></tr>
+          <tr><td class="petstore_form" align="right"><b>First Name</b></td>
+          <td align="left" colspan="2"><input class="petstore_form" type="text" name="given_name_a" size="30" maxlength="30" value="Duke"></td></tr>
+          <tr><td class="petstore_form" align="right"><b>Last Name</b></td>
+          <td align="left" colspan="2"><input class="petstore_form" type="text" name="family_name_a" size="30" maxlength="30" value="BluesPrints"></td></tr>
+          <!-- street address, city, state, postal code, country, telephone, email fields -->
+          <tr><td colspan="3"><p class="petstore_title">Credit Card Information</p></td></tr>
+          <!-- card number, card type, expiry date fields -->
+          <tr><td colspan="3"><p class="petstore_title">Profile Information</p></td></tr>
+          <!-- language, favorite category, mylist, banners checkboxes -->
+          <input class="petstore_form" type="submit" value="Submit">
+          </form>
+    stack_metadata:
+      jsp.page: create_customer.jsp
+
+  - record_key: CUSTOMER-INTEGRATION-0001
+    kind: integration
+    capability_key: customer-management
+    requirement: >
+      The system SHALL integrate with the SignOn component to create user identities
+      (username and password) as part of customer registration. The SignOn component
+      SHALL use ServiceLocator to find SignOnLocalHome and create a SignOn EJB instance.
+    confidence: high
+    confidence_basis: >
+      CreateUserEJBAction explicitly uses ServiceLocator to lookup and create the SignOn EJB.
+      The pattern is consistent and required for customer registration to proceed.
+    risk_class: operational
+    basis: >
+      CreateUserEJBAction.perform() uses:
+      ServiceLocator sl = new ServiceLocator();
+      SignOnLocalHome home =(SignOnLocalHome)sl.getLocalHome(JNDINames.SIGN_ON_EJBHOME);
+      signOn = home.create();
+      signOn.createUser(userName, password);
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/petstore/src/com/sun/j2ee/blueprints/petstore/controller/ejb/actions/CreateUserEJBAction.java
+        line_start: 84
+        line_end: 94
+        excerpt: |
+          try {
+              ServiceLocator sl = new ServiceLocator();
+              SignOnLocalHome home =(SignOnLocalHome)sl.getLocalHome(JNDINames.SIGN_ON_EJBHOME);
+              signOn = home.create();
+          } catch (ServiceLocatorException  slx) {
+              throw new DuplicateAccountException("Failed to Create SignOn EJB: caught " + slx);
+          } catch (CreateException cx) {
+              throw new DuplicateAccountException("Failed to Create SignOn EJB: caught " + cx);
+          }
+          signOn.createUser(userName, password);
+    stack_metadata:
+      framework: EJB with ServiceLocator
+
+findings: []

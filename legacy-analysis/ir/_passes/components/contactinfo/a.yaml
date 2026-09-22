@@ -1,0 +1,397 @@
+records:
+  - record_key: CONTACTINFO-ENTITY-0001
+    kind: entity
+    capability_key: order-checkout
+    requirement: >
+      The system SHALL maintain a ContactInfo entity with contact information fields.
+      Each ContactInfo SHALL have a givenName, familyName, telephone, email, and an
+      associated Address.
+    confidence: high
+    confidence_basis: >
+      ContactInfo is declared as a CMP 2.x entity bean with Container-managed persistence
+      in ejb-jar.xml. All required fields are defined as CMP fields with corresponding
+      accessor methods in ContactInfoEJB. The DTD and ContactInfo.java POJO both declare
+      these fields as required elements.
+    risk_class: operational
+    basis: >
+      ContactInfoEJB is declared as a CMP 2.x entity bean with abstract methods for
+      each field (givenName, familyName, telephone, email). The DTD defines ContactInfo
+      element with FamilyName, GivenName, Email, Phone as PCDATA elements with no
+      OPTIONAL marker. The ContactInfoLocalHome provides create methods that accept
+      these parameters. The relationship to Address is enforced through ejb-local-ref
+      and CMR fields.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/ejb-jar.xml
+        line_start: 46
+        line_end: 84
+        excerpt: |
+          <entity>
+            <display-name>ContactInfoEB</display-name>
+            <ejb-name>ContactInfoEJB</ejb-name>
+            <local-home>com.sun.j2ee.blueprints.contactinfo.ejb.ContactInfoLocalHome</local-home>
+            <local>com.sun.j2ee.blueprints.contactinfo.ejb.ContactInfoLocal</local>
+            <ejb-class>com.sun.j2ee.blueprints.contactinfo.ejb.ContactInfoEJB</ejb-class>
+            <persistence-type>Container</persistence-type>
+            <prim-key-class>java.lang.Object</prim-key-class>
+            <cmp-version>2.x</cmp-version>
+            <abstract-schema-name>ContactInfo</abstract-schema-name>
+            <cmp-field>
+              <field-name>telephone</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>familyName</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>email</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>givenName</field-name>
+            </cmp-field>
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/rsrc/schemas/ContactInfo.dtd
+        line_start: 38
+        line_end: 46
+        excerpt: |
+          <!ELEMENT ContactInfo (FamilyName, GivenName, Address, Email, Phone)>
+          <!ELEMENT FamilyName (#PCDATA)>
+          <!ELEMENT GivenName (#PCDATA)>
+          <!ELEMENT Email (#PCDATA)>
+          <!ELEMENT Phone (#PCDATA)>
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfoEJB.java
+        line_start: 59
+        line_end: 73
+        excerpt: |
+          public abstract String getFamilyName();
+          public abstract void setFamilyName(String familyName);
+
+          public abstract String getGivenName();
+          public abstract void setGivenName(String givenName);
+
+          public abstract String getTelephone();
+          public abstract void setTelephone(String telephone);
+
+          public abstract String getEmail();
+          public abstract void setEmail(String email);
+
+          // CMR fields
+          public abstract AddressLocal getAddress();
+          public abstract void setAddress(AddressLocal address);
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      db.object: ContactInfo
+      ejb.transaction: Required
+
+  - record_key: CONTACTINFO-ENTITY-0002
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain a one-to-one relationship between ContactInfo and Address.
+      When a ContactInfo is deleted, its associated Address SHALL be cascade-deleted.
+    confidence: high
+    confidence_basis: >
+      The relationship is declared in ejb-jar.xml with cascade-delete configured on the
+      Address side. CMR field (address) is declared as abstract in ContactInfoEJB. Both
+      the declarative configuration and the programmatic relationship management (setAddress
+      method) enforce this constraint.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines an ejb-relation with one-to-one multiplicity between
+      ContactInfoEJB and AddressEJB. The AddressEJB relationship role includes a
+      cascade-delete element. ContactInfoEJB has an abstract getAddress() and setAddress()
+      method for managing the CMR field.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/ejb-jar.xml
+        line_start: 126
+        line_end: 147
+        excerpt: |
+          <relationships>
+            <ejb-relation>
+              <ejb-relation-name></ejb-relation-name>
+              <ejb-relationship-role>
+                <ejb-relationship-role-name>ContactInfoEJB</ejb-relationship-role-name>
+                <multiplicity>One</multiplicity>
+                <relationship-role-source>
+                  <ejb-name>ContactInfoEJB</ejb-name>
+                </relationship-role-source>
+                <cmr-field>
+                  <cmr-field-name>address</cmr-field-name>
+                </cmr-field>
+              </ejb-relationship-role>
+              <ejb-relationship-role>
+                <ejb-relationship-role-name>AddressEJB</ejb-relationship-role-name>
+                <multiplicity>One</multiplicity>
+                <cascade-delete />
+                <relationship-role-source>
+                  <ejb-name>AddressEJB</ejb-name>
+                </relationship-role-source>
+              </ejb-relationship-role>
+            </ejb-relation>
+          </relationships>
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      db.object: ContactInfo
+      ejb.transaction: Required
+
+  - record_key: CONTACTINFO-ENTITY-0003
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL provide creation methods for ContactInfo entities. A ContactInfo
+      entity MAY be created empty (with default Address created automatically) or with
+      explicit parameters (givenName, familyName, telephone, email, Address).
+    confidence: high
+    confidence_basis: >
+      Three distinct create methods are declared in ContactInfoLocalHome and all are
+      marked as Required transaction attribute in ejb-jar.xml. The ejbCreate and
+      ejbPostCreate methods in ContactInfoEJB show that Address is either created
+      automatically or provided explicitly. All create methods are accessible through
+      the LocalHome interface.
+    risk_class: operational
+    basis: >
+      ContactInfoLocalHome defines three create methods: create(), create(String,
+      String, String, String, AddressLocal), and create(ContactInfo). ContactInfoEJB
+      implements corresponding ejbCreate and ejbPostCreate methods. For the no-arg
+      create(), AddressEJB is instantiated using ServiceLocator. For parameterized
+      creates, the Address is either provided or created from ContactInfo data.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfoLocalHome.java
+        line_start: 45
+        line_end: 55
+        excerpt: |
+          public interface ContactInfoLocalHome extends javax.ejb.EJBLocalHome {
+
+            public ContactInfoLocal create() throws CreateException;
+
+            public ContactInfoLocal create(String givenName, String familyName,
+                                           String telephone, String email, AddressLocal address) throws CreateException;
+
+            public ContactInfoLocal create(ContactInfo contactInfo) throws CreateException;
+
+            public ContactInfoLocal findByPrimaryKey(Object key) throws FinderException;
+          }
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfoEJB.java
+        line_start: 77
+        line_end: 127
+        excerpt: |
+          public Object ejbCreate () throws CreateException {
+            return null;
+          }
+
+          public void ejbPostCreate () throws CreateException {
+            try {
+              ServiceLocator serviceLocator = new ServiceLocator();
+              AddressLocalHome adh = (AddressLocalHome)
+                  serviceLocator.getLocalHome(JNDINames.ADDR_EJB);
+              AddressLocal address = adh.create();
+              setAddress(address);
+            } catch (ServiceLocatorException ne) {
+              throw new CreateException("ContactInfoEJB error: ServiceLocator exception looking up address");
+            }
+          }
+
+          public Object ejbCreate(String givenName, String familyName,
+                                  String telephone, String email, AddressLocal address)
+                                  throws CreateException {
+            setGivenName(givenName);
+            setFamilyName(familyName);
+            setTelephone(telephone);
+            setEmail(email);
+            return null;
+          }
+
+          public void ejbPostCreate(String givenName, String familyName,
+                                    String telephone, String email,
+                                    AddressLocal address) throws CreateException {
+            setAddress(address);
+          }
+
+          public Object ejbCreate(ContactInfo contactInfo) throws CreateException {
+            setGivenName(contactInfo.getGivenName());
+            setFamilyName(contactInfo.getFamilyName());
+            setTelephone(contactInfo.getPhone());
+            setEmail(contactInfo.getEmail());
+            return null;
+          }
+
+          public void ejbPostCreate(ContactInfo contactInfo) throws CreateException {
+            try {
+              ServiceLocator serviceLocator = new ServiceLocator();
+              AddressLocalHome adh = (AddressLocalHome)
+                  serviceLocator.getLocalHome(JNDINames.ADDR_EJB);
+              AddressLocal address = adh.create(contactInfo.getAddress());
+              setAddress(address);
+            } catch (ServiceLocatorException ne) {
+              throw new CreateException("ContactInfoEJB error: ServiceLocator exception looking up address");
+            }
+          }
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      db.object: ContactInfo
+      ejb.transaction: Required
+
+  - record_key: CONTACTINFO-ENTITY-0004
+    kind: entity
+    capability_key: customer-management
+    requirement: >
+      The system SHALL provide a getData() method on ContactInfo that returns a
+      ContactInfo POJO containing all entity attributes and the associated Address data.
+    confidence: high
+    confidence_basis: >
+      The getData() method is declared in ContactInfoEJB and called consistently from
+      client code. It is marked as Required transaction attribute in ejb-jar.xml. The
+      method assembles all CMP fields and navigates the CMR relationship to Address,
+      calling Address.getData() to retrieve nested address data.
+    risk_class: operational
+    basis: >
+      ContactInfoEJB.getData() retrieves givenName, familyName, telephone, email from
+      CMP fields and calls getAddress().getData() to retrieve the associated Address
+      POJO. This method serves as the public interface for serializing ContactInfo
+      entity state to the POJO for transport or XML serialization.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfoEJB.java
+        line_start: 129
+        line_end: 137
+        excerpt: |
+          public ContactInfo getData() {
+            ContactInfo contactInfo = new ContactInfo();
+            contactInfo.setGivenName(getGivenName());
+            contactInfo.setFamilyName(getFamilyName());
+            contactInfo.setPhone(getTelephone());
+            contactInfo.setEmail(getEmail());
+            contactInfo.setAddress(getAddress().getData());
+            return contactInfo;
+          }
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      db.object: ContactInfo
+      ejb.transaction: Required
+
+  - record_key: CONTACTINFO-REQUIREMENT-0005
+    kind: requirement
+    capability_key: order-checkout
+    requirement: >
+      The system SHALL support XML serialization and deserialization of ContactInfo
+      through a ContactInfo POJO with toDOM() and fromDOM() methods. The ContactInfo
+      DTD SHALL define the XML schema with required elements: FamilyName, GivenName,
+      Address, Email, Phone.
+    confidence: high
+    confidence_basis: >
+      Both ContactInfo.java and the DTD are part of the component source. The toDOM()
+      method constructs XML elements for all fields, and fromDOM() parses them back.
+      The DTD explicitly defines all elements as required (no OPTIONAL marker). The
+      constants in ContactInfo.java match the DTD element names.
+    risk_class: presentational
+    basis: >
+      ContactInfo.java defines toDOM(Document document) which creates an element tree
+      for XML serialization. The fromDOM(Node node) static method parses XML back into
+      a ContactInfo POJO. The ContactInfo.dtd defines the XML schema with required
+      elements and references the Address DTD. The XML element names in DTD and Java
+      code are synchronized (FamilyName, GivenName, Email, Phone).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfo.java
+        line_start: 54
+        line_end: 80
+        excerpt: |
+          public class ContactInfo {
+            public static final String DTD_PUBLIC_ID = "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD ContactInfo 1.1//EN";
+            public static final String DTD_SYSTEM_ID = "/com/sun/j2ee/blueprints/contactinfo/rsrc/schemas/ContactInfo.dtd";
+            public static final String XML_CONTACTINFO = "ContactInfo";
+            public static final String XML_FAMILY_NAME = "FamilyName";
+            public static final String XML_GIVEN_NAME = "GivenName";
+            public static final String XML_ADDRESS = "Address";
+            public static final String XML_EMAIL = "Email";
+            public static final String XML_PHONE = "Phone";
+            private String familyName;
+            private String givenName;
+            private Address address;
+            private String email;
+            private String phone;
+
+            public ContactInfo() {}
+
+            public ContactInfo(String familyName, String givenName, Address address, String email, String phone) {
+              this.familyName = familyName;
+              this.givenName = givenName;
+              this.address = address;
+              this.email = email;
+              this.phone = phone;
+              return;
+            }
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/com/sun/j2ee/blueprints/contactinfo/ejb/ContactInfo.java
+        line_start: 133
+        line_end: 161
+        excerpt: |
+          public Node toDOM(Document document) {
+            Element root = document.createElement(XML_CONTACTINFO);
+            XMLDocumentUtils.appendChild(document, root, XML_FAMILY_NAME, familyName);
+            XMLDocumentUtils.appendChild(document, root, XML_GIVEN_NAME, givenName);
+            root.appendChild(address.toDOM(document));
+            XMLDocumentUtils.appendChild(document, root, XML_EMAIL, email);
+            XMLDocumentUtils.appendChild(document, root, XML_PHONE, phone);
+            return root;
+          }
+
+          public static ContactInfo fromDOM(Node node) throws XMLDocumentException {
+            Element element;
+            if (node.getNodeType() == Node.ELEMENT_NODE && (element = ((Element) node)).getTagName().equals(XML_CONTACTINFO)) {
+              Element child;
+              ContactInfo contactInfo = new ContactInfo();
+              child = XMLDocumentUtils.getFirstChild(element, XML_FAMILY_NAME, false);
+              contactInfo.familyName = XMLDocumentUtils.getContentAsString(child, false);
+              child = child = XMLDocumentUtils.getNextSibling(child, XML_GIVEN_NAME, false);
+              contactInfo.givenName = XMLDocumentUtils.getContentAsString(child, false);
+              child =  XMLDocumentUtils.getNextSibling(child, Address.XML_ADDRESS, false);
+              contactInfo.address = Address.fromDOM(child);
+              child = XMLDocumentUtils.getNextSibling(child, XML_EMAIL, false);
+              contactInfo.email = XMLDocumentUtils.getContentAsString(child, true /*false*/);
+              child = XMLDocumentUtils.getNextSibling(child, XML_PHONE, false);
+              contactInfo.phone = XMLDocumentUtils.getContentAsString(child, false);
+              return contactInfo;
+            }
+            throw new XMLDocumentException(XML_CONTACTINFO + " element expected.");
+          }
+
+  - record_key: CONTACTINFO-REQUIREMENT-0006
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      All ContactInfo business logic methods SHALL participate in container-managed
+      transactions with trans-attribute Required. If a method is called within an
+      existing transaction, it SHALL join that transaction; otherwise, a new transaction
+      SHALL be created.
+    confidence: high
+    confidence_basis: >
+      All methods (getters, setters, create, remove, getData) are explicitly declared
+      in ejb-jar.xml container-transaction elements with trans-attribute of Required.
+      This is a declarative, enforced constraint applied at the EJB container level.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml contains multiple container-transaction declarations for ContactInfoEJB
+      methods, each with trans-attribute value of Required. This declarative configuration
+      ensures transactional integrity for all business operations on ContactInfo entities.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/contactinfo/src/ejb-jar.xml
+        line_start: 302
+        line_end: 330
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>ContactInfoEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>getTelephone</method-name>
+              <method-params />
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+          <container-transaction>
+            <method>
+              <ejb-name>ContactInfoEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>setFamilyName</method-name>
+              <method-params>
+                <method-param>java.lang.String</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+
+findings: []

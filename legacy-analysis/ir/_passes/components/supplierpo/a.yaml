@@ -1,0 +1,590 @@
+records:
+  - record_key: supplier-integration-entity-0001
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      The system SHALL maintain a SupplierOrder entity with an identifier (poId),
+      date (poDate), and status (poStatus) to represent a purchase order received
+      from the petstore.
+    confidence: high
+    confidence_basis: >
+      The SupplierOrder EJB is declared in ejb-jar.xml with CMP persistence,
+      field definitions, and primary key. The abstract accessor methods in
+      SupplierOrderEJB and the local interface confirm all fields and their types.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines SupplierOrder as a CMP 2.x entity bean with three
+      CMP fields: poId (primary key, String), poDate (long), and poStatus (String).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 48
+        line_end: 105
+        excerpt: |
+          <entity>
+            <description>SupplierOrder CMP EJB</description>
+            <ejb-name>SupplierOrderEJB</ejb-name>
+            <persistence-type>Container</persistence-type>
+            <prim-key-class>java.lang.String</prim-key-class>
+            <cmp-version>2.x</cmp-version>
+            <abstract-schema-name>SupplierOrder</abstract-schema-name>
+            <cmp-field>
+              <field-name>poId</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>poDate</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>poStatus</field-name>
+            </cmp-field>
+            <primkey-field>poId</primkey-field>
+          </entity>
+    stack_metadata:
+      ejb.bean: SupplierOrderEJB
+      ejb.persistence: Container
+
+  - record_key: supplier-integration-entity-0002
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      Each SupplierOrder SHALL maintain a one-to-one relationship with ContactInfo
+      to store shipping information (contact name, email, telephone, and address).
+    confidence: high
+    confidence_basis: >
+      The ejb-jar.xml declares a one-to-one relationship between SupplierOrder
+      and ContactInfo. The SupplierOrderEJB code in ejbPostCreate creates and
+      assigns ContactInfo when an order is created.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines an EJB relation SupplierOrder-ContactInfo with one-to-one
+      multiplicity and cascade delete. The CMR field contactInfo in SupplierOrder
+      provides access to the related ContactInfo entity.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 234
+        line_end: 258
+        excerpt: |
+          <ejb-relation>
+            <ejb-relation-name>SupplierOrder-ContactInfo</ejb-relation-name>
+            <ejb-relationship-role>
+              <ejb-relationship-role-name>purchaseorder-has-address</ejb-relationship-role-name>
+              <multiplicity>One</multiplicity>
+              <relationship-role-source>
+                <ejb-name>SupplierOrderEJB</ejb-name>
+              </relationship-role-source>
+              <cmr-field>
+                <cmr-field-name>contactInfo</cmr-field-name>
+              </cmr-field>
+            </ejb-relationship-role>
+          </ejb-relation>
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderEJB.java
+        line_start: 164
+        line_end: 170
+        excerpt: |
+          ContactInfoLocalHome cinforef = (ContactInfoLocalHome)
+              serviceLocator.getLocalHome(JNDINames.CINFO_EJB);
+          ContactInfoLocal cinfoloc = (ContactInfoLocal)
+                          cinforef.create(supplierOrder.getShippingInfo());
+          setContactInfo(cinfoloc);
+    stack_metadata:
+      ejb.relationship: SupplierOrder-ContactInfo
+      ejb.multiplicity: One
+
+  - record_key: supplier-integration-entity-0003
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      Each ContactInfo entity for a supplier order SHALL include givenName,
+      familyName, email, and telephone fields, and SHALL maintain a one-to-one
+      relationship with an Address entity for delivery address details.
+    confidence: high
+    confidence_basis: >
+      ContactInfo is defined in ejb-jar.xml with explicit CMP field declarations
+      for all four name/contact fields. The relationship to Address is declared
+      with one-to-one multiplicity and cascade delete.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml shows ContactInfo as a CMP 2.x entity with four CMP fields
+      (givenName, familyName, email, telephone) and a one-to-one relationship
+      to AddressEJB.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 107
+        line_end: 145
+        excerpt: |
+          <entity>
+            <display-name>ContactInfoEB</display-name>
+            <ejb-name>ContactInfoEJB</ejb-name>
+            <persistence-type>Container</persistence-type>
+            <cmp-version>2.x</cmp-version>
+            <abstract-schema-name>ContactInfo</abstract-schema-name>
+            <cmp-field>
+              <field-name>telephone</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>familyName</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>email</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>givenName</field-name>
+            </cmp-field>
+            <ejb-local-ref>
+              <ejb-ref-name>ejb/Address</ejb-ref-name>
+            </ejb-local-ref>
+          </entity>
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 263
+        line_end: 283
+        excerpt: |
+          <ejb-relation>
+            <ejb-relation-name></ejb-relation-name>
+            <ejb-relationship-role>
+              <ejb-relationship-role-name>ContactInfoEJB</ejb-relationship-role-name>
+              <multiplicity>One</multiplicity>
+              <relationship-role-source>
+                <ejb-name>ContactInfoEJB</ejb-name>
+              </relationship-role-source>
+              <cmr-field>
+                <cmr-field-name>address</cmr-field-name>
+              </cmr-field>
+            </ejb-relationship-role>
+            <ejb-relationship-role>
+              <ejb-relationship-role-name>AddressEJB</ejb-relationship-role-name>
+              <multiplicity>One</multiplicity>
+              <cascade-delete />
+            </ejb-relationship-role>
+          </ejb-relation>
+    stack_metadata:
+      ejb.bean: ContactInfoEJB
+      ejb.persistence: Container
+
+  - record_key: supplier-integration-entity-0004
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      Each Address entity SHALL store delivery address components: country, state,
+      city, two streetName fields (streetName1 and streetName2), and zipCode.
+    confidence: high
+    confidence_basis: >
+      Address is defined in ejb-jar.xml as a CMP 2.x entity with six explicit
+      CMP field declarations matching the address components.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines AddressEJB as a CMP 2.x entity with six CMP fields:
+      zipCode, streetName2, state, streetName1, city, country.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 146
+        line_end: 185
+        excerpt: |
+          <entity>
+            <display-name>AddressEB</display-name>
+            <ejb-name>AddressEJB</ejb-name>
+            <persistence-type>Container</persistence-type>
+            <cmp-version>2.x</cmp-version>
+            <abstract-schema-name>Address</abstract-schema-name>
+            <cmp-field>
+              <field-name>zipCode</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>streetName2</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>state</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>streetName1</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>city</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>country</field-name>
+            </cmp-field>
+          </entity>
+    stack_metadata:
+      ejb.bean: AddressEJB
+      ejb.persistence: Container
+
+  - record_key: supplier-integration-entity-0005
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      Each SupplierOrder SHALL maintain a one-to-many relationship with LineItem
+      entities to represent the product line items in the purchase order.
+    confidence: high
+    confidence_basis: >
+      The ejb-jar.xml explicitly declares the SupplierOrder-LineItem relationship
+      with One multiplicity on the order side and Many on the line item side.
+      The SupplierOrderEJB code confirms creation and addition of line items.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines a one-to-many EJB relation with CMR field lineItems
+      (java.util.Collection) in SupplierOrder. SupplierOrderEJB.ejbPostCreate()
+      populates lineItems by creating LineItemLocal instances and adding them.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 289
+        line_end: 314
+        excerpt: |
+          <ejb-relation>
+            <ejb-relation-name>SupplierOrder-LineItem</ejb-relation-name>
+            <ejb-relationship-role>
+              <ejb-relationship-role-name>purchaseorder-has-lineitems</ejb-relationship-role-name>
+              <multiplicity>One</multiplicity>
+              <relationship-role-source>
+                <ejb-name>SupplierOrderEJB</ejb-name>
+              </relationship-role-source>
+              <cmr-field>
+                <cmr-field-name>lineItems</cmr-field-name>
+                <cmr-field-type>java.util.Collection</cmr-field-type>
+              </cmr-field>
+            </ejb-relationship-role>
+            <ejb-relationship-role>
+              <ejb-relationship-role-name>lineItem-for-purchaseorder</ejb-relationship-role-name>
+              <multiplicity>Many</multiplicity>
+              <cascade-delete />
+            </ejb-relationship-role>
+          </ejb-relation>
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderEJB.java
+        line_start: 171
+        line_end: 179
+        excerpt: |
+          LineItemLocalHome lineItemref = (LineItemLocalHome)
+              serviceLocator.getLocalHome(JNDINames.LI_EJB);
+          Collection litems = supplierOrder.getLineItems();
+          Iterator it = litems.iterator();
+          while((it != null) && (it.hasNext())) {
+            LineItem li = (LineItem) it.next();
+            LineItemLocal lineItemloc = (LineItemLocal) lineItemref.create(li, 0);
+            addLineItem(lineItemloc);
+          }
+    stack_metadata:
+      ejb.relationship: SupplierOrder-LineItem
+      ejb.multiplicity: One-to-Many
+
+  - record_key: supplier-integration-entity-0006
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      Each LineItem entity SHALL store categoryId, productId, itemId, lineNumber,
+      quantity (integer), unitPrice (float), and quantityShipped (integer).
+    confidence: high
+    confidence_basis: >
+      LineItem is defined in ejb-jar.xml with explicit CMP field declarations
+      for all seven fields. Method signatures in container-transaction elements
+      confirm field types.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines LineItemEJB as a CMP 2.x entity with seven CMP fields.
+      Container-transaction methods confirm types: quantity and quantityShipped
+      as int, unitPrice as float.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 187
+        line_end: 224
+        excerpt: |
+          <entity>
+            <description>LineItem CMP EJB</description>
+            <display-name>LineItemEB</display-name>
+            <ejb-name>LineItemEJB</ejb-name>
+            <persistence-type>Container</persistence-type>
+            <cmp-version>2.x</cmp-version>
+            <abstract-schema-name>LineItem</abstract-schema-name>
+            <cmp-field>
+              <field-name>categoryId</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>productId</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>itemId</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>lineNumber</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>quantity</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>unitPrice</field-name>
+            </cmp-field>
+            <cmp-field>
+              <field-name>quantityShipped</field-name>
+            </cmp-field>
+          </entity>
+    stack_metadata:
+      ejb.bean: LineItemEJB
+      ejb.persistence: Container
+
+  - record_key: order-workflow-business-rule-0001
+    kind: business-rule
+    capability_key: order-workflow
+    requirement: >
+      Every new SupplierOrder SHALL be created with an initial status of PENDING.
+    confidence: high
+    confidence_basis: >
+      The ejbCreate method in SupplierOrderEJB explicitly calls setPoStatus with
+      OrderStatusNames.PENDING. This is the only place where orders are created,
+      confirming all new orders start in PENDING state.
+    risk_class: operational
+    basis: >
+      SupplierOrderEJB.ejbCreate(SupplierOrder) at line 154 invokes
+      setPoStatus(OrderStatusNames.PENDING).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderEJB.java
+        line_start: 151
+        line_end: 156
+        excerpt: |
+          public String ejbCreate(SupplierOrder supplierOrder) throws CreateException {
+            setPoId(supplierOrder.getOrderId());
+            setPoDate(supplierOrder.getOrderDate().getTime());
+            setPoStatus(OrderStatusNames.PENDING);
+            return null;
+          }
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/OrderStatusNames.java
+        line_start: 50
+        line_end: 52
+        excerpt: |
+          /** for orders that have been placed but not yet approved */
+          public static final String PENDING = "PENDING";
+    stack_metadata:
+      ejb.bean: SupplierOrderEJB
+
+  - record_key: order-workflow-business-rule-0002
+    kind: business-rule
+    capability_key: order-workflow
+    requirement: >
+      A SupplierOrder status SHALL transition through states: PENDING → APPROVED
+      → COMPLETED, or alternatively PENDING → DENIED. The setPoStatus method
+      enables state transitions.
+    confidence: high
+    confidence_basis: >
+      OrderStatusNames defines four states with documented transitions in its
+      class javadoc. The setPoStatus method declared in ejb-jar.xml with
+      Required transaction attribute allows any status update. No validation
+      logic is enforced in the code, allowing any transition.
+    risk_class: operational
+    basis: >
+      OrderStatusNames class documents the state machine:
+      "pending->approved->completed or pending->denied". Four status constants
+      are defined: PENDING, APPROVED, DENIED, COMPLETED.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/OrderStatusNames.java
+        line_start: 41
+        line_end: 62
+        excerpt: |
+          /**
+           * This class is the central location to store the names of the
+           * status that an order can be in.
+           * The states an order goes through are:
+           * pending->approved->completed   or
+           * pending->denied
+           */
+          public class OrderStatusNames {
+              public static final String PENDING = "PENDING";
+              public  static final String APPROVED = "APPROVED";
+              public  static final String DENIED = "DENIED";
+              public  static final String COMPLETED = "COMPLETED";
+          }
+    stack_metadata:
+      ejb.bean: SupplierOrderEJB
+      ejb.transaction: Required
+
+  - record_key: supplier-integration-workflow-0001
+    kind: workflow
+    capability_key: supplier-integration
+    requirement: >
+      When a SupplierOrder is created from supplier order data, the system SHALL
+      atomically create a ContactInfo record with the supplier's shipping
+      information and associate it with the order, then create LineItem records
+      for each item in the order and associate them with the order, all within
+      a single transaction.
+    confidence: high
+    confidence_basis: >
+      The ejbPostCreate method (invoked immediately after ejbCreate) contains
+      all the logic to create related entities. The method is wrapped with
+      container-managed transactions (Required attribute from line 454), ensuring
+      all operations commit or roll back together. ServiceLocatorException is
+      caught and re-thrown as CreateException, causing order creation to fail
+      if association fails.
+    risk_class: operational
+    basis: >
+      SupplierOrderEJB.ejbPostCreate at lines 162-184 creates ContactInfo by
+      invoking cinforef.create(supplierOrder.getShippingInfo()), then iterates
+      over the order's line items and creates LineItemLocal instances, adding
+      each to the order. This occurs in a Required transaction (ejb-jar.xml,
+      line 454).
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderEJB.java
+        line_start: 158
+        line_end: 184
+        excerpt: |
+          public void ejbPostCreate(SupplierOrder supplierOrder)
+                                                              throws CreateException {
+            try {
+              ServiceLocator serviceLocator = new ServiceLocator();
+              ContactInfoLocalHome cinforef = (ContactInfoLocalHome)
+                  serviceLocator.getLocalHome(JNDINames.CINFO_EJB);
+              ContactInfoLocal cinfoloc = (ContactInfoLocal)
+                              cinforef.create(supplierOrder.getShippingInfo());
+              setContactInfo(cinfoloc);
+              LineItemLocalHome lineItemref = (LineItemLocalHome)
+                  serviceLocator.getLocalHome(JNDINames.LI_EJB);
+              Collection litems = supplierOrder.getLineItems();
+              Iterator it = litems.iterator();
+              while((it != null) && (it.hasNext())) {
+                LineItem li = (LineItem) it.next();
+                LineItemLocal lineItemloc = (LineItemLocal) lineItemref.create(li, 0);
+                addLineItem(lineItemloc);
+              }
+            } catch(ServiceLocatorException ne) {
+              throw new CreateException("ServiceLocator Ex while persisting PO CMR :" +
+                                        ne.getMessage());
+            }
+          }
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 445
+        line_end: 456
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>SupplierOrderEJB</ejb-name>
+              <method-intf>LocalHome</method-intf>
+              <method-name>create</method-name>
+              <method-params>
+                <method-param>com.sun.j2ee.blueprints.supplierpo.ejb.SupplierOrder</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+    stack_metadata:
+      ejb.bean: SupplierOrderEJB
+      ejb.transaction: Required
+
+  - record_key: supplier-integration-workflow-0002
+    kind: workflow
+    capability_key: supplier-integration
+    requirement: >
+      The system SHALL provide a query capability to find all SupplierOrder
+      records by their status value.
+    confidence: high
+    confidence_basis: >
+      The ejb-jar.xml declares an EJB-QL query findOrdersByStatus that accepts
+      a status parameter. The SupplierOrderLocalHome interface confirms this
+      finder method exists. The implementation is container-generated from the
+      EJB-QL statement.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml query element at line 95 defines findOrdersByStatus with
+      EJB-QL: "SELECT DISTINCT OBJECT(a) FROM SupplierOrder a WHERE a.poStatus = ?1".
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 95
+        line_end: 104
+        excerpt: |
+          <query>
+            <description></description>
+            <query-method>
+              <method-name>findOrdersByStatus</method-name>
+              <method-params>
+                <method-param>java.lang.String</method-param>
+              </method-params>
+            </query-method>
+            <ejb-ql>SELECT DISTINCT OBJECT(a) FROM SupplierOrder a WHERE a.poStatus = ?1</ejb-ql>
+          </query>
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderLocalHome.java
+        line_start: 57
+        line_end: 58
+        excerpt: |
+          public Collection findOrdersByStatus(String status) throws FinderException;
+    stack_metadata:
+      ejb.bean: SupplierOrderEJB
+      ejb.query: findOrdersByStatus
+
+  - record_key: supplier-integration-business-rule-0001
+    kind: business-rule
+    capability_key: supplier-integration
+    requirement: >
+      When a line item quantity is shipped, the system SHALL track the
+      quantityShipped field separately from the requested quantity, allowing
+      partial shipments.
+    confidence: medium
+    confidence_basis: >
+      LineItem CMP fields include both quantity and quantityShipped. Container-
+      transaction methods setQuantityShipped and getQuantityShipped are declared,
+      confirming the field is updatable. However, no business logic validates
+      or constrains the relationship between these two fields (e.g., that
+      quantityShipped <= quantity).
+    risk_class: operational
+    basis: >
+      ejb-jar.xml LineItem definition includes two fields:
+      - quantity (requested quantity)
+      - quantityShipped (amount shipped)
+      Both can be independently set via container methods, suggesting support
+      for partial shipments.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 199
+        line_end: 219
+        excerpt: |
+          <cmp-field>
+            <field-name>quantity</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>unitPrice</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>quantityShipped</field-name>
+          </cmp-field>
+      - path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+        line_start: 905
+        line_end: 924
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>LineItemEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>getQuantityShipped</method-name>
+              <method-params />
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+          <container-transaction>
+            <method>
+              <ejb-name>LineItemEJB</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>setQuantityShipped</method-name>
+              <method-params>
+                <method-param>int</method-param>
+              </method-params>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+    stack_metadata:
+      ejb.bean: LineItemEJB
+      ejb.transaction: Required
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrder.java
+    description: >
+      Line 221 contains a FIX ME comment indicating that orderDate parsing
+      failure defaults to new Date() without clear logging. The condition under
+      which this default is applied and whether it should occur is unresolved.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/supplierpo/src/ejb-jar.xml
+    description: >
+      The ContactInfo relationship to Address is unidirectional (line 254-255
+      comment states no CMR field on Address side). It is unclear whether this
+      is by design (to prevent independent Address deletion) or an oversight.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/supplierpo/src/com/sun/j2ee/blueprints/supplierpo/ejb/SupplierOrderEJB.java
+    description: >
+      Line 209 in getData() appears to have a bug: setShippingInfo is called
+      with the result of getShippingInfo() on the newly-created object (not yet
+      populated). This looks like it should be calling getContactInfo() and
+      converting to ContactInfo, but the logic is unclear.

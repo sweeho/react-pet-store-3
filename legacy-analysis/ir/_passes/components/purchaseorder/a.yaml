@@ -1,0 +1,497 @@
+records:
+  - record_key: ORDER-CHECKOUT-0001
+    kind: entity
+    capability_key: order-checkout
+    requirement: >
+      A PurchaseOrder SHALL comprise OrderId, UserId, EmailId, OrderDate, ShippingInfo
+      (ContactInfo), BillingInfo (ContactInfo), TotalPrice, CreditCard, and one or more
+      LineItems.
+    confidence: high
+    confidence_basis: >
+      The DTD schema at legacy-source/.../PurchaseOrder.dtd declaratively specifies the
+      XML structure; the ejb-jar.xml defines corresponding persistent CMP fields; and the
+      PurchaseOrder value object class implements both serialization and field storage. The
+      structure is enforced in three independent places (DTD, EJB declarative, and Java
+      class).
+    risk_class: operational
+    basis: >
+      PurchaseOrder.dtd line 38 defines the element content model; PurchaseOrderEJB.java
+      lines 62-83 define the CMP fields; PurchaseOrder.java lines 59-83 define the value
+      object state.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/com/sun/j2ee/blueprints/purchaseorder/rsrc/schemas/PurchaseOrder.dtd
+        line_start: 38
+        line_end: 68
+        excerpt: |
+          <!ELEMENT PurchaseOrder (OrderId, UserId, EmailId, OrderDate, ShippingInfo, BillingInfo, TotalPrice, CreditCard, LineItem+)>
+          <!ATTLIST PurchaseOrder
+            locale CDATA "en_US"
+          >
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 60
+        line_end: 83
+        excerpt: |
+          <cmp-field>
+            <field-name>poId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>poUserId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>poEmailId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>poDate</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>poLocale</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>poValue</field-name>
+          </cmp-field>
+    stack_metadata:
+      ejb.bean: PurchaseOrderEJB
+      framework: EJB 2.0 CMP
+      db.object: PurchaseOrder
+
+  - record_key: ORDER-CHECKOUT-0002
+    kind: requirement
+    capability_key: order-checkout
+    requirement: >
+      Each PurchaseOrder SHALL maintain a one-to-one relationship with a ContactInfo
+      (shipping address) and a one-to-one relationship with a CreditCard.
+    confidence: high
+    confidence_basis: >
+      Both relationships are declared in ejb-jar.xml as CMR (container-managed
+      relationships) with multiplicity One and unidirectional direction. The PurchaseOrderEJB
+      exposes getter/setter methods for both relationships with Required transaction
+      attributes, indicating they are load-bearing persistence semantics.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml defines two ejb-relation declarations: PurchaseOrder-ContactInfo and
+      PurchaseOrder-Card, each with One multiplicity and cascade-delete on the inverse side.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 286
+        line_end: 310
+        excerpt: |
+          <ejb-relation>
+          <ejb-relation-name>PurchaseOrder-ContactInfo</ejb-relation-name>
+          <ejb-relationship-role>
+            <ejb-relationship-role-name>purchaseorder-has-contactinfo</ejb-relationship-role-name>
+            <multiplicity>One</multiplicity>
+            <relationship-role-source>
+              <ejb-name>PurchaseOrderEJB</ejb-name>
+            </relationship-role-source>
+            <cmr-field>
+              <cmr-field-name>contactInfo</cmr-field-name>
+            </cmr-field>
+          </ejb-relationship-role>
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 342
+        line_end: 366
+        excerpt: |
+          <ejb-relation>
+          <ejb-relation-name>PurchaseOrder-Card</ejb-relation-name>
+          <ejb-relationship-role>
+            <ejb-relationship-role-name>purchaseorder-has-card</ejb-relationship-role-name>
+            <multiplicity>One</multiplicity>
+            <relationship-role-source>
+              <ejb-name>PurchaseOrderEJB</ejb-name>
+            </relationship-role-source>
+            <cmr-field>
+              <cmr-field-name>creditCard</cmr-field-name>
+            </cmr-field>
+          </ejb-relationship-role>
+    stack_metadata:
+      ejb.bean: PurchaseOrderEJB
+      framework: EJB 2.0 CMR
+
+  - record_key: ORDER-CHECKOUT-0003
+    kind: requirement
+    capability_key: order-checkout
+    requirement: >
+      Each PurchaseOrder SHALL maintain a one-to-many relationship with LineItems,
+      where each LineItem carries categoryId, productId, itemId, lineNumber, quantity,
+      unitPrice, and quantityShipped (initially 0).
+    confidence: high
+    confidence_basis: >
+      The relationship is declared in ejb-jar.xml as a CMR with One-to-Many multiplicity
+      and is referenced by both the DTD (LineItem+) and the PurchaseOrderEJB getter/setter
+      pair with Required transaction attribute. The LineItem fields are declared as CMP
+      fields in the same configuration file.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml lines 372-397 define the PurchaseOrder-LineItem relationship; lines
+      250-271 define LineItemEJB CMP fields including quantityShipped.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 372
+        line_end: 397
+        excerpt: |
+          <ejb-relation>
+          <ejb-relation-name>PurchaseOrder-LineItem</ejb-relation-name>
+          <ejb-relationship-role>
+            <ejb-relationship-role-name>purchaseorder-has-lineitems</ejb-relationship-role-name>
+            <multiplicity>One</multiplicity>
+            <relationship-role-source>
+              <ejb-name>PurchaseOrderEJB</ejb-name>
+            </relationship-role-source>
+            <cmr-field>
+              <cmr-field-name>lineItems</cmr-field-name>
+              <cmr-field-type>java.util.Collection</cmr-field-type>
+            </cmr-field>
+          </ejb-relationship-role>
+          <ejb-relationship-role>
+            <ejb-relationship-role-name>lineItem-for-purchaseorder</ejb-relationship-role-name>
+            <multiplicity>Many</multiplicity>
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 250
+        line_end: 271
+        excerpt: |
+          <cmp-field>
+            <field-name>categoryId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>productId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>itemId</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>lineNumber</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>quantity</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>unitPrice</field-name>
+          </cmp-field>
+          <cmp-field>
+            <field-name>quantityShipped</field-name>
+          </cmp-field>
+    stack_metadata:
+      ejb.bean: LineItemEJB
+      framework: EJB 2.0 CMR
+
+  - record_key: ORDER-WORKFLOW-0001
+    kind: workflow
+    capability_key: order-workflow
+    requirement: >
+      When a PurchaseOrder is received, the system SHALL create a PurchaseOrder entity
+      and initialize its workflow status to PENDING.
+    confidence: high
+    confidence_basis: >
+      The PurchaseOrderMDB's onMessage() method at line 156 explicitly calls
+      processManager.createManager(purchaseOrder.getOrderId(), OrderStatusNames.PENDING).
+      This is the single entry point for all orders entering the system, and the
+      OrderStatusNames constant indicates this is a declared workflow state.
+    risk_class: operational
+    basis: >
+      PurchaseOrderMDB.java lines 151-165 show the order creation and initial status assignment.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/PurchaseOrderMDB.java
+        line_start: 151
+        line_end: 165
+        excerpt: |
+          private String doWork(String xmlMessage) throws XMLDocumentException, CreateException {
+            String ret = null;
+            PurchaseOrder purchaseOrder = PurchaseOrder.fromXML(xmlMessage, entityCatalogURL, validateXmlPurchaseOrder);
+            poHome.create(purchaseOrder);
+            //update process manager to start workflow for this purchase order
+            processManager.createManager(purchaseOrder.getOrderId(), OrderStatusNames.PENDING);
+            if(canIApprove(purchaseOrder)) {
+              ChangedOrder co = new ChangedOrder(purchaseOrder.getOrderId(), OrderStatusNames.APPROVED);
+              OrderApproval oa = new OrderApproval();
+              oa.addOrder(co);
+              ret = oa.toXML();
+            }
+            return ret;
+          }
+    stack_metadata:
+      framework: EJB Message-Driven Bean
+      jms.queue: PurchaseOrderQueue
+      ejb.bean: PurchaseOrderMDB
+
+  - record_key: ORDER-APPROVAL-0001
+    kind: business-rule
+    capability_key: order-approval
+    requirement: >
+      An order for a customer in the US locale with total price < 500 USD SHALL be
+      automatically approved and transitioned to APPROVED status. An order for a customer
+      in the Japan locale with total price < 50000 JPY SHALL be automatically approved.
+    confidence: medium
+    confidence_basis: >
+      The thresholds are hardcoded in the canIApprove method at lines 183-191. While this
+      implements automatic approval logic, there is no external documentation or configuration
+      file declaring these thresholds. The values are bare literals without a comment
+      explaining their business rationale.
+    risk_class: financial
+    basis: >
+      PurchaseOrderMDB.java lines 183-191 contain the approval logic. The method checks
+      locale and total price against literal threshold values.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/PurchaseOrderMDB.java
+        line_start: 183
+        line_end: 191
+        excerpt: |
+          private boolean canIApprove(PurchaseOrder purchaseOrder) {
+            Locale locale = purchaseOrder.getLocale();
+            if (locale.equals(Locale.US)) {
+              if (purchaseOrder.getTotalPrice() < 500) return true;
+            } else if (locale.equals(Locale.JAPAN))  {
+              if (purchaseOrder.getTotalPrice() < 50000) return true;
+            }
+            return false;
+          }
+    stack_metadata:
+      framework: EJB Message-Driven Bean
+
+  - record_key: ORDER-APPROVAL-0002
+    kind: business-rule
+    capability_key: order-approval
+    requirement: >
+      Only orders in PENDING status SHALL be processed for approval or denial. Orders
+      that are already APPROVED, DENIED, or COMPLETED SHALL NOT be processed again.
+    confidence: high
+    confidence_basis: >
+      The OrderApprovalMDB's doWork method explicitly checks the order status (line 204-207)
+      and skips processing if the status is not PENDING. This is a defensive check that
+      prevents duplicate processing of the same order.
+    risk_class: operational
+    basis: >
+      OrderApprovalMDB.java lines 199-207 show the status guard condition.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/OrderApprovalMDB.java
+        line_start: 199
+        line_end: 207
+        excerpt: |
+          while(it!= null && it.hasNext()) {
+            ChangedOrder co = (ChangedOrder) it.next();
+            // only PENDING orders can be updated
+            //if order alreay APPROVED or DENIED or COMPLETED, then order
+            //already processed so dont process again
+            String curStatus = processManager.getStatus(co.getOrderId());
+            if(!curStatus.equals(OrderStatusNames.PENDING)) {
+              continue;
+            }
+    stack_metadata:
+      framework: EJB Message-Driven Bean
+
+  - record_key: ORDER-WORKFLOW-0002
+    kind: workflow
+    capability_key: order-workflow
+    requirement: >
+      When an order status is updated to APPROVED, the order SHALL transition to APPROVED
+      state. The system SHALL then generate a supplier purchase order from the customer
+      order and send it for fulfillment.
+    confidence: high
+    confidence_basis: >
+      Lines 218-223 of OrderApprovalMDB show that for all approved orders, the system
+      builds and queues an XML supplier purchase order. This is a required step in the
+      order workflow.
+    risk_class: operational
+    basis: >
+      OrderApprovalMDB.java lines 215-223 show the approval-to-supplier-PO transition.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/OrderApprovalMDB.java
+        line_start: 215
+        line_end: 223
+        excerpt: |
+          //update process manager
+          //for this purchase order workflow
+          processManager.updateStatus(co.getOrderId(), co.getOrderStatus());
+
+          //for all approved orders, send a PO to supplier
+          if(co.getOrderStatus().equals(OrderStatusNames.APPROVED)) {
+            po = poHome.findByPrimaryKey(co.getOrderId());
+            String xmlPO = getXmlPO(po, supplierOrderXDE);
+            supplierPoList.add(xmlPO);
+          }
+    stack_metadata:
+      framework: EJB Message-Driven Bean
+
+  - record_key: SUPPLIER-INTEGRATION-0001
+    kind: business-rule
+    capability_key: supplier-integration
+    requirement: >
+      A supplier purchase order SHALL contain the order ID, order date, shipping address
+      (given name, family name, street, city, state, country, zip code, email, telephone),
+      and line items with product details (category, product, item ID, line number,
+      quantity, unit price).
+    confidence: high
+    confidence_basis: >
+      The getXmlPO method at lines 248-268 demonstrates exactly what fields are extracted
+      from the PurchaseOrder entity and written to the supplier PO. This is the single
+      code path for all supplier order generation.
+    risk_class: operational
+    basis: >
+      OrderApprovalMDB.java lines 248-268 show the supplier PO generation logic.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/OrderApprovalMDB.java
+        line_start: 248
+        line_end: 268
+        excerpt: |
+          private String getXmlPO(PurchaseOrderLocal po, TPASupplierOrderXDE supplierOrderXDE) throws XMLDocumentException{
+            supplierOrderXDE.newDocument();
+            supplierOrderXDE.setOrderId(po.getPoId());
+            Date tmpDate = new Date(po.getPoDate());
+            supplierOrderXDE.setOrderDate(tmpDate);
+            ContactInfoLocal cinfo = po.getContactInfo();
+            AddressLocal addr = cinfo.getAddress();
+            supplierOrderXDE.setShippingAddress(cinfo.getGivenName(), cinfo.getFamilyName(),
+                                                addr.getStreetName1(), addr.getCity(),
+                                                addr.getState(), addr.getCountry(),
+                                                addr.getZipCode(), cinfo.getEmail(), cinfo.getTelephone());
+            Collection liColl = po.getData().getLineItems();
+            Iterator liIt = liColl.iterator();
+            while((liIt != null) && (liIt.hasNext())) {
+              LineItem li = (LineItem) liIt.next();
+              supplierOrderXDE.addLineItem(li.getCategoryId(), li.getProductId(), li.getItemId(),
+                                           li.getLineNumber(), li.getQuantity(), li.getUnitPrice());
+            }
+            return supplierOrderXDE.getDocumentAsString();
+          }
+    stack_metadata:
+      framework: EJB Message-Driven Bean
+
+  - record_key: ORDER-WORKFLOW-0003
+    kind: business-rule
+    capability_key: order-workflow
+    requirement: >
+      An order SHALL be marked as COMPLETED only when all of its line items have been
+      shipped in full quantity. The system SHALL track quantityShipped for each line item
+      and compare it against the requested quantity.
+    confidence: high
+    confidence_basis: >
+      PurchaseOrderHelper.processInvoice() (lines 80-103) is the single handler for
+      invoice processing and shipment tracking. It loops through all line items and only
+      returns true (order complete) when quantity == quantityShipped for all items.
+    risk_class: operational
+    basis: >
+      PurchaseOrderHelper.java lines 80-103 show the completion logic.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/com/sun/j2ee/blueprints/purchaseorder/ejb/PurchaseOrderHelper.java
+        line_start: 80
+        line_end: 103
+        excerpt: |
+          public boolean processInvoice(PurchaseOrderLocal po, Map lineItemIds) {
+
+            //set the quantity of line items shipped in the PO
+            Collection liColl = po.getLineItems();
+            Iterator liIt = liColl.iterator();
+            while((liIt != null) && (liIt.hasNext())) {
+              LineItemLocal li = (LineItemLocal) liIt.next();
+              if(lineItemIds.containsKey(li.getItemId())) {
+                        Integer shipped = (Integer) lineItemIds.get(li.getItemId());
+                li.setQuantityShipped(li.getQuantityShipped() + shipped.intValue());
+                }
+            }//end while
+
+            // now loop through all LIs and see if all are shipped completely
+            liColl = po.getLineItems();
+            liIt = liColl.iterator();
+            while((liIt != null) && (liIt.hasNext())) {
+              LineItemLocal li = (LineItemLocal) liIt.next();
+              if(li.getQuantity() != li.getQuantityShipped()) {
+                  return false;
+                  }
+            }//end while
+            return true;
+          }
+    stack_metadata:
+      framework: EJB Session Bean Helper
+
+  - record_key: ORDER-CHECKOUT-0004
+    kind: requirement
+    capability_key: order-checkout
+    requirement: >
+      A PurchaseOrder SHALL capture the locale preference of the customer (en_US,
+      ja_JP, etc.) and store it as part of the order record.
+    confidence: high
+    confidence_basis: >
+      The locale is declared as an XML attribute in the DTD (line 40-42), persisted as a
+      CMP field poLocale (ejb-jar.xml line 78-79), and used for business logic decisions
+      (approval thresholds in PurchaseOrderMDB.java line 184-189).
+    risk_class: presentational
+    basis: >
+      PurchaseOrder.dtd line 40-42; ejb-jar.xml line 78-79; PurchaseOrder.java lines 74,
+      92-94, 127-141; PurchaseOrderMDB.java lines 184-189.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/com/sun/j2ee/blueprints/purchaseorder/rsrc/schemas/PurchaseOrder.dtd
+        line_start: 40
+        line_end: 42
+        excerpt: |
+          <!ATTLIST PurchaseOrder
+            locale CDATA "en_US"
+          >
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 78
+        line_end: 79
+        excerpt: |
+          <cmp-field>
+            <field-name>poLocale</field-name>
+          </cmp-field>
+    stack_metadata:
+      framework: EJB 2.0 CMP
+      db.object: PurchaseOrder
+
+  - record_key: ORDER-CHECKOUT-0005
+    kind: requirement
+    capability_key: order-checkout
+    requirement: >
+      A PurchaseOrder SHALL store the total price as a float value representing the sum
+      of all line items (before or after tax/shipping is determined by business logic
+      outside this component).
+    confidence: medium
+    confidence_basis: >
+      The poValue field is persisted as a float (ejb-jar.xml line 82-83) and is set
+      during order creation (PurchaseOrderEJB.java line 203). However, no code in this
+      component shows how the total is calculated from line items, suggesting that
+      calculation happens upstream in the order-checkout component (petstore app).
+    risk_class: financial
+    basis: >
+      ejb-jar.xml line 82-83; PurchaseOrderEJB.java line 203; PurchaseOrder.java lines
+      81, 120-122, 174-177.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/ejb-jar.xml
+        line_start: 82
+        line_end: 83
+        excerpt: |
+          <cmp-field>
+            <field-name>poValue</field-name>
+          </cmp-field>
+      - path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/com/sun/j2ee/blueprints/purchaseorder/ejb/PurchaseOrderEJB.java
+        line_start: 197
+        line_end: 205
+        excerpt: |
+          public String ejbCreate(PurchaseOrder purchaseOrder) throws CreateException {
+                setPoId(purchaseOrder.getOrderId());
+                setPoUserId(purchaseOrder.getUserId());
+                setPoEmailId(purchaseOrder.getEmailId());
+                setPoDate(purchaseOrder.getOrderDate().getTime());
+                setPoLocale(purchaseOrder.getLocale().toString());
+                setPoValue(purchaseOrder.getTotalPrice());
+                return null;
+          }
+    stack_metadata:
+      framework: EJB 2.0 CMP
+      db.object: PurchaseOrder
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/purchaseorder/src/com/sun/j2ee/blueprints/purchaseorder/ejb/PurchaseOrderEJB.java
+    description: >
+      Line 268 sets billing info equal to shipping info with a comment "// XXX".
+      This appears intentional (not a copy-paste error) but the XXX marker suggests
+      uncertainty about whether billing and shipping should always be identical or if
+      this is a simplification for the demo. The specification does not clarify when
+      billing differs from shipping.
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/apps/opc/src/com/sun/j2ee/blueprints/opc/ejb/PurchaseOrderMDB.java
+    description: >
+      The automatic approval thresholds (500 USD, 50000 JPY) are hardcoded in the
+      canIApprove method. No external configuration or documentation explains the
+      business rationale for these specific values or how they were determined. It is
+      unclear if other locales should also receive auto-approval, or if these are the
+      only two supported locales.

@@ -1,0 +1,423 @@
+records:
+  - record_key: waf-integration-0001
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL route HTTP requests to a MainServlet that processes
+      requests using a URL mapping configuration to determine the appropriate
+      action handler and target screen for rendering.
+    confidence: high
+    confidence_basis: >
+      The web.xml declares MainServlet as the servlet mapped to *.do URL patterns,
+      and the MainServlet.init() method explicitly loads URL mappings from
+      mappings.xml. Both declarative configuration and code show this pattern
+      consistently enforced.
+    risk_class: operational
+    basis: >
+      Web tier request routing is declared in web.xml (servlet mapping to *.do)
+      and implemented in MainServlet.java, which loads URLMappingsXmlDAO mappings
+      at initialization. RequestProcessor.processRequest uses these mappings to
+      determine actions.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 52
+        line_end: 98
+        excerpt: |
+          <servlet>
+            <servlet-name>webTierEntryPoint</servlet-name>
+            <servlet-class>com.sun.j2ee.blueprints.waf.controller.web.MainServlet</servlet-class>
+          </servlet>
+          <servlet-mapping>
+            <servlet-name>webTierEntryPoint</servlet-name>
+            <url-pattern>*.do</url-pattern>
+          </servlet-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 79
+        line_end: 95
+        excerpt: |
+          public void init(ServletConfig config) throws ServletException {
+            this.context = config.getServletContext();
+            urlMappings = URLMappingsXmlDAO.loadRequestMappings(requestMappingsURL);
+            context.setAttribute(WebKeys.URL_MAPPINGS, urlMappings);
+          }
+
+  - record_key: waf-integration-0002
+    kind: requirement
+    capability_key: customer-management
+    requirement: >
+      The system SHALL maintain user session state with a default session
+      timeout of 30 minutes and store user locale preference in the session
+      when not explicitly set, defaulting to en_US.
+    confidence: high
+    confidence_basis: >
+      Session timeout is declared in web.xml <session-config> element with
+      explicit 30-minute value. MainServlet.doProcess() shows explicit locale
+      initialization code that checks session and sets default. Both are
+      primary source declarative + code confirmation.
+    risk_class: operational
+    basis: >
+      Session configuration specified in web.xml at lines 100-102. MainServlet
+      initializes default locale at lines 110-112 where it retrieves the locale
+      parameter passed during servlet init and sets it in the user session if
+      not present.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 100
+        line_end: 102
+        excerpt: |
+          <session-config>
+            <session-timeout>30</session-timeout>
+          </session-config>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 108
+        line_end: 113
+        excerpt: |
+          // set the locale of the user to default if not set
+          if (request.getSession().getAttribute(WebKeys.LOCALE) == null) {
+              request.getSession().setAttribute(WebKeys.LOCALE, defaultLocale);
+          }
+
+  - record_key: waf-controller-0001
+    kind: integration
+    capability_key: order-workflow
+    requirement: >
+      The system SHALL process events through a stateful EJB controller that
+      receives events from the web tier, routes them through a StateMachine
+      for processing, and returns EventResponse objects back to the web tier.
+    confidence: high
+    confidence_basis: >
+      ejb-jar.xml declares a stateful session bean EJBController with
+      explicit transaction handling (Required). RequestProcessor.processRequest()
+      shows the lookup and invocation pattern. EJBControllerLocalEJB.java shows
+      the implementation delegating to StateMachine. All three layers are
+      consistent and independently reinforce the pattern.
+    risk_class: operational
+    basis: >
+      The EJBController is configured as a stateful session bean in ejb-jar.xml
+      with container-managed transactions. RequestProcessor invokes it via
+      WebController.handleEvent(). StateMachine processes events.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/ejb-jar.xml
+        line_start: 50
+        line_end: 58
+        excerpt: |
+          <session>
+            <display-name>EJBController</display-name>
+            <ejb-name>EJBController</ejb-name>
+            <ejb-class>com.sun.j2ee.blueprints.waf.controller.ejb.EJBControllerLocalEJB</ejb-class>
+            <session-type>Stateful</session-type>
+            <transaction-type>Container</transaction-type>
+          </session>
+      - path: legacy-source/petstore1.3.2/src/waf/src/ejb-jar.xml
+        line_start: 62
+        line_end: 73
+        excerpt: |
+          <container-transaction>
+            <method>
+              <ejb-name>EJBController</ejb-name>
+              <method-intf>Local</method-intf>
+              <method-name>processEvent</method-name>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/ejb/EJBControllerLocalEJB.java
+        line_start: 61
+        line_end: 70
+        excerpt: |
+          public void ejbCreate() {
+              sm = new StateMachine(this, sc);
+          }
+          public EventResponse processEvent(Event ev) throws EventException {
+              return (sm.processEvent(ev));
+          }
+
+  - record_key: waf-screen-0001
+    kind: screen
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL render screens using a template-based rendering engine
+      that accepts requests for .screen URLs, loads screen definitions from
+      XML configuration files, and combines multiple JSP fragments
+      (banner, body, footer) into a unified HTML response.
+    confidence: high
+    confidence_basis: >
+      web.xml declares TemplateServlet servlet mapping to *.screen URLs.
+      TemplateServlet.init() loads screen definitions from screendefinitions_en_US.xml.
+      screendefinitions.xml shows screen structure with multiple parameters
+      (HtmlBanner, HtmlBody, HtmlFooter). All three layers confirm the
+      template-composition pattern.
+    risk_class: presentational
+    basis: >
+      Template servlet is configured in web.xml with load-on-startup=2.
+      Screen definitions are loaded from XML at initialization time.
+      Each screen is composed of multiple JSP fragments combined by a template.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 64
+        line_end: 92
+        excerpt: |
+          <servlet>
+            <servlet-name>TemplateServlet</servlet-name>
+            <servlet-class>com.sun.j2ee.blueprints.waf.view.template.TemplateServlet</servlet-class>
+            <init-param>
+              <param-name>locales</param-name>
+              <param-value>en_US</param-value>
+            </init-param>
+            <init-param>
+              <param-name>default_locale</param-name>
+              <param-value>en_US</param-value>
+            </init-param>
+            <load-on-startup>2</load-on-startup>
+          </servlet>
+          <servlet-mapping>
+            <servlet-name>TemplateServlet</servlet-name>
+            <url-pattern>*.screen</url-pattern>
+          </servlet-mapping>
+      - path: legacy-source/petstore1.3.2/src/waf/src/view/template/com/sun/j2ee/blueprints/waf/view/template/TemplateServlet.java
+        line_start: 115
+        line_end: 132
+        excerpt: |
+          private void initScreens(ServletContext context, String language) {
+            screenDefinitionURL = context.getResource("/WEB-INF/screendefinitions_" + language + ".xml");
+            if (screenDefinitionURL != null) {
+              Screens screenDefinitions = ScreenDefinitionDAO.loadScreenDefinitions(screenDefinitionURL);
+              if (screenDefinitions != null) {
+                allScreens.put(language, screenDefinitions);
+              }
+            }
+          }
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/xml/screendefinitions.xml
+        line_start: 45
+        line_end: 63
+        excerpt: |
+          <screen>
+            <screen-name>MAIN</screen-name>
+            <parameter key="HtmlTitle" value="Welcome to Java Pet Store Demo" direct="true"/>
+            <parameter key="HtmlBanner" value="/banner.jsp" direct="false"/>
+            <parameter key="HtmlBody" value="/index.jsp" direct="false"/>
+            <parameter key="HtmlPetFooter" value="/petfooter.jsp" direct="false"/>
+            <parameter key="HtmlFooter" value="/footer.jsp" direct="false"/>
+          </screen>
+
+  - record_key: waf-screen-0002
+    kind: screen
+    capability_key: customer-management
+    requirement: >
+      The system SHALL render an ERROR screen when exceptions occur during
+      request processing, with the exception made available to the JSP via
+      the javax.servlet.jsp.jspException request attribute.
+    confidence: high
+    confidence_basis: >
+      MainServlet.doProcess() catches Throwable exceptions and sets the
+      exception in the request before forwarding to the error screen.
+      screendefinitions.xml defines an ERROR screen. Code and configuration
+      both confirm this pattern.
+    risk_class: operational
+    basis: >
+      MainServlet exception handler forwards to ScreenFlowManager.getExceptionScreen()
+      and sets the exception in the request attribute before dispatching.
+      An ERROR screen is defined in the screen definitions XML.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 117
+        line_end: 128
+        excerpt: |
+          } catch (Throwable ex) {
+            String className = ex.getClass().getName();
+            String nextScreen = getScreenFlowManager().getExceptionScreen(ex);
+            request.setAttribute("javax.servlet.jsp.jspException", ex);
+            if (nextScreen == null) {
+              ex.printStackTrace();
+              throw new ServletException("MainServlet: unknown exception: " + className);
+            }
+            context.getRequestDispatcher(nextScreen).forward(request, response);
+          }
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/xml/screendefinitions.xml
+        line_start: 56
+        line_end: 63
+        excerpt: |
+          <screen>
+            <screen-name>ERROR</screen-name>
+            <parameter key="HtmlTitle" value="Error" direct="true"/>
+            <parameter key="HtmlBanner" value="/banner.jsp" direct="false"/>
+            <parameter key="HtmlBody" value="/errorpage.jsp" direct="false"/>
+            <parameter key="HtmlFooter" value="/footer.jsp" direct="false"/>
+          </screen>
+
+  - record_key: waf-config-0001
+    kind: business-rule
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL initialize a default locale of en_US for the servlet,
+      which is applied to all sessions that do not explicitly set a locale
+      preference.
+    confidence: high
+    confidence_basis: >
+      The MainServlet init() method reads the default_locale init parameter
+      explicitly set in web.xml to en_US. This value is then used to
+      initialize session locale. Both declaration and implementation are
+      present and consistent.
+    risk_class: presentational
+    basis: >
+      web.xml init parameter declared for MainServlet. MainServlet.init()
+      retrieves this value and stores it. doProcess() uses it to set session
+      locale when not already present.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+        line_start: 57
+        line_end: 60
+        excerpt: |
+          <init-param>
+            <param-name>default_locale</param-name>
+            <param-value>en_US</param-value>
+          </init-param>
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/MainServlet.java
+        line_start: 79
+        line_end: 81
+        excerpt: |
+          String defaultLocaleString = config.getInitParameter("default_locale");
+          defaultLocale = I18nUtil.getLocaleFromString(defaultLocaleString);
+
+  - record_key: waf-ejb-0001
+    kind: requirement
+    capability_key: order-workflow
+    requirement: >
+      The system SHALL manage event processing through a stateful session
+      bean that maintains conversational state across multiple client calls
+      and executes all event processing methods within a Required container-managed
+      transaction.
+    confidence: high
+    confidence_basis: >
+      ejb-jar.xml declares the EJBController as Stateful with container
+      transaction type Required. This is the only declaration of transaction
+      management for this critical component. Code implementation in
+      EJBControllerLocalEJB shows no application-managed transaction, confirming
+      reliance on container management.
+    risk_class: operational
+    basis: >
+      ejb-jar.xml specifies session type as Stateful and container-transaction
+      for the processEvent method with Required attribute.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/ejb-jar.xml
+        line_start: 50
+        line_end: 74
+        excerpt: |
+          <session>
+            <display-name>EJBController</display-name>
+            <ejb-name>EJBController</ejb-name>
+            <ejb-class>com.sun.j2ee.blueprints.waf.controller.ejb.EJBControllerLocalEJB</ejb-class>
+            <session-type>Stateful</session-type>
+            <transaction-type>Container</transaction-type>
+          </session>
+          ...
+          <container-transaction>
+            <method>
+              <ejb-name>EJBController</ejb-name>
+              <method-name>processEvent</method-name>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+          </container-transaction>
+
+  - record_key: waf-request-0001
+    kind: workflow
+    capability_key: catalog-browsing
+    requirement: >
+      GIVEN an incoming HTTP request to a .do URL,
+      WHEN the MainServlet receives the request,
+      THEN the RequestProcessor SHALL invoke the mapped HTMLAction.doStart(),
+      followed by HTMLAction.perform() to generate an Event, and then
+      HTMLAction.doEnd() with the EventResponse.
+    confidence: high
+    confidence_basis: >
+      RequestProcessor.processRequest() explicitly calls these three methods
+      in sequence on the action object. The method exists in the codebase
+      and is the core of request processing. This is the definitive implementation
+      of request flow.
+    risk_class: operational
+    basis: >
+      RequestProcessor.processRequest() shows the exact sequence: doStart(),
+      perform(), and doEnd() method calls on the HTMLAction.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/RequestProcessor.java
+        line_start: 127
+        line_end: 144
+        excerpt: |
+          URLMapping urlMapping = getURLMapping(selectedURL);
+          HTMLAction action = getAction(urlMapping);
+          if (action != null) {
+              action.setServletContext(request.getSession().getServletContext());
+              action.doStart(request);
+              ev = action.perform(request);
+              EventResponse eventResponse = null;
+              if (ev != null) {
+                 EventMapping eventMapping = getEventMapping(ev);
+                 if (eventMapping != null) {
+                         ev.setEJBActionClassName(eventMapping.getEJBActionClassName());
+                 }
+                 ComponentManager sl = (ComponentManager)request.getSession().getAttribute(WebKeys.COMPONENT_MANAGER);
+                 WebController wcc = sl.getWebController(request.getSession());
+                 eventResponse = wcc.handleEvent(ev, request.getSession());
+             }
+             action.doEnd(request, eventResponse);
+          }
+
+  - record_key: waf-mapping-0001
+    kind: requirement
+    capability_key: catalog-browsing
+    requirement: >
+      The system SHALL support URL-to-screen mappings that associate HTTP
+      request URLs with specific HTMLAction handlers and target screen names,
+      loaded from mappings.xml at application startup.
+    confidence: high
+    confidence_basis: >
+      MainServlet.init() explicitly loads URL mappings via URLMappingsXmlDAO.
+      mappings.xml contains url-mapping entries with web-action-class and
+      screen attributes. Both source and configuration present this pattern.
+    risk_class: operational
+    basis: >
+      mappings.xml defines URL patterns with associated action classes and
+      screens. MainServlet loads these mappings into a HashMap at startup.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/mappings.xml
+        line_start: 41
+        line_end: 59
+        excerpt: |
+          <mappings>
+              <event-mapping>
+                  <event-class>com.sun.j2ee.blueprints.waf.event.events.ChangeLocaleEvent</event-class>
+                  <ejb-action-class>com.sun.j2ee.blueprints.waf.controller.ejb.action.actions.ChangeLocaleEJBAction</ejb-action-class>
+              </event-mapping>
+              <url-mapping url="changelocale.do" screen="locale_change_success.screen">
+                  <web-action-class>com.sun.j2ee.blueprints.waf.controller.web.action.actions.ChangeLocaleHTMLAction</web-action-class>
+              </url-mapping>
+              <exception-mapping exception-class="com.sun.j2ee.blueprints.petstore.controller.exceptions.GeneralFailureException" screen="error.screen"/>
+          </mappings>
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/waf/src/docroot/WEB-INF/web.xml
+    description: >
+      Lines 109-122 in web.xml reference env-entry values that are marked
+      as REDACTED:secret-finding-73 and REDACTED:secret-finding-74. These
+      appear to be the implementation class names for ComponentManager and
+      WebController respectively. The actual class names are not visible,
+      making it impossible to determine if these are using factory patterns,
+      reflection, or direct instantiation. A human should verify what the
+      actual implementation classes are.
+
+  - kind: unparseable
+    path: legacy-source/petstore1.3.2/src/waf/src/controller/com/sun/j2ee/blueprints/waf/controller/web/ScreenFlowManager.java
+    description: >
+      The ScreenFlowManager class is referenced throughout but the file
+      was not fully examined. It manages exception-to-screen mapping and
+      handles forwarding to the next screen. The complete implementation
+      would clarify how flow control decisions are made.
+
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/waf/src/view/template/com/sun/j2ee/blueprints/waf/view/template/TemplateServlet.java
+    description: >
+      The configuration parameter cache_previous_screen_attributes can be
+      set to true/false via init-param, but both web.xml entries show it set
+      to false. It is unclear whether this feature is used elsewhere or
+      deprecated. The purpose and implications of caching previous screen
+      attributes are not documented in the code.

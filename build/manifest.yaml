@@ -231,6 +231,110 @@ capabilities:
       reviewedBy: null
       reviewedAt: null
 
+  - slug: admin-dashboard
+    title: Admin Dashboard (Not Extracted in SX-0001)
+    order: 7
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-admin-dashboard
+      specCapabilities:
+        - admin-dashboard
+    canvas:
+      problem: Placeholder entry for admin-dashboard capability
+      solution: Not extracted in this run
+      userStories:
+        - Placeholder
+      acceptanceCriteria:
+        - Placeholder
+      outOfScope:
+        - All features pending future extraction
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: catalog-browsing
+    title: Catalog Browsing (Not Extracted in SX-0001)
+    order: 8
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-catalog-browsing
+      specCapabilities:
+        - catalog-browsing
+    canvas:
+      problem: Placeholder entry for catalog-browsing capability
+      solution: Not extracted in this run
+      userStories:
+        - Placeholder
+      acceptanceCriteria:
+        - Placeholder
+      outOfScope:
+        - All features pending future extraction
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: creditcard-validation
+    title: Credit Card Validation (Not Extracted in SX-0001)
+    order: 9
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-creditcard-validation
+      specCapabilities:
+        - creditcard-validation
+    canvas:
+      problem: Placeholder entry for creditcard-validation capability
+      solution: Not extracted in this run
+      userStories:
+        - Placeholder
+      acceptanceCriteria:
+        - Placeholder
+      outOfScope:
+        - All features pending future extraction
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
+  - slug: customer-communications
+    title: Customer Communications (Not Extracted in SX-0001)
+    order: 10
+    dependsOn: []
+    priority: 0
+    change:
+      dir: openspec/changes/sx-customer-communications
+      specCapabilities:
+        - customer-communications
+    canvas:
+      problem: Placeholder entry for customer-communications capability
+      solution: Not extracted in this run
+      userStories:
+        - Placeholder
+      acceptanceCriteria:
+        - Placeholder
+      outOfScope:
+        - All features pending future extraction
+      risksAssumptions: []
+      techStack: []
+      affectedCode: []
+    evidence:
+      irRefs: []
+      reviewedBy: null
+      reviewedAt: null
+
 artifacts:
   openapi: api/openapi.yaml
   erd: architecture/erd.mermaid

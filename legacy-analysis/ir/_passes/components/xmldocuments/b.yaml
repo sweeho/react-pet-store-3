@@ -1,0 +1,469 @@
+records:
+  - record_key: XMLDOC-ENTITY-0001
+    kind: entity
+    capability_key: order-checkout
+    requirement: >
+      A PurchaseOrder XML document SHALL contain the following elements: OrderId, UserId, EmailId, OrderDate,
+      ShipAddress, BillAddress, TotalPrice, CreditCard (CardNumber, ExpiryDate, CardType), and one or more LineItem elements.
+      The PurchaseOrder element has a locale attribute with default value "en_US".
+    confidence: high
+    confidence_basis: >
+      The DTD schema (PurchaseOrder.dtd) explicitly defines all required elements and attributes.
+      Both XMLDocumentUtils and OrderApproval classes reference these elements in their implementation,
+      confirming consistent usage across the module. The schema is enforced through XML parsing with
+      validation enabled (VALIDATING = true).
+    risk_class: operational
+    basis: >
+      PurchaseOrder.dtd defines element structure with mandatory child elements and locale attribute.
+      XMLDocumentEditor and XMLDocumentUtils provide serialization/deserialization methods.
+      Test and example files reference this document type.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/PurchaseOrder.dtd
+        line_start: 38
+        line_end: 85
+        excerpt: |
+          <!ELEMENT PurchaseOrder (OrderId, UserId, EmailId, OrderDate, ShipAddress, BillAddress, TotalPrice, CreditCard, LineItem+)>
+          <!ATTLIST PurchaseOrder
+          	locale CDATA "en_US"
+          >
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/XMLDocumentEditor.java
+        line_start: 47
+        line_end: 102
+        excerpt: |
+          public interface XMLDocumentEditor {
+            public void setDocument(Source source) throws XMLDocumentException;
+            public Source getDocument() throws XMLDocumentException;
+            public void copyDocument(Result result) throws XMLDocumentException;
+          }
+    stack_metadata:
+      dtd.document: PurchaseOrder.dtd
+      validation.enabled: true
+
+  - record_key: XMLDOC-ENTITY-0002
+    kind: entity
+    capability_key: order-approval
+    requirement: >
+      An OrderApproval XML document SHALL contain one or more Order elements.
+      Each Order element SHALL contain OrderId and OrderStatus child elements.
+      OrderStatus element should be an attribute rather than a child element (schema has FIXME comment).
+    confidence: medium
+    confidence_basis: >
+      The DTD schema explicitly defines the structure. The DTD includes a FIXME comment suggesting
+      OrderStatus should be an attribute, indicating ambiguity in the design. However, the current
+      implementation uses it as an element, and ChangedOrder.java and OrderApproval.java both
+      confirm the element-based approach in their fromDOM/toDOM methods.
+    risk_class: operational
+    basis: >
+      OrderApproval.dtd defines the element structure. DTD contains inline FIXME comment
+      suggesting design intent mismatch. ChangedOrder and OrderApproval classes implement
+      the element-based serialization. The class manages order lists and converts between
+      XML and in-memory representations.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/OrderApproval.dtd
+        line_start: 38
+        line_end: 46
+        excerpt: |
+          <!ELEMENT OrderApproval (Order+)>
+          <!ELEMENT Order (OrderId, OrderStatus)>
+          <!ELEMENT OrderId (#PCDATA)>
+          <!-- FIXME should be attribute -->
+          <!ELEMENT OrderStatus (#PCDATA)>
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/ChangedOrder.java
+        line_start: 44
+        line_end: 91
+        excerpt: |
+          public class ChangedOrder {
+            public static final String XML_ORDERID = "OrderId";
+            public static final String XML_ORDERSTATUS = "OrderStatus";
+            public Node toDOM(Document document) {
+              Element root = document.createElement(XML_ORDER);
+              XMLDocumentUtils.appendChild(document, root, XML_ORDERID, orderId);
+              XMLDocumentUtils.appendChild(document, root, XML_ORDERSTATUS, orderStatus);
+              return root;
+            }
+          }
+    stack_metadata:
+      dtd.document: OrderApproval.dtd
+      java.class: ChangedOrder
+
+  - record_key: XMLDOC-ENTITY-0003
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      An Invoice XML document SHALL contain OrderId, UserId, OrderDate, ShippingDate, and one or more LineItem elements.
+      LineItem is an external entity reference to LineItem.dtd.
+    confidence: high
+    confidence_basis: >
+      Invoice.dtd explicitly defines all required elements. The LineItem entity is publicly defined
+      as an external DTD reference following J2EE Blueprints conventions. No ambiguity in element structure.
+    risk_class: operational
+    basis: >
+      Invoice.dtd defines the Invoice element with public external entity for LineItem.
+      Schema is used in supplier integration workflows for sending invoices.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/Invoice.dtd
+        line_start: 38
+        line_end: 53
+        excerpt: |
+          <!ENTITY % LineItem PUBLIC "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD Line Item 1.0//EN" "LineItem.dtd">
+          %LineItem;
+          <!ELEMENT Invoice (OrderId, UserId, OrderDate, ShippingDate, LineItem+)>
+          <!ATTLIST Invoice
+          	locale CDATA "en_US"
+          >
+    stack_metadata:
+      dtd.document: Invoice.dtd
+      entity.reference: LineItem.dtd
+
+  - record_key: XMLDOC-ENTITY-0004
+    kind: entity
+    capability_key: supplier-integration
+    requirement: >
+      A SupplierOrder XML document SHALL contain orderid, orderdate, shipaddress, and one or more lineitem elements (lowercase).
+      ShipAddress SHALL include FirstName, LastName, Street, City, State, Country, and ZipCode.
+      LineItem is an external entity reference.
+    confidence: high
+    confidence_basis: >
+      SupplierOrder.dtd explicitly defines all elements with lowercase naming for most elements
+      (contrary to CamelCase used in PurchaseOrder). This distinction is deliberate and enforced
+      through XML validation. TPA classes reference this schema with consistent naming.
+    risk_class: operational
+    basis: >
+      SupplierOrder.dtd defines elements with different casing than PurchaseOrder (orderid vs OrderId).
+      Used in supplier purchase order management workflows.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/SupplierOrder.dtd
+        line_start: 38
+        line_end: 64
+        excerpt: |
+          <!ELEMENT SupplierOrder (orderid, orderdate, shipaddress, lineitem+)>
+          <!ELEMENT orderid (#PCDATA)>
+          <!ELEMENT orderdate (#PCDATA)>
+          <!ENTITY % Address "firstname, lastname, street, city, state, country, zip">
+          <!ELEMENT shipaddress (%Address;)>
+    stack_metadata:
+      dtd.document: SupplierOrder.dtd
+      element.case: lowercase
+
+  - record_key: XMLDOC-ENTITY-0005
+    kind: entity
+    capability_key: customer-communications
+    requirement: >
+      A Mail XML document SHALL contain Address, Subject, and Content child elements.
+      All elements contain text content (#PCDATA).
+    confidence: high
+    confidence_basis: >
+      Mail.dtd explicitly and simply defines three mandatory text elements. No ambiguity or complexity.
+    risk_class: operational
+    basis: >
+      Mail.dtd defines the simple Mail element structure used for notification messages.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/Mail.dtd
+        line_start: 38
+        line_end: 42
+        excerpt: |
+          <!ELEMENT Mail (Address, Subject, Content)>
+          <!ELEMENT Address (#PCDATA)>
+          <!ELEMENT Subject (#PCDATA)>
+          <!ELEMENT Content (#PCDATA)>
+    stack_metadata:
+      dtd.document: Mail.dtd
+
+  - record_key: XMLDOC-ENTITY-0006
+    kind: entity
+    capability_key: order-checkout
+    requirement: >
+      A LineItem XML document SHALL contain CategoryId, ProductId, ItemId, LineNum, Quantity, and UnitPrice child elements.
+      This entity is reusable across multiple document types (PurchaseOrder, Invoice, SupplierOrder).
+    confidence: high
+    confidence_basis: >
+      LineItem.dtd explicitly defines the element structure. Multiple parent DTDs reference it as
+      an external entity, confirming its reusable nature. Elements are used consistently across different document types.
+    risk_class: operational
+    basis: >
+      LineItem.dtd defines reusable line item elements. Referenced by PurchaseOrder, Invoice, SupplierOrder DTDs
+      and by TPALineItem entities in TPA subcomponent.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/LineItem.dtd
+        line_start: 38
+        line_end: 51
+        excerpt: |
+          <!ELEMENT LineItem (CategoryId, ProductId, ItemId, LineNum, Quantity, UnitPrice)>
+          <!ELEMENT CategoryId (#PCDATA)>
+          <!ELEMENT ProductId (#PCDATA)>
+          <!ELEMENT ItemId (#PCDATA)>
+          <!ELEMENT LineNum (#PCDATA)>
+          <!ELEMENT Quantity (#PCDATA)>
+          <!ELEMENT UnitPrice (#PCDATA)>
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/PurchaseOrder.dtd
+        line_start: 82
+        line_end: 84
+        excerpt: |
+          <!ENTITY % LineItem PUBLIC "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD Line Item 1.0//EN" "LineItem.dtd">
+          %LineItem;
+    stack_metadata:
+      dtd.document: LineItem.dtd
+      reusable: true
+
+  - record_key: XMLDOC-BR-0001
+    kind: business-rule
+    capability_key: order-checkout
+    requirement: >
+      XML documents SHALL be parsed and serialized using validating DTD parsing with CustomEntityResolver
+      to resolve entity references from an entity catalog. Entity catalog mappings are defined in EntityCatalog.properties
+      and support both old (1.0) and new TPA (1.1) DTD versions.
+    confidence: high
+    confidence_basis: >
+      XMLDocumentUtils and OrderApproval both use VALIDATING = true and reference CustomEntityResolver.
+      CustomEntityResolver class explicitly implements EntityResolver interface and loads EntityCatalog.properties
+      from multiple sources (embedded resource and URL-based catalogs). The catalog maps public identifiers
+      to DTD file paths with support for versioning.
+    risk_class: operational
+    basis: >
+      XMLDocumentUtils.fromXML() calls CustomEntityResolver to parse documents.
+      OrderApproval.VALIDATING = true enforces DTD validation.
+      CustomEntityResolver loads EntityCatalog.properties which contains mappings for all document types.
+      Version 1.0 DTDs map to local schema paths, version 1.1 maps to component-specific paths.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/CustomEntityResolver.java
+        line_start: 47
+        line_end: 109
+        excerpt: |
+          public class CustomEntityResolver implements EntityResolver {
+            public static final String ENTITY_CATALOG = "/com/sun/j2ee/blueprints/xmldocuments/rsrc/EntityCatalog.properties";
+            public InputSource resolveEntity(String entityURI, String entityURL) {
+              // ... maps URIs using entity catalog, then attempts to load as resource
+            }
+          }
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/EntityCatalog.properties
+        line_start: 1
+        line_end: 21
+        excerpt: |
+          #Old DTDs
+          -//Sun\ Microsystems,\ Inc.\ -\ J2EE\ Blueprints\ Group//DTD\ Invoice\ 1.0//EN: /schemas/Invoice.dtd
+          #New TPA DTDs
+          -//Sun\ Microsystems,\ Inc.\ -\ J2EE\ Blueprints\ Group//DTD\ TPA-Invoice\ 1.0//EN: /com/sun/j2ee/blueprints/xmldocuments/rsrc/schemas/TPAInvoice.dtd
+          #New Component/Composite DTDs
+          -//Sun\ Microsystems,\ Inc.\ -\ J2EE\ Blueprints\ Group//DTD\ PurchaseOrder\ 1.1//EN: /com/sun/j2ee/blueprints/purchaseorder/rsrc/schemas/PurchaseOrder.dtd
+    stack_metadata:
+      entity.resolver: CustomEntityResolver
+      validation.mode: DTD
+      catalog.properties: EntityCatalog.properties
+
+  - record_key: XMLDOC-BR-0002
+    kind: business-rule
+    capability_key: order-approval
+    requirement: >
+      The system SHALL support polymorphic XML document editing through the XMLDocumentEditor interface.
+      Document editors are instantiated via XMLDocumentEditorFactory using a properties-based registry
+      that maps schema URIs to editor class names. Each editor implementation must handle document
+      serialization (getDocument), deserialization (setDocument), and copying (copyDocument).
+    confidence: high
+    confidence_basis: >
+      XMLDocumentEditor interface explicitly defines three methods for document manipulation.
+      XMLDocumentEditorFactory.getXDE(schemaURI) uses reflection to instantiate editors from a catalog.
+      TPAInvoiceXDE and TPASupplierOrderXDE are concrete implementations extending DefaultXDE.
+      Factory uses Class.forName() and newInstance() to dynamically create editor instances.
+    risk_class: operational
+    basis: >
+      XMLDocumentEditor interface and DefaultXDE base class define editor contract.
+      XMLDocumentEditorFactory loads schema-to-editor mappings from a Properties file and uses
+      reflection to instantiate concrete implementations.
+      TPA editors (TPAInvoiceXDE, TPASupplierOrderXDE) extend DefaultXDE with specific DTD/XSD handling.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/XMLDocumentEditor.java
+        line_start: 47
+        line_end: 102
+        excerpt: |
+          public interface XMLDocumentEditor {
+            public void setDocument(Source source) throws XMLDocumentException;
+            public Source getDocument() throws XMLDocumentException;
+            public void copyDocument(Result result) throws XMLDocumentException;
+          }
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/XMLDocumentEditorFactory.java
+        line_start: 60
+        line_end: 75
+        excerpt: |
+          public XMLDocumentEditor getXDE(String schemaURI) throws XMLDocumentException {
+            String className = xdeCatalog.getProperty(schemaURI);
+            if (className != null) {
+              return createXDE(className);
+            }
+            throw new XMLDocumentException("No mapping for schema: " + schemaURI);
+          }
+    stack_metadata:
+      pattern: factory
+      interface: XMLDocumentEditor
+      factory.class: XMLDocumentEditorFactory
+
+  - record_key: XMLDOC-BR-0003
+    kind: business-rule
+    capability_key: order-workflow
+    requirement: >
+      Order approval workflows SHALL serialize order status changes (OrderId and OrderStatus pairs)
+      into an OrderApproval XML document. The OrderApproval object maintains an ArrayList of ChangedOrder objects,
+      each representing a single order status change. The toDOM() and fromDOM() methods enable bidirectional
+      conversion between in-memory representations and XML.
+    confidence: high
+    confidence_basis: >
+      OrderApproval class explicitly manages an ArrayList of ChangedOrder objects.
+      Both toDOM() and fromDOM() methods are implemented for bidirectional serialization.
+      OrderApproval.addOrder() adds ChangedOrder to the list, and getOrdersList() retrieves them.
+      The class is instantiated with a no-arg constructor, then populated via addOrder() method.
+      ChangedOrder wraps orderId and orderStatus fields with public getters.
+    risk_class: operational
+    basis: >
+      OrderApproval.java implements order collection management with XML serialization.
+      ChangedOrder.java represents individual order status changes.
+      Both classes provide toDOM/fromDOM methods for XML interoperability.
+      Public static factory methods (fromXML) and DTD references enable usage across the system.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/OrderApproval.java
+        line_start: 66
+        line_end: 171
+        excerpt: |
+          public class OrderApproval {
+            private ArrayList orderList = new ArrayList();
+            public void addOrder(ChangedOrder order) {
+              orderList.add(order);
+            }
+            public Collection getOrdersList() {
+              return orderList;
+            }
+            public static OrderApproval fromXML(Source source) throws XMLDocumentException {
+              return fromXML(source, null, VALIDATING);
+            }
+            public static OrderApproval fromDOM(Node node) throws XMLDocumentException {
+              OrderApproval orderApproval = new OrderApproval();
+              for (child = XMLDocumentUtils.getFirstChild(element, ChangedOrder.XML_ORDER, false);
+                   child != null;
+                   child = XMLDocumentUtils.getNextSibling(child, ChangedOrder.XML_ORDER, true)) {
+                orderApproval.orderList.add(ChangedOrder.fromDOM(child));
+              }
+              return orderApproval;
+            }
+          }
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/ChangedOrder.java
+        line_start: 44
+        line_end: 91
+        excerpt: |
+          public class ChangedOrder {
+            private String orderId;
+            private String orderStatus;
+            public String getOrderId() { return(orderId); }
+            public String getOrderStatus() { return orderStatus; }
+          }
+    stack_metadata:
+      java.class: OrderApproval
+      data.structure: ArrayList
+
+  - record_key: XMLDOC-BR-0004
+    kind: business-rule
+    capability_key: supplier-integration
+    requirement: >
+      TPA (Third Party Agreement) documents use namespaced XML with both DTD and XSD validation support.
+      TPA document editors (TPAInvoiceXDE, TPASupplierOrderXDE) use XML namespaces with prefixes (tpai, tpaso)
+      and support both legacy DTD validation and modern XSD schema validation.
+      TPA documents include namespaced element names with prefixes (e.g., tpai:Invoice, tpaso:SupplierOrder).
+    confidence: high
+    confidence_basis: >
+      TPAInvoiceXDE and TPASupplierOrderXDE both define XML_PREFIX, XML_NAMESPACE, and support both
+      DTD_PUBLIC_ID and XSD_PUBLIC_ID constants. Element definitions use prefixed names
+      (e.g., XML_PREFIX + ":" + "Invoice"). SimpleDateFormat is used for date serialization,
+      indicating date handling requirements. The editor pattern shows explicit support for both validation modes.
+    risk_class: operational
+    basis: >
+      TPAInvoiceXDE defines namespace handling with public constants for DTD, XSD, and namespace URIs.
+      All element names are constructed with namespace prefixes.
+      TPASupplierOrderXDE follows identical pattern with different prefix (tpaso vs tpai).
+      Both extend DefaultXDE from XMLDocumentEditor interface.
+      Date handling via SimpleDateFormat("yyyy-MM-dd") for order and shipping dates.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/tpa/TPAInvoiceXDE.java
+        line_start: 57
+        line_end: 80
+        excerpt: |
+          public class TPAInvoiceXDE extends XMLDocumentEditor.DefaultXDE {
+            public static final String DTD_PUBLIC_ID = "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD TPA-Invoice 1.0//EN";
+            public static final String XSD_PUBLIC_ID = "http://blueprints.j2ee.sun.com/TPAInvoice";
+            public static final String XML_NAMESPACE = "http://blueprints.j2ee.sun.com/TPAInvoice";
+            public static final String XML_PREFIX = "tpai";
+            public static final String XML_INVOICE = XML_PREFIX + ":" + "Invoice";
+            public static final String XML_ORDERID = XML_PREFIX + ":" + "OrderId";
+            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/tpa/TPASupplierOrderXDE.java
+        line_start: 57
+        line_end: 80
+        excerpt: |
+          public class TPASupplierOrderXDE extends XMLDocumentEditor.DefaultXDE {
+            public static final String DTD_PUBLIC_ID = "-//Sun Microsystems, Inc. - J2EE Blueprints Group//DTD TPA-SupplierOrder 1.0//EN";
+            public static final String XSD_PUBLIC_ID = "http://blueprints.j2ee.sun.com/TPASupplierOrder";
+            public static final String XML_NAMESPACE = "http://blueprints.j2ee.sun.com/TPASupplierOrder";
+            public static final String XML_PREFIX = "tpaso";
+            public static final String XML_SUPPLIERORDER = XML_PREFIX + ":" + "SupplierOrder";
+            public static final String XML_ORDERID = XML_PREFIX + ":" + "OrderId";
+            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    stack_metadata:
+      xml.namespace: true
+      validation.mode: DTD and XSD
+      date.format: yyyy-MM-dd
+
+  - record_key: XMLDOC-SCREEN-0001
+    kind: workflow
+    capability_key: order-workflow
+    requirement: >
+      The XML document processing workflow SHALL support serialization and deserialization of order data
+      in both DOM (in-memory tree) and XML string formats. Documents can be created from Sources, Streams, or Strings,
+      and serialized to Results or byte arrays. The XMLDocumentUtils class provides utility methods for both directions.
+    confidence: high
+    confidence_basis: >
+      OrderApproval and ChangedOrder both implement toXML()/fromXML() methods that wrap underlying toDOM()/fromDOM().
+      XMLDocumentUtils provides static methods for XML parsing and generation via JAXP Transform API.
+      Multiple overloaded methods support different input/output formats (StreamSource, StreamResult, StringReader).
+      The pattern is consistent across all document types.
+    risk_class: operational
+    basis: >
+      OrderApproval.java shows bidirectional conversion between String, Source, and DOM formats.
+      XMLDocumentUtils.java provides core transformation utilities using javax.xml.transform package.
+      Both parsing (fromXML) and generation (toXML) are supported.
+      Documents can optionally use entity catalog URLs for schema resolution.
+    traces:
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/OrderApproval.java
+        line_start: 89
+        line_end: 139
+        excerpt: |
+          public void toXML(Result result) throws XMLDocumentException {
+            toXML(result, null);
+          }
+          public String toXML() throws XMLDocumentException {
+            return toXML((URL) null);
+          }
+          public static OrderApproval fromXML(Source source) throws XMLDocumentException {
+            return fromXML(source, null, VALIDATING);
+          }
+          public static OrderApproval fromXML(String buffer) throws XMLDocumentException {
+            return fromXML(buffer, null, VALIDATING);
+          }
+      - path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/com/sun/j2ee/blueprints/xmldocuments/XMLDocumentUtils.java
+        line_start: 55
+        line_end: 100
+        excerpt: |
+          public final class XMLDocumentUtils {
+            public static final String DEFAULT_ENCODING = "UTF-8";
+            public static String getAttribute(Element element, String name, boolean optional) throws XMLDocumentException;
+            public static int getAttributeAsInt(Element element, String name, boolean optional) throws XMLDocumentException;
+            public static Element getFirstChild(Element element, String name, boolean optional) throws XMLDocumentException;
+    stack_metadata:
+      java.class: XMLDocumentUtils
+      encoding: UTF-8
+      transform.api: JAXP
+
+findings:
+  - kind: ambiguity
+    path: legacy-source/petstore1.3.2/src/components/xmldocuments/src/rsrc/schemas/OrderApproval.dtd
+    description: >
+      The OrderApproval.dtd contains a FIXME comment indicating that OrderStatus should be an XML attribute
+      rather than a child element. However, the current implementation in ChangedOrder.java and OrderApproval.java
+      treats it as a child element. This creates a design inconsistency that a human should review.
+      The question is whether to refactor the code to use an attribute (breaking change) or update the schema comment
+      to reflect the current design decision.

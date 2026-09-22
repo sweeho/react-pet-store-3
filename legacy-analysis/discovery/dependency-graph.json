@@ -1,0 +1,207 @@
+{
+  "title": "J2EE Petstore 1.3.2 Dependency Graph",
+  "timestamp": "2026-09-22",
+  "description": "Module dependencies derived from import analysis of Java source code",
+  "dependencies": {
+    "apps/petstore": {
+      "tier": "presentation",
+      "role": "main-storefront",
+      "depends_on": [
+        "components/address",
+        "components/asyncsender",
+        "components/cart",
+        "components/catalog",
+        "components/contactinfo",
+        "components/creditcard",
+        "components/customer",
+        "components/lineitem",
+        "components/purchaseorder",
+        "components/servicelocator",
+        "components/signon",
+        "components/uidgen",
+        "components/util",
+        "components/waf",
+        "components/xmldocuments"
+      ]
+    },
+    "apps/opc": {
+      "tier": "presentation",
+      "role": "order-processing-backend",
+      "depends_on": [
+        "components/address",
+        "components/contactinfo",
+        "components/lineitem",
+        "components/mailer",
+        "components/processmanager",
+        "components/purchaseorder",
+        "components/servicelocator",
+        "components/xmldocuments"
+      ]
+    },
+    "apps/admin": {
+      "tier": "presentation",
+      "role": "order-admin-dashboard",
+      "depends_on": [
+        "components/asyncsender",
+        "components/servicelocator",
+        "components/xmldocuments"
+      ]
+    },
+    "apps/supplier": {
+      "tier": "presentation",
+      "role": "supplier-integration",
+      "depends_on": [
+        "components/lineitem",
+        "components/processmanager",
+        "components/servicelocator",
+        "components/supplierpo",
+        "components/xmldocuments"
+      ]
+    },
+    "components/purchaseorder": {
+      "tier": "business-logic",
+      "role": "order-data-model",
+      "depends_on": [
+        "components/address",
+        "components/contactinfo",
+        "components/creditcard",
+        "components/lineitem",
+        "components/servicelocator",
+        "components/xmldocuments"
+      ]
+    },
+    "components/processmanager": {
+      "tier": "business-logic",
+      "role": "order-workflow-manager",
+      "depends_on": []
+    },
+    "components/creditcard": {
+      "tier": "business-logic",
+      "role": "payment-validation",
+      "depends_on": ["components/xmldocuments"]
+    },
+    "components/cart": {
+      "tier": "business-logic",
+      "role": "shopping-cart",
+      "depends_on": ["components/catalog", "components/util"]
+    },
+    "components/catalog": {
+      "tier": "business-logic",
+      "role": "product-catalog",
+      "depends_on": ["components/servicelocator", "components/util"]
+    },
+    "components/customer": {
+      "tier": "business-logic",
+      "role": "customer-profile",
+      "depends_on": ["components/contactinfo", "components/creditcard"]
+    },
+    "components/contactinfo": {
+      "tier": "business-logic",
+      "role": "contact-data-model",
+      "depends_on": ["components/address", "components/servicelocator", "components/xmldocuments"]
+    },
+    "components/signon": {
+      "tier": "business-logic",
+      "role": "authentication",
+      "depends_on": []
+    },
+    "components/supplierpo": {
+      "tier": "business-logic",
+      "role": "supplier-order",
+      "depends_on": [
+        "components/address",
+        "components/contactinfo",
+        "components/lineitem",
+        "components/servicelocator",
+        "components/xmldocuments"
+      ]
+    },
+    "components/address": {
+      "tier": "data-model",
+      "role": "address-entity",
+      "depends_on": ["components/xmldocuments"]
+    },
+    "components/contactinfo": {
+      "tier": "data-model",
+      "role": "contact-entity",
+      "depends_on": ["components/address", "components/servicelocator", "components/xmldocuments"]
+    },
+    "components/lineitem": {
+      "tier": "data-model",
+      "role": "order-line-item-entity",
+      "depends_on": ["components/xmldocuments"]
+    },
+    "components/mailer": {
+      "tier": "infrastructure",
+      "role": "email-sending",
+      "depends_on": ["components/xmldocuments"]
+    },
+    "components/xmldocuments": {
+      "tier": "infrastructure",
+      "role": "xml-serialization",
+      "depends_on": []
+    },
+    "components/servicelocator": {
+      "tier": "infrastructure",
+      "role": "jndi-service-locator",
+      "depends_on": []
+    },
+    "components/util": {
+      "tier": "infrastructure",
+      "role": "utility-functions",
+      "depends_on": []
+    },
+    "components/asyncsender": {
+      "tier": "infrastructure",
+      "role": "async-messaging",
+      "depends_on": ["components/servicelocator"]
+    },
+    "components/uidgen": {
+      "tier": "infrastructure",
+      "role": "id-generation",
+      "depends_on": []
+    },
+    "components/encodingfilter": {
+      "tier": "infrastructure",
+      "role": "request-encoding-filter",
+      "depends_on": []
+    },
+    "waf": {
+      "tier": "infrastructure",
+      "role": "web-application-framework",
+      "depends_on": []
+    }
+  },
+  "critical_paths": [
+    {
+      "name": "Shopping Flow",
+      "modules": [
+        "apps/petstore",
+        "components/catalog",
+        "components/cart",
+        "components/customer",
+        "components/purchaseorder",
+        "components/creditcard"
+      ]
+    },
+    {
+      "name": "Order Processing",
+      "modules": [
+        "apps/opc",
+        "components/purchaseorder",
+        "components/processmanager",
+        "components/mailer"
+      ]
+    },
+    {
+      "name": "Admin Oversight",
+      "modules": ["apps/admin", "components/processmanager"]
+    },
+    {
+      "name": "Supplier Coordination",
+      "modules": ["apps/supplier", "components/supplierpo", "components/processmanager"]
+    }
+  ],
+  "circular_dependencies": [],
+  "notes": "No circular dependencies detected. Strong layering: presentation tier (apps/*) depends on business logic (components/*); business logic depends on infrastructure; infrastructure has no external dependencies."
+}

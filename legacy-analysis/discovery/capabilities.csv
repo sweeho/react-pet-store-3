@@ -1,0 +1,11 @@
+capability_key,name,summary
+catalog-browsing,Product Catalog,Searching, filtering, and browsing pet products by category with multi-language support
+shopping-cart,Shopping Cart,Add, remove, and manage items in a shopping cart session with quantity management
+order-checkout,Order Checkout,Collect customer contact info, shipping address, billing address, and creditcard for order placement
+creditcard-validation,Credit Card Processing,Validate card type, number, and expiry date; process payment transactions
+order-workflow,Order Workflow,Manage order lifecycle through states: PENDING → APPROVED → SHIPPED_PART → COMPLETED or DENIED
+customer-management,Customer Account,Register users, authenticate via sign-on, manage customer profile and order history
+supplier-integration,Supplier Integration,Receive purchase orders from petstore, send invoices, coordinate shipments
+order-approval,Order Approval,Admin review and approval/denial of orders with configurable thresholds by amount or tier
+customer-communications,Customer Notifications,Send order confirmation, approval, shipment, and completion emails to customers
+admin-dashboard,Admin Monitoring,View orders by status, generate order charts for date ranges and status analysis

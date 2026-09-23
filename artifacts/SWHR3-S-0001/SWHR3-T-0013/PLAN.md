@@ -31,6 +31,14 @@ This ticket may create or modify only these files:
 - `lib/customer-profile.test.ts`
 - `src/types/customer-profile.ts`
 
+**Deviation (minor, no contract/ownership impact):** also added
+`src/types/customer-profile.ts` to `tsconfig.node.json`'s `include` array
+(one line), mirroring the exact precedent T-0020 set for
+`src/constants/auth.ts`. Without it, `tsc --build` refuses the parity
+test's cross-import with TS6307 ("File ... is not listed within the file
+list of project ... tsconfig.node.json"). No other ticket in this sprint
+phase touches `tsconfig.node.json`, so this carries no ownership conflict.
+
 ## Definition of Done
 
 - AC-1, AC-2, AC-3, AC-4, AC-5: every acceptance criterion on the ticket, in order, is met and covered by a test that fails without the change.

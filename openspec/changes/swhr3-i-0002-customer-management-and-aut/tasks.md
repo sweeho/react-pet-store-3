@@ -89,13 +89,13 @@
 
 ## 10. EJB Service Layer
 
-- [ ] 10.1 Create CustomerLocal interface extending EJBLocalObject (SWHR3-T-0016)
-- [ ] 10.2 Create CustomerLocalHome interface extending EJBLocalHome (SWHR3-T-0016)
-- [ ] 10.3 Implement customer query methods in CustomerEJB (stateless session bean) (SWHR3-T-0016)
-- [ ] 10.4 Implement ServiceLocator pattern for EJB lookup (SWHR3-T-0016)
-- [ ] 10.5 Create JNDI names for CustomerLocalHome and SignOnLocalHome (SWHR3-T-0016)
-- [ ] 10.6 Implement exception handling and wrapping in service layer (SWHR3-T-0016)
-- [ ] 10.7 Declare local interfaces in ejb-jar.xml deployment descriptor (SWHR3-T-0016)
+- [x] 10.1 Create CustomerLocal interface extending EJBLocalObject (SWHR3-T-0016)
+- [x] 10.2 Create CustomerLocalHome interface extending EJBLocalHome (SWHR3-T-0016)
+- [x] 10.3 Implement customer query methods in CustomerEJB (stateless session bean) (SWHR3-T-0016)
+- [x] 10.4 Implement ServiceLocator pattern for EJB lookup (SWHR3-T-0016)
+- [x] 10.5 Create JNDI names for CustomerLocalHome and SignOnLocalHome (SWHR3-T-0016)
+- [x] 10.6 Implement exception handling and wrapping in service layer (SWHR3-T-0016)
+- [x] 10.7 Declare local interfaces in ejb-jar.xml deployment descriptor (SWHR3-T-0016)
 
 ## 11. SignOn Component Integration
 

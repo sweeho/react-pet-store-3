@@ -55,7 +55,7 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
     await page.goto("/signin");
 
     const newCustomerPanel = page.getByRole("region", { name: "New customer" });
-    await newCustomerPanel.getByLabel("User name").fill(username);
+    await newCustomerPanel.getByLabel("User name", { exact: true }).fill(username);
     await newCustomerPanel.getByLabel("Password", { exact: true }).fill(password);
     await newCustomerPanel.getByLabel("Confirm password").fill(password);
     await newCustomerPanel.getByRole("button", { name: "Create new account" }).click();
@@ -86,7 +86,7 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
     await expect(page).toHaveURL(/\/signin$/);
 
     const returningPanel = page.getByRole("region", { name: "Returning customer" });
-    await returningPanel.getByLabel("User name").fill(username);
+    await returningPanel.getByLabel("User name", { exact: true }).fill(username);
     await returningPanel.getByLabel("Password", { exact: true }).fill(password);
     await returningPanel.getByRole("checkbox", { name: /Remember my user name/ }).check();
     await returningPanel.getByRole("button", { name: "Sign in" }).click();
@@ -97,7 +97,9 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
 
     await page.goto("/signin");
     await expect(
-      page.getByRole("region", { name: "Returning customer" }).getByLabel("User name"),
+      page
+        .getByRole("region", { name: "Returning customer" })
+        .getByLabel("User name", { exact: true }),
     ).toHaveValue(username);
   });
 
@@ -126,7 +128,7 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
     await expect(page).toHaveURL(/\/signin\?redirect=%2Fusers%2Fprofile$/);
 
     const returningPanel = page.getByRole("region", { name: "Returning customer" });
-    await returningPanel.getByLabel("User name").fill(username);
+    await returningPanel.getByLabel("User name", { exact: true }).fill(username);
     await returningPanel.getByLabel("Password", { exact: true }).fill(password);
     await returningPanel.getByRole("button", { name: "Sign in" }).click();
 
@@ -144,7 +146,7 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
 
     await page.goto("/signin");
     const returningPanel = page.getByRole("region", { name: "Returning customer" });
-    await returningPanel.getByLabel("User name").fill(username);
+    await returningPanel.getByLabel("User name", { exact: true }).fill(username);
     await returningPanel.getByLabel("Password", { exact: true }).fill("totally-wrong-password");
     await returningPanel.getByRole("button", { name: "Sign in" }).click();
 
@@ -166,7 +168,7 @@ test.describe("Customer sign-on, registration and profile (SWHR3-T-0022)", () =>
 
     await page.goto("/signin");
     const newCustomerPanel = page.getByRole("region", { name: "New customer" });
-    await newCustomerPanel.getByLabel("User name").fill(username);
+    await newCustomerPanel.getByLabel("User name", { exact: true }).fill(username);
     await newCustomerPanel.getByLabel("Password", { exact: true }).fill("another-password-1");
     await newCustomerPanel.getByLabel("Confirm password").fill("another-password-1");
     await newCustomerPanel.getByRole("button", { name: "Create new account" }).click();

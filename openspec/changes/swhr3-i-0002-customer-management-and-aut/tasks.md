@@ -59,13 +59,13 @@
 
 ## 7. Customer Profile Value Object
 
-- [ ] 7.1 Create CustomerProfile serializable value object class (SWHR3-T-0013)
-- [ ] 7.2 Mirror CMP entity fields in value object (SWHR3-T-0013)
-- [ ] 7.3 Implement getters and setters for all customer profile fields (SWHR3-T-0013)
-- [ ] 7.4 Implement toDOM(Document) for XML serialization (SWHR3-T-0013)
-- [ ] 7.5 Implement fromDOM(Node) for XML deserialization (SWHR3-T-0013)
-- [ ] 7.6 Define XML element names (CUSTOMER, FIRST_NAME, LAST_NAME, EMAIL, etc.) (SWHR3-T-0013)
-- [ ] 7.7 Support CustomerProfile data transfer between web and EJB tiers (SWHR3-T-0013)
+- [x] 7.1 Create CustomerProfile serializable value object class (SWHR3-T-0013)
+- [x] 7.2 Mirror CMP entity fields in value object (SWHR3-T-0013)
+- [x] 7.3 Implement getters and setters for all customer profile fields (SWHR3-T-0013)
+- [x] 7.4 Implement toDOM(Document) for XML serialization (SWHR3-T-0013)
+- [x] 7.5 Implement fromDOM(Node) for XML deserialization (SWHR3-T-0013)
+- [x] 7.6 Define XML element names (CUSTOMER, FIRST_NAME, LAST_NAME, EMAIL, etc.) (SWHR3-T-0013)
+- [x] 7.7 Support CustomerProfile data transfer between web and EJB tiers (SWHR3-T-0013)
 
 ## 8. Customer Creation Form
 

@@ -22,6 +22,7 @@
     "db",
     "lib",
     "e2e",
-    "src/constants/auth.ts"
+    "src/constants/auth.ts",
+    "src/types/customer-profile.ts"
   ]
 }

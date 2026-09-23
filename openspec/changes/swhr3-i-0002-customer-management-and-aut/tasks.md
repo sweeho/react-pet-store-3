@@ -119,13 +119,13 @@
 
 ## 13. Error Handling & Exception Mapping
 
-- [ ] 13.1 Implement MainServlet.doProcess() exception handler (catch Throwable) (SWHR3-T-0019)
-- [ ] 13.2 Implement ScreenFlowManager.getExceptionScreen() exception-to-screen mapping (SWHR3-T-0019)
-- [ ] 13.3 Set javax.servlet.jsp.jspException request attribute before forwarding (SWHR3-T-0019)
-- [ ] 13.4 Create ERROR screen definition in screendefinitions.xml (SWHR3-T-0019)
-- [ ] 13.5 Implement errorpage.jsp to display exception details (SWHR3-T-0019)
-- [ ] 13.6 Map DuplicateAccountException to user-friendly error screen (SWHR3-T-0019)
-- [ ] 13.7 Implement logging of exceptions for debugging (SWHR3-T-0019)
+- [x] 13.1 Implement MainServlet.doProcess() exception handler (catch Throwable) (SWHR3-T-0019)
+- [x] 13.2 Implement ScreenFlowManager.getExceptionScreen() exception-to-screen mapping (SWHR3-T-0019)
+- [x] 13.3 Set javax.servlet.jsp.jspException request attribute before forwarding (SWHR3-T-0019)
+- [x] 13.4 Create ERROR screen definition in screendefinitions.xml (SWHR3-T-0019)
+- [x] 13.5 Implement errorpage.jsp to display exception details (SWHR3-T-0019)
+- [x] 13.6 Map DuplicateAccountException to user-friendly error screen (SWHR3-T-0019)
+- [x] 13.7 Implement logging of exceptions for debugging (SWHR3-T-0019)
 
 ## 14. Security Configuration
 

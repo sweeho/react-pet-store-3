@@ -79,13 +79,13 @@
 
 ## 9. Customer Profile Operations
 
-- [ ] 9.1 Implement CustomerEJB.createCustomer() for new customer registration (SWHR3-T-0015)
-- [ ] 9.2 Implement CustomerEJB.getCustomer() to retrieve existing customer profiles (SWHR3-T-0015)
-- [ ] 9.3 Implement CustomerEJB.updateCustomer() to modify customer attributes (SWHR3-T-0015)
-- [ ] 9.4 Implement CustomerEJB.deleteCustomer() for account removal (SWHR3-T-0015)
-- [ ] 9.5 Implement CustomerLocalHome.findByUserId() finder method (SWHR3-T-0015)
-- [ ] 9.6 Implement customer profile validation before persistence (SWHR3-T-0015)
-- [ ] 9.7 Implement email uniqueness constraint checking (SWHR3-T-0015)
+- [x] 9.1 Implement CustomerEJB.createCustomer() for new customer registration (SWHR3-T-0015)
+- [x] 9.2 Implement CustomerEJB.getCustomer() to retrieve existing customer profiles (SWHR3-T-0015)
+- [x] 9.3 Implement CustomerEJB.updateCustomer() to modify customer attributes (SWHR3-T-0015)
+- [x] 9.4 Implement CustomerEJB.deleteCustomer() for account removal (SWHR3-T-0015)
+- [x] 9.5 Implement CustomerLocalHome.findByUserId() finder method (SWHR3-T-0015)
+- [x] 9.6 Implement customer profile validation before persistence (SWHR3-T-0015)
+- [x] 9.7 Implement email uniqueness constraint checking (SWHR3-T-0015)
 
 ## 10. EJB Service Layer
 

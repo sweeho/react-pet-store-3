@@ -43,8 +43,9 @@ export default function SignIn() {
   const [username, setUsername] = useState(() => readCookie(REMEMBER_COOKIE_NAME) ?? "");
   const [password, setPassword] = useState("");
   const [rememberUsername, setRememberUsername] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [signInFailed, setSignInFailed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const [regUsername, setRegUsername] = useState("");
   const [regPassword, setRegPassword] = useState("");
@@ -55,7 +56,7 @@ export default function SignIn() {
   const [regSubmitting, setRegSubmitting] = useState(false);
 
   const handleSignIn = async () => {
-    setError(undefined);
+    setSignInFailed(false);
     setSubmitting(true);
 
     try {
@@ -68,8 +69,10 @@ export default function SignIn() {
         },
       });
       navigate(resolveRedirect(searchParams.get("redirect")));
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Sign in failed. Please try again.");
+    } catch {
+      setSignInFailed(true);
+      setPassword("");
+      passwordInputRef.current?.focus();
     } finally {
       setSubmitting(false);
     }
@@ -118,6 +121,15 @@ export default function SignIn() {
       <p className="text-muted-foreground mt-2 mb-6 text-sm">
         Sign in to continue to checkout, or create an account — it takes about a minute.
       </p>
+      {signInFailed && (
+        <Alert variant="destructive" role="alert" className="mb-6">
+          <AlertTitle>There were errors signing you in</AlertTitle>
+          <AlertDescription>
+            The user name and password you entered were not found in our records. Check for typos
+            and try again — passwords are case sensitive.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="flex items-start gap-6">
         <section
           className="bg-card flex-1 rounded-lg border shadow-sm"
@@ -137,11 +149,6 @@ export default function SignIn() {
               }}
               noValidate
             >
-              {error && (
-                <p role="alert" className="text-destructive mb-4 text-sm">
-                  {error}
-                </p>
-              )}
               <FormField label="User name">
                 <Input
                   name="j_username"
@@ -152,6 +159,7 @@ export default function SignIn() {
               </FormField>
               <FormField label="Password">
                 <Input
+                  ref={passwordInputRef}
                   name="j_password"
                   type="password"
                   autoComplete="current-password"

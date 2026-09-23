@@ -4,7 +4,7 @@ import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 
-import { accounts, users } from "./schema";
+import { accounts, creditCards, customers, users } from "./schema";
 
 // Vitest sets VITEST=true in every worker; an in-memory db keeps route
 // integration tests isolated from the file-backed dev/prod db and from
@@ -17,7 +17,11 @@ const sqlite = new Database(
   process.env.VITEST ? ":memory:" : path.join(process.cwd(), "sqlite.db"),
 );
 
-export const db = drizzle(sqlite, { schema: { users, accounts } });
+// bun:sqlite does not enforce foreign keys by default; creditCards'
+// ON DELETE CASCADE to customers (D8) needs this on for every connection.
+sqlite.exec("PRAGMA foreign_keys = ON");
+
+export const db = drizzle(sqlite, { schema: { users, accounts, customers, creditCards } });
 
 migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
 

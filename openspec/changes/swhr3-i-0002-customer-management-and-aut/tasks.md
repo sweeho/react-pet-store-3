@@ -29,13 +29,13 @@
 
 ## 4. Session Management
 
-- [ ] 4.1 Configure session timeout in web.xml (session-config/session-timeout = 30) (SWHR3-T-0010)
-- [ ] 4.2 Implement session creation on successful authentication (SWHR3-T-0010)
-- [ ] 4.3 Store user ID in session attribute WebKeys.USER_ID (SWHR3-T-0010)
-- [ ] 4.4 Store default locale in session attribute WebKeys.LOCALE (en_US default) (SWHR3-T-0010)
-- [ ] 4.5 Implement MainServlet.doProcess() locale initialization logic (SWHR3-T-0010)
-- [ ] 4.6 Implement session invalidation on logout (SWHR3-T-0010)
-- [ ] 4.7 Detect session timeout in ApplRequestProcessor (req.getSession(false) == null) (SWHR3-T-0010)
+- [x] 4.1 Configure session timeout in web.xml (session-config/session-timeout = 30) (SWHR3-T-0010)
+- [x] 4.2 Implement session creation on successful authentication (SWHR3-T-0010)
+- [x] 4.3 Store user ID in session attribute WebKeys.USER_ID (SWHR3-T-0010)
+- [x] 4.4 Store default locale in session attribute WebKeys.LOCALE (en_US default) (SWHR3-T-0010)
+- [x] 4.5 Implement MainServlet.doProcess() locale initialization logic (SWHR3-T-0010)
+- [x] 4.6 Implement session invalidation on logout (SWHR3-T-0010)
+- [x] 4.7 Detect session timeout in ApplRequestProcessor (req.getSession(false) == null) (SWHR3-T-0010)
 
 ## 5. Protected Resources & Access Control
 

@@ -139,13 +139,13 @@
 
 ## 15. Form Validation & Constraints
 
-- [ ] 15.1 Implement JSP form validation for required fields (username, password) (SWHR3-T-0021)
-- [ ] 15.2 Validate password confirmation match in registration form (SWHR3-T-0021)
-- [ ] 15.3 Add client-side validation using waf:input validation attribute (SWHR3-T-0021)
-- [ ] 15.4 Validate email format in customer creation form (SWHR3-T-0021)
-- [ ] 15.5 Implement server-side validation in CreateUserEJBAction (SWHR3-T-0021)
-- [ ] 15.6 Set maxlength on text input fields (username, passwords, names) (SWHR3-T-0021)
-- [ ] 15.7 Implement form value preservation on validation failure (SWHR3-T-0021)
+- [x] 15.1 Implement JSP form validation for required fields (username, password) (SWHR3-T-0021)
+- [x] 15.2 Validate password confirmation match in registration form (SWHR3-T-0021)
+- [x] 15.3 Add client-side validation using waf:input validation attribute (SWHR3-T-0021)
+- [x] 15.4 Validate email format in customer creation form (SWHR3-T-0021)
+- [x] 15.5 Implement server-side validation in CreateUserEJBAction (SWHR3-T-0021)
+- [x] 15.6 Set maxlength on text input fields (username, passwords, names) (SWHR3-T-0021)
+- [x] 15.7 Implement form value preservation on validation failure (SWHR3-T-0021)
 
 ## 16. Testing & Integration
 

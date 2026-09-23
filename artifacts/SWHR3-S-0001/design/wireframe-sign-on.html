@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Sign-on</title>
+<style>
+body{margin:0;background:#fff;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#3f3f46}
+.page{width:720px;margin:0 auto}
+.chrome{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e4e4e7;padding:10px 16px;background:#fafafa}
+.logo{width:96px;height:20px;background:#d4d4d8;border-radius:4px;flex:none}
+.navbars{display:flex;gap:10px;flex:1}
+.navbar{width:52px;height:8px;background:#e4e4e7;border-radius:4px}
+.search{width:150px;height:26px;border:1px solid #d4d4d8;border-radius:6px;background:#fff;display:flex;align-items:center;padding:0 8px;font-size:10px;color:#a1a1aa;flex:none}
+.body{padding:22px 16px}
+.h1{font-size:19px;font-weight:700;color:#27272a;margin:0 0 4px}
+.sub{font-size:11px;color:#71717a;margin:0 0 18px}
+.cols{display:flex;gap:16px;align-items:flex-start}
+.card{border:1px solid #e4e4e7;border-radius:10px;background:#fff;padding:16px;flex:1}
+.cardhead{font-size:13px;font-weight:600;color:#27272a;margin:0 0 3px}
+.cardsub{font-size:10px;color:#a1a1aa;margin:0 0 14px}
+.label{font-size:10px;font-weight:500;color:#52525b;margin:0 0 4px;display:block}
+.input{height:30px;border:1px solid #d4d4d8;border-radius:6px;background:#fff;display:flex;align-items:center;padding:0 8px}
+.val{height:7px;background:#d4d4d8;border-radius:4px;width:96px}
+.dots{height:7px;background:#e4e4e7;border-radius:4px;width:72px}
+.field{margin-bottom:11px}
+.btn{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;padding:0 16px;width:100%;box-sizing:border-box}
+.btn-primary{background:#3f3f46;color:#fff}
+.btn-outline{border:1px solid #d4d4d8;background:#fff;color:#3f3f46}
+.check{display:flex;align-items:center;gap:7px;font-size:11px;color:#3f3f46;margin:12px 0 14px}
+.box{width:13px;height:13px;border:1px solid #a1a1aa;border-radius:3px;background:#fff;flex:none}
+.note{font-size:9px;color:#a1a1aa;margin-top:5px}
+.foot{padding:0 16px;font-size:10px;color:#a1a1aa}
+</style></head>
+<body>
+<div class="page">
+  <div class="chrome">
+    <div class="logo"></div>
+    <div class="navbars"><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div></div>
+    <div class="search">Search</div>
+  </div>
+
+  <div class="body">
+    <div class="h1">Sign In</div>
+    <div class="sub">Returning customers sign in here. New customers create an account on the right.</div>
+
+    <div class="cols">
+      <div class="card">
+        <div class="cardhead">Returning Customer</div>
+        <div class="cardsub">Sign in with your existing account</div>
+
+        <div class="field">
+          <span class="label">User Name</span>
+          <div class="input"><div class="val"></div></div>
+          <div class="note">Pre-filled from the bp_signon cookie when previously remembered</div>
+        </div>
+
+        <div class="field">
+          <span class="label">Password</span>
+          <div class="input"><div class="dots"></div></div>
+        </div>
+
+        <div class="check"><div class="box"></div>Remember My User Name</div>
+
+        <div class="btn btn-primary">Sign In</div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">New Customer</div>
+        <div class="cardsub">Create an account to continue</div>
+
+        <div class="field">
+          <span class="label">User Name</span>
+          <div class="input"></div>
+        </div>
+
+        <div class="field">
+          <span class="label">Password</span>
+          <div class="input"></div>
+        </div>
+
+        <div class="field">
+          <span class="label">Confirm Password</span>
+          <div class="input"></div>
+        </div>
+
+        <div style="height:26px"></div>
+        <div class="btn btn-outline">Create New Account</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">After signing in you are returned to the page you originally requested.</div>
+</div>
+</body>
+</html>

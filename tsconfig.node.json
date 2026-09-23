@@ -20,6 +20,9 @@
     "routes",
     "middleware",
     "db",
-    "e2e"
+    "lib",
+    "e2e",
+    "src/constants/auth.ts",
+    "src/types/customer-profile.ts"
   ]
 }

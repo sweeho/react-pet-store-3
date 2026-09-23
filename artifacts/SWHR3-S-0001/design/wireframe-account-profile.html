@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Account profile</title>
+<style>
+body{margin:0;background:#fff;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#3f3f46}
+.page{width:720px;margin:0 auto}
+.chrome{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e4e4e7;padding:10px 16px;background:#fafafa}
+.logo{width:96px;height:20px;background:#d4d4d8;border-radius:4px;flex:none}
+.navbars{display:flex;gap:10px;flex:1}
+.navbar{width:52px;height:8px;background:#e4e4e7;border-radius:4px}
+.search{width:150px;height:26px;border:1px solid #d4d4d8;border-radius:6px;background:#fff;display:flex;align-items:center;padding:0 8px;font-size:10px;color:#a1a1aa;flex:none}
+.body{padding:22px 16px 32px}
+.head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.h1{font-size:19px;font-weight:700;color:#27272a;margin:0 0 4px}
+.sub{font-size:11px;color:#71717a;margin:0}
+.card{border:1px solid #e4e4e7;border-radius:10px;background:#fff;padding:16px;margin-bottom:14px}
+.cardhead{font-size:13px;font-weight:600;color:#27272a;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid #f4f4f5}
+.label{font-size:10px;font-weight:500;color:#52525b;margin:0 0 4px;display:block}
+.opt{color:#a1a1aa;font-weight:400}
+.input{height:30px;border:1px solid #d4d4d8;border-radius:6px;background:#fff;display:flex;align-items:center;padding:0 8px}
+.ro{height:30px;border:1px solid #e4e4e7;border-radius:6px;background:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+.rotag{font-size:9px;color:#a1a1aa}
+.select{height:30px;border:1px solid #d4d4d8;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:10px;color:#52525b}
+.val{height:7px;background:#d4d4d8;border-radius:4px}
+.field{margin-bottom:11px}
+.row{display:flex;gap:10px}
+.row>.field{flex:1}
+.check{display:flex;align-items:center;gap:7px;font-size:11px;color:#3f3f46;margin:0 0 10px}
+.box{width:13px;height:13px;border:1px solid #a1a1aa;border-radius:3px;background:#fff;flex:none}
+.box.on{background:#3f3f46;border-color:#3f3f46}
+.actions{display:flex;gap:10px;justify-content:flex-end}
+.btn{height:32px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;padding:0 18px}
+.btn-primary{background:#3f3f46;color:#fff}
+.btn-outline{border:1px solid #d4d4d8;background:#fff;color:#3f3f46}
+</style></head>
+<body>
+<div class="page">
+  <div class="chrome">
+    <div class="logo"></div>
+    <div class="navbars"><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div><div class="navbar"></div></div>
+    <div class="search">Search</div>
+  </div>
+
+  <div class="body">
+    <div class="head">
+      <div>
+        <div class="h1">My Account</div>
+        <div class="sub">View and edit your contact details, credit card and preferences.</div>
+      </div>
+      <div class="btn btn-outline">Sign Out</div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">Sign-in Details</div>
+      <div class="field" style="max-width:330px">
+        <span class="label">User Name</span>
+        <div class="ro"><div class="val" style="width:92px"></div><span class="rotag">Cannot be changed</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">Contact Information</div>
+      <div class="row">
+        <div class="field"><span class="label">First Name</span><div class="input"><div class="val" style="width:70px"></div></div></div>
+        <div class="field"><span class="label">Last Name</span><div class="input"><div class="val" style="width:84px"></div></div></div>
+      </div>
+      <div class="field"><span class="label">Street Address 1</span><div class="input"><div class="val" style="width:190px"></div></div></div>
+      <div class="field"><span class="label">Street Address 2 <span class="opt">(optional)</span></span><div class="input"></div></div>
+      <div class="row">
+        <div class="field"><span class="label">City</span><div class="input"><div class="val" style="width:76px"></div></div></div>
+        <div class="field"><span class="label">State / Province</span><div class="input"><div class="val" style="width:56px"></div></div></div>
+      </div>
+      <div class="row">
+        <div class="field"><span class="label">Postal Code</span><div class="input"><div class="val" style="width:52px"></div></div></div>
+        <div class="field"><span class="label">Country</span><div class="input"><div class="val" style="width:64px"></div></div></div>
+      </div>
+      <div class="row">
+        <div class="field"><span class="label">Telephone</span><div class="input"><div class="val" style="width:88px"></div></div></div>
+        <div class="field"><span class="label">Email</span><div class="input"><div class="val" style="width:120px"></div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">Credit Card Information</div>
+      <div class="field"><span class="label">Card Number</span><div class="input"><div class="val" style="width:150px"></div></div></div>
+      <div class="row">
+        <div class="field"><span class="label">Card Type</span><div class="select"><div class="val" style="width:60px"></div><span>&#9662;</span></div></div>
+        <div class="field"><span class="label">Expiry Date</span><div class="select"><div class="val" style="width:60px"></div><span>&#9662;</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">Profile Information</div>
+      <div class="row">
+        <div class="field"><span class="label">Preferred Language</span><div class="select"><span>English</span><span>&#9662;</span></div></div>
+        <div class="field"><span class="label">Favorite Category</span><div class="select"><span>Dogs</span><span>&#9662;</span></div></div>
+      </div>
+      <div style="height:6px"></div>
+      <div class="check"><div class="box on"></div>Enable MyList</div>
+      <div class="check"><div class="box"></div>Show pet tips banners</div>
+    </div>
+
+    <div class="actions">
+      <div class="btn btn-outline">Cancel</div>
+      <div class="btn btn-primary">Save Changes</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

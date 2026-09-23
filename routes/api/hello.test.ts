@@ -1,33 +1,53 @@
 import { H3Event } from "nitro/h3";
 import { describe, expect, it } from "vitest";
 
+import { AUTH_CONFIG } from "../../lib/auth-config";
+import { startSession } from "../../lib/session";
 import authMiddleware from "../../middleware/auth";
 import hello from "./hello";
 
 /**
  * INTEGRATION TEST
  *
- * Exercises two backend units together the way Nitro actually runs them: a
- * middleware handler that populates `event.context`, followed by a route
- * handler that reads it. No HTTP server or network call is involved — we
- * build a real H3Event (via `new H3Event(request, context)` from
- * "nitro/h3") and pass it through both handlers directly, which is fast and
- * exercises the real handler code paths. Copy this pattern for other
- * routes under routes/api that depend on middleware/ or on each other.
+ * Exercises the real auth middleware + /api/hello route the way Nitro
+ * actually runs them (real H3Event, no HTTP server). /api/hello is not a
+ * protected path, so the middleware never throws here — it just may or may
+ * not populate event.context.user (design.md AC-9).
  */
 describe("auth middleware + /api/hello route", () => {
-  it("returns a personalized greeting using the context set by the auth middleware", async () => {
+  it('greets "guest" when there is no session', async () => {
     const event = new H3Event(new Request("http://localhost/api/hello"));
 
     await authMiddleware(event);
     const result = await hello(event);
 
-    expect(result).toEqual({ success: true, message: "Hello Yeasin" });
+    expect(result).toEqual({ success: true, message: "Hello guest" });
   });
 
-  it("throws if the route runs without the auth middleware populating the context first", () => {
+  it("greets the signed-in user by user name when there is an active session", async () => {
+    const started = new H3Event(new Request("http://localhost/api/hello"));
+    await startSession(started, { id: 7, username: "jgarrett" });
+    const sessionCookie = started.res.headers
+      .getSetCookie()
+      .find((cookie) => cookie.startsWith(`${AUTH_CONFIG.sessionCookieName}=`));
+    if (!sessionCookie) {
+      throw new Error("expected startSession to set the session cookie");
+    }
+
+    const event = new H3Event(
+      new Request("http://localhost/api/hello", {
+        headers: { cookie: sessionCookie.split(";")[0] },
+      }),
+    );
+    await authMiddleware(event);
+    const result = await hello(event);
+
+    expect(result).toEqual({ success: true, message: "Hello jgarrett" });
+  });
+
+  it('answers "guest" even without the middleware running first (no throw)', () => {
     const event = new H3Event(new Request("http://localhost/api/hello"));
 
-    expect(() => hello(event)).toThrow();
+    expect(hello(event)).toEqual({ success: true, message: "Hello guest" });
   });
 });

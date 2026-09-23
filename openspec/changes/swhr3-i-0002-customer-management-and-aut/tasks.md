@@ -149,11 +149,11 @@
 
 ## 16. Testing & Integration
 
-- [ ] 16.1 Create integration tests for sign-on flow (valid/invalid credentials) (SWHR3-T-0022)
-- [ ] 16.2 Test protected resource access without authentication (SWHR3-T-0022)
-- [ ] 16.3 Test session creation and timeout behavior (SWHR3-T-0022)
-- [ ] 16.4 Test remember username cookie persistence (SWHR3-T-0022)
-- [ ] 16.5 Test duplicate account detection on registration (SWHR3-T-0022)
-- [ ] 16.6 Test customer profile creation with all form fields (SWHR3-T-0022)
-- [ ] 16.7 Test error screen rendering on exceptions (SWHR3-T-0022)
-- [ ] 16.8 Test transaction rollback on concurrent duplicate registrations (SWHR3-T-0022)
+- [x] 16.1 Create integration tests for sign-on flow (valid/invalid credentials) (SWHR3-T-0022)
+- [x] 16.2 Test protected resource access without authentication (SWHR3-T-0022)
+- [x] 16.3 Test session creation and timeout behavior (SWHR3-T-0022)
+- [x] 16.4 Test remember username cookie persistence (SWHR3-T-0022)
+- [x] 16.5 Test duplicate account detection on registration (SWHR3-T-0022)
+- [x] 16.6 Test customer profile creation with all form fields (SWHR3-T-0022)
+- [x] 16.7 Test error screen rendering on exceptions (SWHR3-T-0022)
+- [x] 16.8 Test transaction rollback on concurrent duplicate registrations (SWHR3-T-0022)

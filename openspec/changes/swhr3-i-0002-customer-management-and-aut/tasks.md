@@ -20,12 +20,12 @@
 
 ## 3. Sign-On Error Handling
 
-- [ ] 3.1 Implement signon_failed.jsp for failed authentication display (SWHR3-T-0009)
-- [ ] 3.2 Map sign-on failures to signon_error.screen template (SWHR3-T-0009)
-- [ ] 3.3 Display error message "user name and password you entered were not found" (SWHR3-T-0009)
-- [ ] 3.4 Implement error page in signon-config.xml (signon-form-error-page) (SWHR3-T-0009)
-- [ ] 3.5 Implement SignOnFilter redirect to error page on validation failure (SWHR3-T-0009)
-- [ ] 3.6 Clear sensitive form data after failed authentication (SWHR3-T-0009)
+- [x] 3.1 Implement signon_failed.jsp for failed authentication display (SWHR3-T-0009)
+- [x] 3.2 Map sign-on failures to signon_error.screen template (SWHR3-T-0009)
+- [x] 3.3 Display error message "user name and password you entered were not found" (SWHR3-T-0009)
+- [x] 3.4 Implement error page in signon-config.xml (signon-form-error-page) (SWHR3-T-0009)
+- [x] 3.5 Implement SignOnFilter redirect to error page on validation failure (SWHR3-T-0009)
+- [x] 3.6 Clear sensitive form data after failed authentication (SWHR3-T-0009)
 
 ## 4. Session Management
 

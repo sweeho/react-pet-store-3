@@ -99,13 +99,13 @@
 
 ## 11. SignOn Component Integration
 
-- [ ] 11.1 Implement SignOnEJB stateless session bean with createUser() method (SWHR3-T-0017)
-- [ ] 11.2 Implement SignOnEJB.validateUser() for sign-on validation (SWHR3-T-0017)
-- [ ] 11.3 Implement SignOnEJB.changePassword() for account updates (SWHR3-T-0017)
-- [ ] 11.4 Implement UserEntity (CMP entity bean) for user identity storage (SWHR3-T-0017)
-- [ ] 11.5 Implement SignOnLocalHome interface with create() and findByPrimaryKey() (SWHR3-T-0017)
-- [ ] 11.6 Implement CreateException handling for duplicate username detection (SWHR3-T-0017)
-- [ ] 11.7 Configure SignOn EJB in ejb-jar.xml with transaction attributes (SWHR3-T-0017)
+- [x] 11.1 Implement SignOnEJB stateless session bean with createUser() method (SWHR3-T-0017)
+- [x] 11.2 Implement SignOnEJB.validateUser() for sign-on validation (SWHR3-T-0017)
+- [x] 11.3 Implement SignOnEJB.changePassword() for account updates (SWHR3-T-0017)
+- [x] 11.4 Implement UserEntity (CMP entity bean) for user identity storage (SWHR3-T-0017)
+- [x] 11.5 Implement SignOnLocalHome interface with create() and findByPrimaryKey() (SWHR3-T-0017)
+- [x] 11.6 Implement CreateException handling for duplicate username detection (SWHR3-T-0017)
+- [x] 11.7 Configure SignOn EJB in ejb-jar.xml with transaction attributes (SWHR3-T-0017)
 
 ## 12. Transaction Management
 

@@ -133,7 +133,10 @@ Create a `.env` file on your VPS if needed:
 NODE_ENV=production
 NITRO_PORT=3000
 NITRO_HOST=127.0.0.1
+SESSION_SECRET=
 ```
+
+`SESSION_SECRET` is **required in production** — `lib/auth-config.ts`'s `getSessionSecret()` throws on startup when `NODE_ENV=production` and it is unset. Outside production a fixed development secret is used automatically. Set it to a random string of at least 32 characters (e.g. `openssl rand -base64 32`).
 
 ## Monitoring
 

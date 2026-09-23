@@ -49,13 +49,13 @@
 
 ## 6. Customer Profile Storage
 
-- [ ] 6.1 Design CustomerEJB entity bean with CMP 2.x persistence (SWHR3-T-0012)
-- [ ] 6.2 Define CMP fields: userId, firstName, lastName, email, telephone, locale, favoriteCategory (SWHR3-T-0012)
-- [ ] 6.3 Create CustomerLocalHome interface with create() and findByPrimaryKey() methods (SWHR3-T-0012)
-- [ ] 6.4 Create CustomerLocal interface with getter and setter methods (SWHR3-T-0012)
-- [ ] 6.5 Implement ejbCreate(), ejbPostCreate(), ejbRemove() lifecycle methods (SWHR3-T-0012)
-- [ ] 6.6 Implement abstract getter/setter methods for all CMP fields (SWHR3-T-0012)
-- [ ] 6.7 Declare primary key class and abstract schema in deployment descriptor (SWHR3-T-0012)
+- [x] 6.1 Design CustomerEJB entity bean with CMP 2.x persistence (SWHR3-T-0012)
+- [x] 6.2 Define CMP fields: userId, firstName, lastName, email, telephone, locale, favoriteCategory (SWHR3-T-0012)
+- [x] 6.3 Create CustomerLocalHome interface with create() and findByPrimaryKey() methods (SWHR3-T-0012)
+- [x] 6.4 Create CustomerLocal interface with getter and setter methods (SWHR3-T-0012)
+- [x] 6.5 Implement ejbCreate(), ejbPostCreate(), ejbRemove() lifecycle methods (SWHR3-T-0012)
+- [x] 6.6 Implement abstract getter/setter methods for all CMP fields (SWHR3-T-0012)
+- [x] 6.7 Declare primary key class and abstract schema in deployment descriptor (SWHR3-T-0012)
 
 ## 7. Customer Profile Value Object
 

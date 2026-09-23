@@ -109,13 +109,13 @@
 
 ## 12. Transaction Management
 
-- [ ] 12.1 Configure Container-Managed Transactions (CMT) for all EJB methods (SWHR3-T-0018)
-- [ ] 12.2 Declare trans-attribute=Required for CustomerEJB create() method (SWHR3-T-0018)
-- [ ] 12.3 Declare trans-attribute=Required for all CustomerEJB getter/setter methods (SWHR3-T-0018)
-- [ ] 12.4 Declare trans-attribute=Required for finder methods (findByUserId, findByEmail) (SWHR3-T-0018)
-- [ ] 12.5 Declare trans-attribute=Required for SignOnEJB create() and validation methods (SWHR3-T-0018)
-- [ ] 12.6 Implement transaction rollback on exception in EJB methods (SWHR3-T-0018)
-- [ ] 12.7 Verify ACID boundaries for multi-step operations (registration + SignOn creation) (SWHR3-T-0018)
+- [x] 12.1 Configure Container-Managed Transactions (CMT) for all EJB methods (SWHR3-T-0018)
+- [x] 12.2 Declare trans-attribute=Required for CustomerEJB create() method (SWHR3-T-0018)
+- [x] 12.3 Declare trans-attribute=Required for all CustomerEJB getter/setter methods (SWHR3-T-0018)
+- [x] 12.4 Declare trans-attribute=Required for finder methods (findByUserId, findByEmail) (SWHR3-T-0018)
+- [x] 12.5 Declare trans-attribute=Required for SignOnEJB create() and validation methods (SWHR3-T-0018)
+- [x] 12.6 Implement transaction rollback on exception in EJB methods (SWHR3-T-0018)
+- [x] 12.7 Verify ACID boundaries for multi-step operations (registration + SignOn creation) (SWHR3-T-0018)
 
 ## 13. Error Handling & Exception Mapping
 

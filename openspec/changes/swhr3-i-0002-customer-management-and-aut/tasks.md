@@ -1,12 +1,12 @@
 ## 1. Authentication & Sign-On Forms
 
-- [ ] 1.1 Implement sign-on screen (signon.jsp) with username and password input fields (SWHR3-T-0007)
-- [ ] 1.2 Add sign-in button and form submission to j_signon_check endpoint (SWHR3-T-0007)
-- [ ] 1.3 Implement "Remember My User Name" checkbox with cookie persistence (SWHR3-T-0007)
-- [ ] 1.4 Restore username from cookie when user previously selected remember option (SWHR3-T-0007)
-- [ ] 1.5 Implement sign-on form parameter handling (j_username, j_password, j_remember_username) (SWHR3-T-0007)
-- [ ] 1.6 Create SignOnFilter.validateSignOn() method to extract and validate form parameters (SWHR3-T-0007)
-- [ ] 1.7 Implement form-based authentication handler (j_security_check endpoint) (SWHR3-T-0007)
+- [x] 1.1 Implement sign-on screen (signon.jsp) with username and password input fields (SWHR3-T-0007)
+- [x] 1.2 Add sign-in button and form submission to j_signon_check endpoint (SWHR3-T-0007)
+- [x] 1.3 Implement "Remember My User Name" checkbox with cookie persistence (SWHR3-T-0007)
+- [x] 1.4 Restore username from cookie when user previously selected remember option (SWHR3-T-0007)
+- [x] 1.5 Implement sign-on form parameter handling (j_username, j_password, j_remember_username) (SWHR3-T-0007)
+- [x] 1.6 Create SignOnFilter.validateSignOn() method to extract and validate form parameters (SWHR3-T-0007)
+- [x] 1.7 Implement form-based authentication handler (j_security_check endpoint) (SWHR3-T-0007)
 
 ## 2. User Registration
 

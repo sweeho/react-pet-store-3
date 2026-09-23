@@ -10,13 +10,13 @@
 
 ## 2. User Registration
 
-- [ ] 2.1 Implement user registration screen in signon.jsp for new account creation (SWHR3-T-0008)
-- [ ] 2.2 Add password confirmation field to registration form (SWHR3-T-0008)
-- [ ] 2.3 Implement form submission to createuser.do endpoint (SWHR3-T-0008)
-- [ ] 2.4 Create CreateUserEJBAction to handle registration request (SWHR3-T-0008)
-- [ ] 2.5 Implement ServiceLocator lookup of SignOnLocalHome (SWHR3-T-0008)
-- [ ] 2.6 Implement SignOnEJB.createUser() with duplicate account detection (SWHR3-T-0008)
-- [ ] 2.7 Throw DuplicateAccountException when username already exists (SWHR3-T-0008)
+- [x] 2.1 Implement user registration screen in signon.jsp for new account creation (SWHR3-T-0008)
+- [x] 2.2 Add password confirmation field to registration form (SWHR3-T-0008)
+- [x] 2.3 Implement form submission to createuser.do endpoint (SWHR3-T-0008)
+- [x] 2.4 Create CreateUserEJBAction to handle registration request (SWHR3-T-0008)
+- [x] 2.5 Implement ServiceLocator lookup of SignOnLocalHome (SWHR3-T-0008)
+- [x] 2.6 Implement SignOnEJB.createUser() with duplicate account detection (SWHR3-T-0008)
+- [x] 2.7 Throw DuplicateAccountException when username already exists (SWHR3-T-0008)
 
 ## 3. Sign-On Error Handling
 

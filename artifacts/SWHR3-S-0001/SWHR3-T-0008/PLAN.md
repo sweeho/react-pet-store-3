@@ -34,6 +34,20 @@ This ticket may create or modify only these files:
 - `src/pages/signin.tsx` (New customer panel only)
 - `src/pages/signin.test.tsx` (registration cases)
 
+**Deviation (minor, no contract/ownership impact):** the New customer panel's
+fields carry the same labels as the Returning customer panel's ("User
+name", "Password" — per mockup-sign-on.html), so a bare
+`getByLabelText("User name")` is now ambiguous. Added one `aria-label`
+attribute to the pre-existing Returning customer `<section>` (mirroring the
+one the New customer section already had) so both panels can be queried
+unambiguously via `getByRole("region", { name })`, and rescoped
+`signin.test.tsx`'s pre-existing (T-0007) queries through that region
+rather than a bare `screen.getByLabelText`. No copy or behaviour of the
+Returning customer panel changed — one attribute, plus the test-scoping it
+enables — and the "existing test suites stay green" DoD item requires it,
+since T-0007's assertions become genuinely ambiguous the moment a second
+"User name"/"Password" pair exists on the page.
+
 ## Definition of Done
 
 - AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7: every acceptance criterion on the ticket, in order, is met and covered by a test that fails without the change.

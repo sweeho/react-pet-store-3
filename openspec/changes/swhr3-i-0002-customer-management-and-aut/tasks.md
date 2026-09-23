@@ -129,13 +129,13 @@
 
 ## 14. Security Configuration
 
-- [ ] 14.1 Configure form-based authentication in web.xml (auth-method=FORM) (SWHR3-T-0020)
-- [ ] 14.2 Set form-login-page to /login.jsp or /signon.screen (SWHR3-T-0020)
-- [ ] 14.3 Set form-error-page to /error.jsp or /signon_error.screen (SWHR3-T-0020)
-- [ ] 14.4 Define security realm in login-config element (SWHR3-T-0020)
-- [ ] 14.5 Implement password length constraints (MAX_PASSWD_LENGTH constant) (SWHR3-T-0020)
-- [ ] 14.6 Implement username character restrictions (alphanumeric validation) (SWHR3-T-0020)
-- [ ] 14.7 Configure authorization roles (if required) for different user types (SWHR3-T-0020)
+- [x] 14.1 Configure form-based authentication in web.xml (auth-method=FORM) (SWHR3-T-0020)
+- [x] 14.2 Set form-login-page to /login.jsp or /signon.screen (SWHR3-T-0020)
+- [x] 14.3 Set form-error-page to /error.jsp or /signon_error.screen (SWHR3-T-0020)
+- [x] 14.4 Define security realm in login-config element (SWHR3-T-0020)
+- [x] 14.5 Implement password length constraints (MAX_PASSWD_LENGTH constant) (SWHR3-T-0020)
+- [x] 14.6 Implement username character restrictions (alphanumeric validation) (SWHR3-T-0020)
+- [x] 14.7 Configure authorization roles (if required) for different user types (SWHR3-T-0020)
 
 ## 15. Form Validation & Constraints
 

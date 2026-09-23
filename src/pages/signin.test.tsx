@@ -133,25 +133,84 @@ describe("SignIn page", () => {
     expect(await screen.findByText("Profile screen")).toBeInTheDocument();
   });
 
-  it("shows an inline error and does not navigate when sign-in fails", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ message: "Invalid user name or password" }), {
-          status: 401,
+  describe("sign-on failure (SWHR3-T-0009)", () => {
+    function stubFailedSignIn() {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          new Response(JSON.stringify({ message: "Invalid user name or password" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          }),
+        ),
+      );
+    }
+
+    it('shows the designed error banner above both panels with role="alert" and the exact legacy message (AC-1, AC-4)', async () => {
+      stubFailedSignIn();
+      const user = userEvent.setup();
+      renderAt("/signin");
+
+      await user.type(returningPanel().getByLabelText("User name"), "jgarrett");
+      await user.type(returningPanel().getByLabelText("Password"), "wrong-password");
+      await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("There were errors signing you in");
+      expect(alert).toHaveTextContent(
+        "The user name and password you entered were not found in our records.",
+      );
+      expect(screen.queryByText("Profile screen")).not.toBeInTheDocument();
+    });
+
+    it("clears the password field and keeps the user name after a failed sign-in, and does not navigate (AC-2)", async () => {
+      stubFailedSignIn();
+      const user = userEvent.setup();
+      renderAt("/signin");
+
+      await user.type(returningPanel().getByLabelText("User name"), "jgarrett");
+      await user.type(returningPanel().getByLabelText("Password"), "wrong-password");
+      await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+      await screen.findByRole("alert");
+      expect(returningPanel().getByLabelText("User name")).toHaveValue("jgarrett");
+      expect(returningPanel().getByLabelText("Password")).toHaveValue("");
+      expect(returningPanel().getByLabelText("Password")).toHaveFocus();
+      expect(screen.queryByText("Profile screen")).not.toBeInTheDocument();
+    });
+
+    it("clears the banner as soon as the next submit starts, before the response arrives", async () => {
+      stubFailedSignIn();
+      const user = userEvent.setup();
+      renderAt("/signin");
+
+      await user.type(returningPanel().getByLabelText("User name"), "jgarrett");
+      await user.type(returningPanel().getByLabelText("Password"), "wrong-password");
+      await user.click(screen.getByRole("button", { name: "Sign in" }));
+      await screen.findByRole("alert");
+
+      let resolveSecondAttempt: (response: Response) => void = () => {};
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(
+          () =>
+            new Promise<Response>((resolve) => {
+              resolveSecondAttempt = resolve;
+            }),
+        ),
+      );
+      await user.type(returningPanel().getByLabelText("Password"), "correct-horse-1");
+      await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+      resolveSecondAttempt(
+        new Response(JSON.stringify({ user: { id: 1, username: "jgarrett" } }), {
+          status: 200,
           headers: { "Content-Type": "application/json" },
         }),
-      ),
-    );
-    const user = userEvent.setup();
-    renderAt("/signin");
-
-    await user.type(returningPanel().getByLabelText("User name"), "jgarrett");
-    await user.type(returningPanel().getByLabelText("Password"), "wrong-password");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent("Invalid user name or password");
-    expect(screen.queryByText("Profile screen")).not.toBeInTheDocument();
+      );
+    });
   });
 
   describe("New customer panel (SWHR3-T-0008)", () => {

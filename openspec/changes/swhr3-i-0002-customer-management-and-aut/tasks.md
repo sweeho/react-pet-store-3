@@ -39,13 +39,13 @@
 
 ## 5. Protected Resources & Access Control
 
-- [ ] 5.1 Implement SignOnFilter.doFilter() for request interception (SWHR3-T-0011)
-- [ ] 5.2 Load protected resources configuration from signon-config.xml (SWHR3-T-0011)
-- [ ] 5.3 Parse URL patterns and protected resource definitions at filter initialization (SWHR3-T-0011)
-- [ ] 5.4 Check authentication status (session != null) for each request (SWHR3-T-0011)
-- [ ] 5.5 Implement redirect to sign-on page for unauthenticated access to protected resources (SWHR3-T-0011)
-- [ ] 5.6 Store original request URL in session for post-authentication redirect (SWHR3-T-0011)
-- [ ] 5.7 Match requested URL against configured protected resource patterns (SWHR3-T-0011)
+- [x] 5.1 Implement SignOnFilter.doFilter() for request interception (SWHR3-T-0011)
+- [x] 5.2 Load protected resources configuration from signon-config.xml (SWHR3-T-0011)
+- [x] 5.3 Parse URL patterns and protected resource definitions at filter initialization (SWHR3-T-0011)
+- [x] 5.4 Check authentication status (session != null) for each request (SWHR3-T-0011)
+- [x] 5.5 Implement redirect to sign-on page for unauthenticated access to protected resources (SWHR3-T-0011)
+- [x] 5.6 Store original request URL in session for post-authentication redirect (SWHR3-T-0011)
+- [x] 5.7 Match requested URL against configured protected resource patterns (SWHR3-T-0011)
 
 ## 6. Customer Profile Storage
 

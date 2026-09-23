@@ -69,13 +69,13 @@
 
 ## 8. Customer Creation Form
 
-- [ ] 8.1 Implement create_customer.jsp form with Contact Information section (SWHR3-T-0014)
-- [ ] 8.2 Add form fields for first name, last name, street address (2 lines), city, state/province (SWHR3-T-0014)
-- [ ] 8.3 Add postal code, country, telephone, email input fields (SWHR3-T-0014)
-- [ ] 8.4 Implement Credit Card Information section with card number, type, expiry date dropdowns (SWHR3-T-0014)
-- [ ] 8.5 Implement Profile Information section with language dropdown (SWHR3-T-0014)
-- [ ] 8.6 Add favorite category dropdown and checkboxes for MyList feature and pet tips banners (SWHR3-T-0014)
-- [ ] 8.7 Set form submission to createcustomer.do with action=create (SWHR3-T-0014)
+- [x] 8.1 Implement create_customer.jsp form with Contact Information section (SWHR3-T-0014)
+- [x] 8.2 Add form fields for first name, last name, street address (2 lines), city, state/province (SWHR3-T-0014)
+- [x] 8.3 Add postal code, country, telephone, email input fields (SWHR3-T-0014)
+- [x] 8.4 Implement Credit Card Information section with card number, type, expiry date dropdowns (SWHR3-T-0014)
+- [x] 8.5 Implement Profile Information section with language dropdown (SWHR3-T-0014)
+- [x] 8.6 Add favorite category dropdown and checkboxes for MyList feature and pet tips banners (SWHR3-T-0014)
+- [x] 8.7 Set form submission to createcustomer.do with action=create (SWHR3-T-0014)
 
 ## 9. Customer Profile Operations
 

@@ -51,5 +51,7 @@ bun --bun vitest run src/utils/manifest-change-dirs.test.ts
 
 ## Full gate
 
-`bun run verify` after the fix: lint, typecheck, and the full unit suite all passed
-(46 test files, 268 tests, 0 failed).
+`bun run verify` after the fix, with the new regression test included: lint, typecheck,
+and the full unit suite all passed (47 test files, 271 tests, 0 failed).
+
+TDD-RESULT: 271 passed, 0 failed

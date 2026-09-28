@@ -26,6 +26,7 @@ See [PRODUCT.md](./PRODUCT.md) for what this is, [DESIGN.md](./DESIGN.md) for th
 ├── src/
 │   ├── components/ui/   # shadcn/ui-style primitives (+ *.test.tsx)
 │   ├── components/auth/ # route guard, sign-out control
+│   ├── components/admin/ # admin shell, administrator gate, admin-only widgets
 │   ├── pages/            # Frontend routes, file-based (+ *.test.tsx)
 │   ├── hooks/, utils/, types/, constants/, data/, store/
 │   ├── test/              # Vitest setup
@@ -34,7 +35,7 @@ See [PRODUCT.md](./PRODUCT.md) for what this is, [DESIGN.md](./DESIGN.md) for th
 ├── routes/api/            # Backend routes, file-based (+ *.test.ts)
 ├── middleware/             # Runs before every route handler (auth.ts resolves the session)
 ├── lib/                     # Server-side shared modules: config, services, errors (+ *.test.ts)
-├── db/                      # Drizzle schema.ts + client.ts (sqlite connection, migrate, seed)
+├── db/                      # Drizzle schema.ts + client.ts (sqlite connection, migrate, seed) + operator scripts
 ├── drizzle/                  # Generated SQL migrations (drizzle-kit generate), committed
 ├── openspec/                 # Specs of record (specs/) and in-flight changes (changes/)
 ├── e2e/                     # Playwright specs + global-setup.ts
@@ -50,7 +51,7 @@ See [PRODUCT.md](./PRODUCT.md) for what this is, [DESIGN.md](./DESIGN.md) for th
 
 ## Routing
 
-**Frontend**: `src/pages/**/*.tsx` → routes (`about.tsx` → `/about`, `[id].tsx` → `/:id`, `[...all].tsx` → catch-all). `*.test.tsx` excluded via `Pages({ exclude })` in `vite.config.ts`.
+**Frontend**: `src/pages/**/*.tsx` → routes (`about.tsx` → `/about`, `[id].tsx` → `/:id`, `[...all].tsx` → catch-all). `*.test.tsx` excluded via `Pages({ exclude })` in `vite.config.ts`. Administrator screens live under `src/pages/admin/` (`/admin/**`) and render inside `AdminShell`, which gates them (see Authentication and sessions).
 
 **Backend**: `routes/api/*.ts` → `/api/*`, and a method suffix (`index.post.ts`, `me.get.ts`) restricts a handler to one method. `middleware/*.ts` runs first and can set `event.context`. Requires `nitro({ serverDir: "./" })` in `vite.config.ts`; the default is `false` (no scanning). `*.test.ts` excluded via `nitro({ ignore })`.
 
@@ -61,7 +62,9 @@ Cross-cutting: every capability that needs to know who is calling uses this, and
 - **Session**: `lib/session.ts` wraps h3 `useSession` in one sealed, httpOnly cookie (`petstore_session`). The cookie holds the account id, user name, locale and last-seen time. The 30-minute timeout is **idle** time: each request re-seals the cookie, and a stale or unreadable cookie reads as _expired_, which is distinct from _never signed in_. `SESSION_SECRET` seals it (see Deployment).
 - **Who is calling**: `middleware/auth.ts` resolves the session into `event.context.user = { id, username }` or leaves it unset. Handlers read `event.context.user`, or call `requireSessionUser(event)` from `lib/session.ts`.
 - **Protected API paths**: an exact-match list in `lib/protected-resources.ts`. The middleware answers 401 for a listed path without an active session: "Session timed out" or "Authentication required".
-- **Protected pages**: a client guard in `src/main.tsx` checks `GET /api/session` and sends signed-out visitors to `/signin?redirect=<path>`. The sign-in page returns them there. Page protection is a UX convenience; the API check is the security boundary.
+- **Roles**: every account has a `role` (`customer` by default, or `admin`). The role is not in the session cookie. `lib/roles.ts` reads it from the database when it is needed, so a changed role applies on the next request.
+- **Administrator API**: every path under `/api/admin/` is admin-only by prefix. The middleware answers 401 without a session and 403 `FORBIDDEN` ("Administrator credentials required") for a session whose account is not `admin`. A handler under `routes/api/admin/` never re-checks the role. Administrators are provisioned by an operator with the `admin:grant` package script (`db/grant-admin.ts`); there is no admin-management UI.
+- **Protected pages**: a client guard in `src/main.tsx` checks `GET /api/session` and sends signed-out visitors to `/signin?redirect=<path>`. The sign-in page returns them there. Admin pages are gated by `RequireAdmin` inside `AdminShell`, which sends anyone without the admin role to `/admin/signin`. `GET /api/session` reports the role for this. Page protection is a UX convenience; the API check is the security boundary.
 - **Settings**: `lib/auth-config.ts` holds the session timeout, cookie names, sign-in page, and user-name and password rules.
 
 ## Errors
@@ -88,6 +91,7 @@ Entity model:
 - **accounts**: identity. Unique user name and an argon2id password hash. Every signed-in session points at one.
 - **customers**: the profile, 1:1 with an account. Holds name, unique email, telephone, the address, and the preferences (locale, favourite category, MyList, pet-tips banners). An account can briefly exist without one, between registration and profile creation.
 - **creditCards**: the one stored card, 1:1 with a customer and deleted with it. It is shown back masked and never charged.
+- **orders**: one row per order, owned by the account that placed it (`accountId`). It holds a snapshot of the customer's name, the order date, the total in integer cents, and a `status` of `PENDING`, `APPROVED`, `DENIED` or `COMPLETED`. Only an administrator's commit moves an order out of `PENDING`, and only to `APPROVED` or `DENIED`. The vocabulary and that rule live in `lib/order-status.ts`, and every status write goes through `lib/orders.ts`. Checkout adds line items and address snapshots alongside these columns. Behaviour: `openspec/specs/order-approval/`.
 - **users**: the starter's demo table. It backs `/api/users` and nothing else.
 
 Commands and file locations:
@@ -113,5 +117,8 @@ Four tiers, one worked example each. Commands and how to extend: [README.md](./R
 - **Sessions are sealed cookies with a sliding 30-minute idle timeout; there is no session table.** Needs no dependency and no storage, and an expired session is distinguishable from none. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D2.
 - **`middleware/auth.ts` is the only place a request is authenticated.** API protection is an exact-match path list in `lib/protected-resources.ts`; pages are guarded client-side with a `redirect` query parameter. One enforcement point means a capability cannot forget to check. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D7.
 - **Passwords are hashed with `Bun.password` (argon2id).** The runtime is already Bun everywhere, so nothing needs adding. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D4.
+- **Roles live on `accounts.role` and are read from the database per request, never from the session cookie.** A revoked role applies on the next request, and adding a role invalidates no existing session. Authored in change `swhr3-i-0003-order-approval-and-status-m`, design.md D3.
+- **`/api/admin/**`is administrator-only by path prefix, enforced in`middleware/auth.ts`(401 signed out, 403`FORBIDDEN`otherwise).** A new admin route cannot be added unprotected; customer paths keep the exact-match list. Authored in change`swhr3-i-0003-order-approval-and-status-m`, design.md D4.
+- **Order status changes go only through `lib/orders.ts` under the transition rule in `lib/order-status.ts`, and a multi-order change is one immediate-mode `withTransaction`.** Approval, fulfilment and any later status writer share one vocabulary and one rule, and overlapping batches cannot lost-update each other. Money is stored in integer cents. Authored in change `swhr3-i-0003-order-approval-and-status-m`, design.md D1, D2 and D6.
 - **Customer-owned data in later capabilities references `accounts.id`.** Every session carries it, and a profile may not exist yet. Contact and address data is read from the profile and snapshotted onto orders. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D16.
 - **Server-shared logic lives in `lib/`; services throw `lib/errors.ts` types; routes convert with `toHttpError`; the client calls through `apiFetch`.** One error body shape across every API. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D11 and D13.

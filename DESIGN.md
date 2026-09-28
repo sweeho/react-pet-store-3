@@ -31,7 +31,11 @@ Pattern (see `src/components/ui/button.tsx` + `button-variants.ts`):
 
 New shared components go in `src/components/ui/`, follow this pattern, get a `*.test.tsx`.
 
-Inventory: `Button`, `Input`, `Label`, `Checkbox`, `Select`, `Alert`, `FormField`.
+Inventory: `Button`, `Input`, `Label`, `Checkbox`, `Select`, `Alert`, `FormField`, `Table`, `Badge`, `Dialog`.
+
+- **Table**: styled native `<table>` parts. A sortable column header is a button that sets `aria-sort` on its `<th>`; the data is sorted by the caller, not by the table.
+- **Badge**: a short uppercase status label with one variant per state (for orders: pending, approved, denied, completed, and staged for a change not yet saved). It never carries an action.
+- **Dialog**: a modal built on `@headlessui/react` `Dialog`. It traps focus, closes on Escape, and returns focus to the control that opened it. The title states the question, and the buttons name their outcomes ("Refresh anyway", not "OK").
 
 ## Forms
 
@@ -48,6 +52,24 @@ Every form is built from the same pieces, so later forms (checkout, admin) look 
 - **Actions**: the primary action (`Button` default variant) ends the form on the right, with the secondary action (`outline`) beside it.
 
 Reference screens: the sign-in, create-account and account-profile mockups under `artifacts/SWHR3-S-0001/design/`.
+
+## Admin area
+
+Administrator screens share one shell, so every admin capability looks like the order queue:
+
+- **Shell**: a header reading "Pet Store · ADMIN", then the admin nav, then the signed-in user name with an `ADMINISTRATOR` badge and Sign out. The page title and a one-line purpose sit under the header. Desktop, fixed width, like the rest of the product.
+- **Access**: a visitor without the admin role sees the administrator sign-in page, not a blank or broken screen. A signed-in non-admin is told plainly that the account is not an administrator, and is offered sign-in as a different user.
+- **Queues**: a queue is a `Table` under tabs, one tab per state, each labelled with its count. Only the tab whose rows can still change is editable; the others say they are read-only.
+
+## Staged edits and confirmations
+
+For work done in batches, where the user makes several decisions and saves them together:
+
+- **Stage locally, save explicitly.** Each decision updates the row at once and marks it "staged". A bar above the table counts the staged changes, and the primary button names the batch ("Commit 3 decisions"). Nothing reaches the server until that button is used.
+- **Confirm before anything irreversible or lossy.** Saving opens a `Dialog` that lists every change (`1001: PENDING → APPROVED`) and says whether the batch is all-or-nothing. Any action that would throw staged work away (refresh, leaving) opens a `Dialog` titled with the count ("Discard 3 uncommitted changes?"). Its safe choice keeps the work ("Cancel — keep my changes") and sits beside the destructive one. With nothing staged, no dialog appears.
+- **Report the outcome in place.** Success shows an `Alert` with the count and reloads the data. Failure shows a destructive `Alert` quoting the server's message, says that nothing was saved, and leaves every staged change as it was.
+
+Reference screens: the admin home, order review, commit and refresh-warning mockups under `artifacts/SWHR3-S-0003/design/`.
 
 ## Icons
 

@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Uncommitted changes warning</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff;color:#3f3f46}
+.shell{max-width:940px;margin:0 auto;padding:18px}
+.stage{position:relative;border:1px solid #e4e4e7;border-radius:10px;overflow:hidden;height:340px;background:#fff}
+.bg{padding:14px;filter:grayscale(1);opacity:.35}
+.bgrow{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #f4f4f5}
+.bar{background:#d4d4d8;border-radius:3px;height:9px;display:inline-block}
+.scrim{position:absolute;inset:0;background:rgba(63,63,70,.35)}
+.dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:430px;background:#fff;border:1px solid #d4d4d8;border-radius:12px;padding:18px}
+.dialog h2{font-size:16px;color:#27272a;margin:0 0 6px}
+.dialog p{font-size:13px;color:#71717a;margin:0 0 12px}
+.box{border:1px solid #e4e4e7;border-radius:8px;background:#fafafa;padding:10px;font-size:12px;color:#52525b;margin-bottom:14px}
+.box b{color:#27272a}
+.actions{display:flex;justify-content:flex-end;gap:8px}
+.btn{display:inline-flex;align-items:center;height:32px;padding:0 13px;border:1px solid #d4d4d8;border-radius:8px;background:#fff;color:#3f3f46;font-size:13px;font-weight:500}
+.btn.primary{background:#27272a;color:#fff;border-color:#27272a}
+.hint{font-size:12px;color:#a1a1aa;margin-top:12px}
+</style></head>
+<body><div class="shell">
+
+  <div class="stage">
+    <div class="bg">
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:120px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:96px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:132px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:88px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:110px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+    </div>
+    <div class="scrim"></div>
+
+    <div class="dialog">
+      <h2>Discard 3 uncommitted changes?</h2>
+      <p>Refreshing reloads every order from the server. Decisions you staged but did not commit will be lost.</p>
+      <div class="box">Staged: <b>1001 → APPROVED</b>, <b>1002 → DENIED</b>, <b>1005 → APPROVED</b></div>
+      <div class="actions"><span class="btn">Cancel — keep my changes</span><span class="btn primary">Refresh anyway</span></div>
+    </div>
+  </div>
+
+  <p class="hint">Cancel returns to the queue with all staged decisions intact. The warning does not appear when nothing is staged — refresh runs straight away.</p>
+
+</div></body></html>

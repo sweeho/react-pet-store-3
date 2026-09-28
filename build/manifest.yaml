@@ -12,7 +12,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-customer-management
+      dir: openspec/changes/archive/2026-09-23-swhr3-i-0002-customer-management-and-aut
       specCapabilities:
         - customer-management
     canvas:
@@ -54,7 +54,7 @@ capabilities:
     dependsOn: [customer-management]
     priority: 0
     change:
-      dir: openspec/changes/sx-order-approval
+      dir: openspec/changes/swhr3-i-0003-order-approval-and-status-m
       specCapabilities:
         - order-approval
     canvas:
@@ -87,7 +87,7 @@ capabilities:
     dependsOn: [customer-management, shopping-cart]
     priority: 0
     change:
-      dir: openspec/changes/sx-order-checkout
+      dir: openspec/changes/swhr3-i-0005-order-checkout-and-payment
       specCapabilities:
         - order-checkout
     canvas:
@@ -122,7 +122,7 @@ capabilities:
     dependsOn: [order-checkout]
     priority: 0
     change:
-      dir: openspec/changes/sx-order-workflow
+      dir: openspec/changes/swhr3-i-0006-order-processing-and-fulfil
       specCapabilities:
         - order-workflow
     canvas:
@@ -158,7 +158,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-shopping-cart
+      dir: openspec/changes/swhr3-i-0004-shopping-cart-and-item-mana
       specCapabilities:
         - shopping-cart
     canvas:
@@ -197,7 +197,7 @@ capabilities:
     dependsOn: [order-workflow]
     priority: 0
     change:
-      dir: openspec/changes/sx-supplier-integration
+      dir: openspec/changes/swhr3-i-0007-supplier-portal-and-invento
       specCapabilities:
         - supplier-integration
     canvas:
@@ -237,7 +237,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-admin-dashboard
+      dir: openspec/changes/swhr3-i-0008-administrator-dashboard-and
       specCapabilities:
         - admin-dashboard
     canvas:
@@ -280,7 +280,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-catalog-browsing
+      dir: openspec/changes/swhr3-i-0009-catalog-browsing-and-produc
       specCapabilities:
         - catalog-browsing
     canvas:
@@ -323,7 +323,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-creditcard-validation
+      dir: openspec/changes/swhr3-i-0010-credit-card-data-storage-an
       specCapabilities:
         - creditcard-validation
     canvas:
@@ -363,7 +363,7 @@ capabilities:
     dependsOn: []
     priority: 0
     change:
-      dir: openspec/changes/sx-customer-communications
+      dir: openspec/changes/swhr3-i-0011-customer-communications-and
       specCapabilities:
         - customer-communications
     canvas:

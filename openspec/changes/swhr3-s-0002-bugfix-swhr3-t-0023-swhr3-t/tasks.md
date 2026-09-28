@@ -4,4 +4,4 @@
 
 ## 2. Tailwind CSS-first cleanup
 
-- [ ] 2.1 Delete `tailwind.config.ts` and blank `tailwind.config` in `components.json` per design.md D3; confirm the app still builds and renders unchanged (SWHR3-T-0024)
+- [x] 2.1 Delete `tailwind.config.ts` and blank `tailwind.config` in `components.json` per design.md D3; confirm the app still builds and renders unchanged (SWHR3-T-0024)

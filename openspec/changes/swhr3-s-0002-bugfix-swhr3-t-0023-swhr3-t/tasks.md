@@ -1,6 +1,6 @@
 ## 1. Manifest change paths
 
-- [ ] 1.1 Repoint all ten `change.dir` values in `build/manifest.yaml` to their existing change directories per design.md D1/D2, leaving every other field unchanged (SWHR3-T-0023)
+- [x] 1.1 Repoint all ten `change.dir` values in `build/manifest.yaml` to their existing change directories per design.md D1/D2, leaving every other field unchanged (SWHR3-T-0023)
 
 ## 2. Tailwind CSS-first cleanup
 

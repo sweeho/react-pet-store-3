@@ -20,6 +20,10 @@ the leftover empty `tailwind.config.ts` and blanks the shadcn `tailwind.config` 
 build succeeds, `bun run verify` (lint + typecheck + unit) is clean, and the full E2E suite passes.
 No defects found during integration QA — no fix-in-place rounds were needed.
 
+This change sets `skip_specs: true` (`openspec/changes/swhr3-s-0002-bugfix-swhr3-t-0023-swhr3-t/.openspec.yaml`, design.md D4) and carries no `specs/` directory — confirmed by `find openspec/changes/swhr3-s-0002-bugfix-swhr3-t-0023-swhr3-t -type d`, which returns only the change's own root. There are no `#### Scenario:` blocks to verify.
+
+SCENARIO-VERDICT: No requirement deltas (skip_specs: true) / N/A — not-testable, this change carries no specs/ directory and no scenarios (design.md D4)
+
 ## E2E Test Status
 
 11/11 passed, 0 failed, 0 skipped, `chromium` project (the project covers all 3 spec files / 11 tests —

@@ -76,11 +76,11 @@
 
 ## 10. Error Handling and Validation
 
-- [ ] 10.1 Validate order IDs before processing updates (SWHR3-T-0045)
-- [ ] 10.2 Validate status values against allowed enumeration (SWHR3-T-0045)
-- [ ] 10.3 Check order permissions for administrator (SWHR3-T-0045)
-- [ ] 10.4 Handle invalid order or missing order error cases (SWHR3-T-0045)
-- [ ] 10.5 Return meaningful error messages in XML response (SWHR3-T-0045)
+- [x] 10.1 Validate order IDs before processing updates (SWHR3-T-0045)
+- [x] 10.2 Validate status values against allowed enumeration (SWHR3-T-0045)
+- [x] 10.3 Check order permissions for administrator (SWHR3-T-0045)
+- [x] 10.4 Handle invalid order or missing order error cases (SWHR3-T-0045)
+- [x] 10.5 Return meaningful error messages in XML response (SWHR3-T-0045)
 
 ## 11. Integration with Admin Interface
 

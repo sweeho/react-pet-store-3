@@ -15,8 +15,8 @@ import {
  * not (AC-1, AC-2 — pattern loaded/cached in memory and matched exactly).
  */
 describe("PROTECTED_API_PATHS / isProtectedApiPath", () => {
-  it("lists exactly /api/customers and /api/customers/me", () => {
-    expect(PROTECTED_API_PATHS).toEqual(["/api/customers", "/api/customers/me"]);
+  it("lists exactly /api/customers, /api/customers/me and /api/orders", () => {
+    expect(PROTECTED_API_PATHS).toEqual(["/api/customers", "/api/customers/me", "/api/orders"]);
   });
 
   it("is frozen", () => {
@@ -26,6 +26,7 @@ describe("PROTECTED_API_PATHS / isProtectedApiPath", () => {
   it("matches a protected path exactly", () => {
     expect(isProtectedApiPath("/api/customers")).toBe(true);
     expect(isProtectedApiPath("/api/customers/me")).toBe(true);
+    expect(isProtectedApiPath("/api/orders")).toBe(true);
   });
 
   it("does not match a path that merely starts with a protected prefix", () => {

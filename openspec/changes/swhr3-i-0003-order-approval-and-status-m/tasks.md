@@ -18,11 +18,11 @@
 
 ## 3. Client-Side Change Tracking
 
-- [ ] 3.1 Implement TableModel.commit() method to package order changes (SWHR3-T-0038)
-- [ ] 3.2 Serialize modified orders to OrderApproval XML format (SWHR3-T-0038)
-- [ ] 3.3 Create OrderApproval value object containing List<ChangedOrder> (SWHR3-T-0038)
-- [ ] 3.4 Create ChangedOrder value object with orderId and orderStatus fields (SWHR3-T-0038)
-- [ ] 3.5 Implement XML marshalling for order changes (toXML()) (SWHR3-T-0038)
+- [x] 3.1 Implement TableModel.commit() method to package order changes (SWHR3-T-0038)
+- [x] 3.2 Serialize modified orders to OrderApproval XML format (SWHR3-T-0038)
+- [x] 3.3 Create OrderApproval value object containing List<ChangedOrder> (SWHR3-T-0038)
+- [x] 3.4 Create ChangedOrder value object with orderId and orderStatus fields (SWHR3-T-0038)
+- [x] 3.5 Implement XML marshalling for order changes (toXML()) (SWHR3-T-0038)
 
 ## 4. Server Communication Protocol
 

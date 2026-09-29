@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { count, eq } from "drizzle-orm";
 import { H3Event } from "nitro/h3";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { db } from "../../../db/client";
 import {
@@ -232,5 +232,144 @@ describe("POST /api/orders", () => {
     await expect(send(body(), { cartToken: fillCart(), signedIn: false })).rejects.toMatchObject({
       status: 401,
     });
+  });
+});
+
+// A checkout sent with a chosen content type and body encoding, through both
+// middlewares (SWHR3-T-0100). `contentType` null sends no content-type header.
+async function sendRaw(
+  raw: string | FormData,
+  options: { contentType: string | null; cartToken?: string; signedIn?: boolean },
+): Promise<unknown> {
+  const { contentType, cartToken, signedIn = true } = options;
+  const cookies = [signedIn ? sessionCookie : "", cartToken ? `petstore_cart=${cartToken}` : ""]
+    .filter(Boolean)
+    .join("; ");
+  const headers: Record<string, string> = {};
+  if (contentType !== null) {
+    headers["content-type"] = contentType;
+  }
+  if (cookies) {
+    headers.cookie = cookies;
+  }
+  const event = new H3Event(
+    new Request("http://localhost/api/orders", { method: "POST", headers, body: raw }),
+  );
+  await authMiddleware(event);
+  await cartSession(event);
+  return postOrder(event);
+}
+
+function formData(fields: Record<string, string>): FormData {
+  const data = new FormData();
+  for (const [key, value] of Object.entries(fields)) {
+    data.append(key, value);
+  }
+  return data;
+}
+
+const CART_LINES = { "ORD-1": 2, "ORD-2": 1 };
+
+describe("POST /api/orders accepts only JSON (SWHR3-T-0100)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  async function expectRefused(
+    attempt: (token: string) => Promise<unknown>,
+  ): Promise<{ token: string }> {
+    const token = fillCart();
+    const before = orderCount();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    await expect(attempt(token)).rejects.toMatchObject({
+      status: 415,
+      data: { code: "UNSUPPORTED_MEDIA_TYPE" },
+    });
+
+    expect(orderCount()).toBe(before);
+    expect(getDetails(token)).toEqual(CART_LINES);
+    expect(info).not.toHaveBeenCalledWith(expect.stringMatching(/^checkout: order/));
+    return { token };
+  }
+
+  it("[SWHR3-C-0146] form-encoded checkout is refused with 415 and writes nothing", async () => {
+    await expectRefused((token) =>
+      sendRaw(new URLSearchParams(body()).toString(), {
+        contentType: "application/x-www-form-urlencoded",
+        cartToken: token,
+      }),
+    );
+  });
+
+  it("[SWHR3-C-0148] text/plain checkout carrying JSON is refused", async () => {
+    await expectRefused((token) =>
+      sendRaw(JSON.stringify(body()), { contentType: "text/plain", cartToken: token }),
+    );
+  });
+
+  it("[SWHR3-C-0149] multipart checkout is refused with 415, not a parser 400", async () => {
+    await expectRefused((token) =>
+      sendRaw(formData(body()), { contentType: null, cartToken: token }),
+    );
+  });
+
+  it("[SWHR3-C-0150] checkout with no content-type header is refused", async () => {
+    await expectRefused((token) =>
+      sendRaw(JSON.stringify(body()), { contentType: null, cartToken: token }),
+    );
+  });
+
+  it("[SWHR3-C-0152] JSON checkout with a charset parameter places the order", async () => {
+    const token = fillCart();
+    const before = orderCount();
+
+    const result = (await sendRaw(JSON.stringify(body()), {
+      contentType: "application/json; charset=utf-8",
+      cartToken: token,
+    })) as { orderId: number; orderDate: string; email: string };
+
+    expect(result).toEqual({
+      orderId: expect.any(Number),
+      orderDate: expect.any(String),
+      email: "sarah.chen@example.com",
+    });
+    expect(orderCount()).toBe(before + 1);
+    expect(getDetails(token)).toEqual({});
+  });
+
+  it("[SWHR3-C-0154] a refused submission writes no checkout log line", async () => {
+    const token = fillCart();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    await expect(
+      sendRaw(JSON.stringify(body()), { contentType: "text/plain", cartToken: token }),
+    ).rejects.toMatchObject({ status: 415 });
+    await expect(
+      sendRaw(new URLSearchParams(body()).toString(), {
+        contentType: "application/x-www-form-urlencoded",
+        cartToken: token,
+      }),
+    ).rejects.toMatchObject({ status: 415 });
+
+    expect(info).not.toHaveBeenCalledWith(expect.stringMatching(/^checkout: order/));
+  });
+
+  it("[SWHR3-C-0155] a signed-out non-JSON submission answers 401 and logs nothing", async () => {
+    const token = fillCart();
+    const before = orderCount();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    await expect(
+      sendRaw(JSON.stringify(body()), {
+        contentType: "text/plain",
+        cartToken: token,
+        signedIn: false,
+      }),
+    ).rejects.toMatchObject({ status: 401 });
+
+    expect(orderCount()).toBe(before);
+    expect(getDetails(token)).toEqual(CART_LINES);
+    expect(info).not.toHaveBeenCalledWith(expect.stringMatching(/^checkout: order/));
   });
 });

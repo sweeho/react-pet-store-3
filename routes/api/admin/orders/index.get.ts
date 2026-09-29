@@ -6,6 +6,13 @@
  */
 import { defineHandler } from "nitro/h3";
 
+import { getOrdersGroupedByStatus } from "../../../../lib/orders";
+import { toHttpError } from "../../../../lib/errors";
+
 export default defineHandler(() => {
-  throw new Error("VortexNotImplemented");
+  try {
+    return { orders: getOrdersGroupedByStatus() };
+  } catch (error) {
+    throw toHttpError(error);
+  }
 });

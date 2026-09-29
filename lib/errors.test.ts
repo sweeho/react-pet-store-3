@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   DuplicateAccountError,
   DuplicateEmailError,
+  ForbiddenError,
+  InvalidTransitionError,
   NotFoundError,
   ProfileExistsError,
   ServiceError,
@@ -57,6 +59,21 @@ describe("ServiceError subclasses", () => {
     const error = new ServiceUnavailableError();
     expect(error.status).toBe(503);
     expect(error.code).toBe("SERVICE_UNAVAILABLE");
+  });
+
+  it("InvalidTransitionError is a 409 INVALID_TRANSITION naming the order id and current status (C7)", () => {
+    const error = new InvalidTransitionError(42, "DENIED");
+    expect(error.status).toBe(409);
+    expect(error.code).toBe("INVALID_TRANSITION");
+    expect(error.message).toContain("42");
+    expect(error.message).toContain("DENIED");
+  });
+
+  it("ForbiddenError is a 403 FORBIDDEN defaulting to 'Administrator credentials required' (C7)", () => {
+    const error = new ForbiddenError();
+    expect(error.status).toBe(403);
+    expect(error.code).toBe("FORBIDDEN");
+    expect(error.message).toBe("Administrator credentials required");
   });
 
   it("ValidationError is a 422 VALIDATION_FAILED carrying fieldErrors (AC-3)", () => {
@@ -128,5 +145,20 @@ describe("toHttpError", () => {
     const passedThrough = toHttpError(original);
 
     expect(passedThrough).toBe(original);
+  });
+
+  it("maps InvalidTransitionError to 409 INVALID_TRANSITION (C7)", () => {
+    const httpError = toHttpError(new InvalidTransitionError(7, "COMPLETED"));
+
+    expect(httpError.status).toBe(409);
+    expect(httpError.data).toEqual({ code: "INVALID_TRANSITION" });
+  });
+
+  it("maps ForbiddenError to 403 FORBIDDEN (C7)", () => {
+    const httpError = toHttpError(new ForbiddenError());
+
+    expect(httpError.status).toBe(403);
+    expect(httpError.data).toEqual({ code: "FORBIDDEN" });
+    expect(httpError.message).toBe("Administrator credentials required");
   });
 });

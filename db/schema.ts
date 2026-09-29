@@ -8,11 +8,14 @@ export const users = sqliteTable("users", {
 });
 
 // design.md D8/C6: the account an operator signs in with. `customers`
-// links to this 1:1 through a unique accountId.
+// links to this 1:1 through a unique accountId. `role` (design.md D3, C1)
+// is read fresh per request rather than cached in the session cookie, so a
+// revoked role takes effect on the account's next request.
 export const accounts = sqliteTable("accounts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  role: text("role").notNull().default("customer"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
@@ -62,4 +65,24 @@ export const creditCards = sqliteTable("credit_cards", {
   cardNumber: text("card_number").notNull(),
   expiryMonth: integer("expiry_month").notNull(),
   expiryYear: integer("expiry_year").notNull(),
+});
+
+// design.md D1/C1: one row per order, owned by the account that placed it.
+// `status` is one of lib/order-status.ts's ORDER_STATUSES; the column
+// stores it as plain text (not a $type/CHECK) so schema.ts stays free of a
+// lib/ import, and lib/orders.ts is the only writer of `status`. Checkout
+// (swhr3-i-0005) adds line items and address snapshots alongside these
+// columns without reshaping them.
+export const orders = sqliteTable("orders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  accountId: integer("account_id")
+    .notNull()
+    .references(() => accounts.id),
+  customerName: text("customer_name").notNull(),
+  orderDate: integer("order_date", { mode: "timestamp" }).notNull(),
+  totalCents: integer("total_cents").notNull(),
+  status: text("status").notNull().default("PENDING"),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });

@@ -143,6 +143,35 @@ describe("placeOrder", () => {
     expect(getDetails(token)).toEqual({ "EST-1": 2, "EST-2": 1 });
   });
 
+  it("[SWHR3-C-0122] logs one line per order, after the transaction commits, without card data", () => {
+    const token = fillCart();
+    let inTransactionAtLog: boolean | undefined;
+    const info = vi.spyOn(console, "info").mockImplementation(() => {
+      inTransactionAtLog = db.$client.inTransaction;
+    });
+
+    const { orderId } = placeOrder(input(token));
+
+    expect(info).toHaveBeenCalledTimes(1);
+    expect(info).toHaveBeenCalledWith(
+      `checkout: order ${orderId} placed by account ${accountId}, 2 lines, 8300 cents`,
+    );
+    expect(inTransactionAtLog).toBe(false);
+  });
+
+  it("logs nothing when the order fails", () => {
+    const token = fillCart();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const original = purchaseOrders.insertPurchaseOrder;
+    vi.spyOn(purchaseOrders, "insertPurchaseOrder").mockImplementation((tx, po) => {
+      original(tx, po);
+      throw new Error("forced failure after the order rows");
+    });
+
+    expect(() => placeOrder(input(token))).toThrow("forced failure");
+    expect(info).not.toHaveBeenCalled();
+  });
+
   it("an empty cart throws ShoppingCartEmptyError and writes nothing", () => {
     const before = rowCounts();
     expect(() => placeOrder(input(randomUUID()))).toThrow(ShoppingCartEmptyError);

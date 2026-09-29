@@ -20,22 +20,27 @@ export function placeOrder(
   { accountId, cartToken, locale, event }: PlaceOrderInput,
   outer?: DbOrTx,
 ): { orderId: number; orderDate: string; email: string } {
-  return withTransaction(
+  const placed = withTransaction(
     (tx) => {
       const lines = getCheckoutLines(cartToken, locale, tx);
       const purchaseOrder = toPurchaseOrder(accountId, event, lines);
       const orderId = insertPurchaseOrder(tx, purchaseOrder);
       empty(cartToken, tx);
-      console.info(
-        `checkout: order ${orderId} placed by account ${accountId}, ${lines.length} lines, ${purchaseOrder.totalCents} cents`,
-      );
       return {
         orderId,
         orderDate: purchaseOrder.orderDate.toISOString(),
         email: purchaseOrder.emailId,
+        lineCount: lines.length,
+        totalCents: purchaseOrder.totalCents,
       };
     },
     outer,
     { behavior: "immediate" },
   );
+  // D11: logged once the transaction has committed (or, given an outer
+  // transaction, once this work is done), so a rolled-back order never logs.
+  console.info(
+    `checkout: order ${placed.orderId} placed by account ${accountId}, ${placed.lineCount} lines, ${placed.totalCents} cents`,
+  );
+  return { orderId: placed.orderId, orderDate: placed.orderDate, email: placed.email };
 }

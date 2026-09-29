@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
 import { cartItems } from "../db/schema";
-import { addItem, deleteItem, getDetails } from "./cart";
+import { addItem, deleteItem, getDetails, updateItemQuantity } from "./cart";
 import { ValidationError } from "./errors";
 
 /**
@@ -106,5 +106,30 @@ describe("deleteItem", () => {
     deleteItem(a, "EST-1");
     expect(getDetails(a)).toEqual({});
     expect(getDetails(b)).toEqual({ "EST-1": 4 });
+  });
+});
+
+describe("updateItemQuantity", () => {
+  it.each([
+    ["[SWHR3-C-0063] a positive quantity is stored", 3, { "EST-1": 3, "EST-2": 2 }],
+    ["[SWHR3-C-0064] zero removes the item", 0, { "EST-2": 2 }],
+    ["[SWHR3-C-0065] a negative quantity removes the item", -2, { "EST-2": 2 }],
+  ])("%s", (_title, quantity, expected) => {
+    const token = randomUUID();
+    addItem(token, "EST-1", 1);
+    addItem(token, "EST-2", 2);
+    updateItemQuantity(token, "EST-1", quantity);
+    expect(getDetails(token)).toEqual(expected);
+  });
+
+  it("a positive quantity for an absent item adds it (SD14)", () => {
+    const token = randomUUID();
+    updateItemQuantity(token, "EST-1", 4);
+    expect(getDetails(token)).toEqual({ "EST-1": 4 });
+  });
+
+  it("writes nothing for an undefined token", () => {
+    expect(() => updateItemQuantity(undefined, "EST-1", 2)).not.toThrow();
+    expect(getDetails(undefined)).toEqual({});
   });
 });

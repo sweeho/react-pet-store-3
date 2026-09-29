@@ -71,3 +71,16 @@ export function deleteItem(sessionToken: string | undefined, itemId: string, out
       .run();
   }, outer);
 }
+
+export function updateItemQuantity(
+  sessionToken: string | undefined,
+  itemId: string,
+  quantity: number,
+  outer?: DbOrTx,
+): void {
+  void sessionToken;
+  void itemId;
+  void quantity;
+  void outer;
+  throw new Error("VortexNotImplemented");
+}

@@ -64,14 +64,14 @@
 
 ## 7. Request Processing Servlet
 
-- [ ] 7.1 Create RcvrRequestProcessor servlet (SWHR3-T-0134)
-- [ ] 7.2 Implement doGet() for initial request handling (SWHR3-T-0134)
-- [ ] 7.3 Implement doPost() for form submissions (SWHR3-T-0134)
-- [ ] 7.4 Add authentication check via isUserInRole("administrator") (SWHR3-T-0134)
-- [ ] 7.5 Parse currentScreen request parameter (SWHR3-T-0134)
-- [ ] 7.6 Route "displayinventory" to JSP forward (SWHR3-T-0134)
-- [ ] 7.7 Route "updateinventory" to inventory update handler (SWHR3-T-0134)
-- [ ] 7.8 Implement exception handling for request processing (SWHR3-T-0134)
+- [x] 7.1 Create RcvrRequestProcessor servlet (SWHR3-T-0134)
+- [x] 7.2 Implement doGet() for initial request handling (SWHR3-T-0134)
+- [x] 7.3 Implement doPost() for form submissions (SWHR3-T-0134)
+- [x] 7.4 Add authentication check via isUserInRole("administrator") (SWHR3-T-0134)
+- [x] 7.5 Parse currentScreen request parameter (SWHR3-T-0134)
+- [x] 7.6 Route "displayinventory" to JSP forward (SWHR3-T-0134)
+- [x] 7.7 Route "updateinventory" to inventory update handler (SWHR3-T-0134)
+- [x] 7.8 Implement exception handling for request processing (SWHR3-T-0134)
 
 ## 8. Inventory Display Handler
 

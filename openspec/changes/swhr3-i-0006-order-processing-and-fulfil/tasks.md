@@ -64,11 +64,11 @@
 
 ## 9. Order Processing Facade
 
-- [ ] 9.1 Create OrderProcessingFacade coordinating facade (SWHR3-T-0117)
-- [ ] 9.2 Implement processOrder(OrderEvent) orchestration method (SWHR3-T-0117)
-- [ ] 9.3 Coordinate payment, inventory, notification components (SWHR3-T-0117)
-- [ ] 9.4 Implement transaction management for facade (SWHR3-T-0117)
-- [ ] 9.5 Implement exception handling and rollback logic (SWHR3-T-0117)
+- [x] 9.1 Create OrderProcessingFacade coordinating facade (SWHR3-T-0117)
+- [x] 9.2 Implement processOrder(OrderEvent) orchestration method (SWHR3-T-0117)
+- [x] 9.3 Coordinate payment, inventory, notification components (SWHR3-T-0117)
+- [x] 9.4 Implement transaction management for facade (SWHR3-T-0117)
+- [x] 9.5 Implement exception handling and rollback logic (SWHR3-T-0117)
 
 ## 10. Process Manager
 

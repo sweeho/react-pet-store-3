@@ -104,11 +104,11 @@
 
 ## 14. Testing
 
-- [ ] 14.1 Test order creation flow end-to-end (SWHR3-T-0122)
-- [ ] 14.2 Test payment processing success and failure paths (SWHR3-T-0122)
-- [ ] 14.3 Test inventory reservation and updates (SWHR3-T-0122)
-- [ ] 14.4 Test supplier PO generation (SWHR3-T-0122)
-- [ ] 14.5 Test order status transitions (SWHR3-T-0122)
-- [ ] 14.6 Test notification queuing (SWHR3-T-0122)
-- [ ] 14.7 Test transaction rollback on failures (SWHR3-T-0122)
-- [ ] 14.8 Test concurrent order processing (SWHR3-T-0122)
+- [x] 14.1 Test order creation flow end-to-end (SWHR3-T-0122)
+- [x] 14.2 Test payment processing success and failure paths (SWHR3-T-0122)
+- [x] 14.3 Test inventory reservation and updates (SWHR3-T-0122)
+- [x] 14.4 Test supplier PO generation (SWHR3-T-0122)
+- [x] 14.5 Test order status transitions (SWHR3-T-0122)
+- [x] 14.6 Test notification queuing (SWHR3-T-0122)
+- [x] 14.7 Test transaction rollback on failures (SWHR3-T-0122)
+- [x] 14.8 Test concurrent order processing (SWHR3-T-0122)

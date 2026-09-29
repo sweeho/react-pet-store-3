@@ -35,11 +35,11 @@
 
 ## 5. Business Delegate Implementation
 
-- [ ] 5.1 Create AdminRequestBD business delegate class (SWHR3-T-0040)
-- [ ] 5.2 Implement updateOrders(OrderApproval oa) method (SWHR3-T-0040)
-- [ ] 5.3 Iterate through ChangedOrder items and invoke EJB update methods (SWHR3-T-0040)
-- [ ] 5.4 Handle AdminBDException and convert to appropriate error messages (SWHR3-T-0040)
-- [ ] 5.5 Ensure transaction atomicity (all-or-nothing for batch updates) (SWHR3-T-0040)
+- [x] 5.1 Create AdminRequestBD business delegate class (SWHR3-T-0040)
+- [x] 5.2 Implement updateOrders(OrderApproval oa) method (SWHR3-T-0040)
+- [x] 5.3 Iterate through ChangedOrder items and invoke EJB update methods (SWHR3-T-0040)
+- [x] 5.4 Handle AdminBDException and convert to appropriate error messages (SWHR3-T-0040)
+- [x] 5.5 Ensure transaction atomicity (all-or-nothing for batch updates) (SWHR3-T-0040)
 
 ## 6. Data Retrieval and Filtering
 

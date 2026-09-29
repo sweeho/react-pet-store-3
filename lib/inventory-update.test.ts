@@ -8,6 +8,7 @@ import {
   inventory,
   lineItems,
   orders,
+  supplierFulfilmentAttempts,
   supplierPurchaseOrders,
 } from "../db/schema";
 import { applyInventoryUpdate } from "./inventory-update";
@@ -53,6 +54,9 @@ function clearPendingPos(): void {
     db.update(lineItems)
       .set({ supplierPoId: null })
       .where(inArray(lineItems.supplierPoId, ids))
+      .run();
+    db.delete(supplierFulfilmentAttempts)
+      .where(inArray(supplierFulfilmentAttempts.supplierPoId, ids))
       .run();
     db.delete(supplierPurchaseOrders).where(inArray(supplierPurchaseOrders.id, ids)).run();
   }
@@ -151,6 +155,42 @@ describe("applyInventoryUpdate", () => {
     expect(result.updated).toEqual([]);
     expect(result.fulfilledOrders).toBeGreaterThanOrEqual(1);
     expect(poStatus(poId)).toBe("PROCESSING");
+  });
+
+  it("logs `supplier: inventory <item> <before> -> <after>` per update and one summary line", () => {
+    clearPendingPos();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    setInventory("EST-1", 6);
+    setInventory("EST-2", 1);
+
+    applyInventoryUpdate([
+      { itemId: "EST-1", quantity: 2 },
+      { itemId: "EST-2", quantity: 4 },
+    ]);
+
+    const lines = info.mock.calls.map((call) => String(call[0]));
+    expect(lines).toContain("supplier: inventory EST-1 6 -> 2");
+    expect(lines).toContain("supplier: inventory EST-2 1 -> 4");
+    expect(lines.filter((l) => l.startsWith("supplier: inventory update"))).toEqual([
+      "supplier: inventory update applied to 2 items, 0 orders processed, 0 fulfilled",
+    ]);
+  });
+
+  it("logs an unexpected failure with context, then rethrows", () => {
+    clearPendingPos();
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    setInventory("EST-1", 6);
+
+    expect(() =>
+      applyInventoryUpdate([
+        { itemId: "EST-1", quantity: 2 },
+        { itemId: "NOT-IN-CATALOGUE", quantity: 1 },
+      ]),
+    ).toThrow();
+
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain("supplier: inventory update failed");
+    expect(String(error.mock.calls[0][0])).toContain("2 items");
   });
 
   it("logs each item's quantity before and after", () => {

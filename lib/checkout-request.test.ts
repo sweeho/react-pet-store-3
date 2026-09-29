@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { FieldErrorCollector, extractContactInfo } from "./checkout-request";
+import { FieldErrorCollector, extractContactInfo, extractCreditCard } from "./checkout-request";
 
 /**
  * UNIT TEST (server project). design.md C4/C6, D2: one address read from
@@ -143,5 +143,67 @@ describe("extractContactInfo suffix isolation", () => {
     expect(info?.familyName).toBe("Okafor");
     expect(info?.city).toBe("Austin");
     expect(info?.email).toBe("b@example.com");
+  });
+});
+
+describe("extractCreditCard", () => {
+  const year = new Date().getFullYear();
+  const card = (overrides: Record<string, string> = {}): Record<string, string> => ({
+    credit_card_number: "4111 1111 1111 4412",
+    credit_card_type: "Java Card",
+    expiration_month: "03",
+    expiration_year: String(year + 3),
+    ...overrides,
+  });
+
+  it("[SWHR3-C-0108] valid card fields become a CreditCard", () => {
+    const errors = new FieldErrorCollector();
+
+    expect(extractCreditCard(card(), errors)).toEqual({
+      cardNumber: "4111111111114412",
+      cardType: "Java Card",
+      expiryDate: `03/${year + 3}`,
+    });
+    expect(errors.fieldErrors).toEqual({});
+    expect(errors.missingFields).toEqual([]);
+  });
+
+  it("[SWHR3-C-0108] a single-digit month is stored as MM/YYYY", () => {
+    const errors = new FieldErrorCollector();
+
+    const ok = extractCreditCard(
+      card({ expiration_month: "3", expiration_year: String(year) }),
+      errors,
+    );
+    expect(ok?.expiryDate).toBe(`03/${year}`);
+  });
+
+  it.each([
+    ["an empty number", { credit_card_number: "" }, "credit_card_number"],
+    ["a non-numeric number", { credit_card_number: "12ab" }, "credit_card_number"],
+    ["a too-short number", { credit_card_number: "1234 5678" }, "credit_card_number"],
+    ["month 13", { expiration_month: "13" }, "expiration_month"],
+    ["a past year", { expiration_year: String(year - 1) }, "expiration_year"],
+    ["a year too far ahead", { expiration_year: String(year + 6) }, "expiration_year"],
+  ])("[SWHR3-C-0109] %s is recorded on its field", (_name, override, param) => {
+    const errors = new FieldErrorCollector();
+
+    expect(extractCreditCard(card(override), errors)).toBeNull();
+    expect(Object.keys(errors.fieldErrors)).toEqual([param]);
+  });
+
+  it("[SWHR3-C-0109] an empty number is recorded as missing", () => {
+    const errors = new FieldErrorCollector();
+
+    extractCreditCard(card({ credit_card_number: "" }), errors);
+
+    expect(errors.missingFields).toEqual(["credit_card_number"]);
+  });
+
+  it("[SWHR3-C-0112] a card type outside the three is rejected", () => {
+    const errors = new FieldErrorCollector();
+
+    expect(extractCreditCard(card({ credit_card_type: "Visa" }), errors)).toBeNull();
+    expect(errors.fieldErrors).toHaveProperty("credit_card_type");
   });
 });

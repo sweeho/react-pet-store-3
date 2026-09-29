@@ -3,6 +3,7 @@
  * recorded on a FieldErrorCollector, keyed by request param, rather than
  * thrown, so the whole form can be reported at once.
  */
+import type { CreditCard } from "./credit-card";
 import { CONTACT_INFO_FIELDS, type ContactInfo } from "./contact-info";
 import { validateEmail } from "./validation";
 
@@ -60,4 +61,8 @@ export function extractContactInfo(
 
   // ok is true only when every required field passed, so each string key is set.
   return ok ? (values as unknown as ContactInfo) : null;
+}
+
+export function extractCreditCard(): CreditCard | null {
+  throw new Error("VortexNotImplemented");
 }

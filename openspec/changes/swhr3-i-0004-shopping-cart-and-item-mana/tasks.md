@@ -113,11 +113,11 @@
 
 ## 14. Catalog Integration
 
-- [ ] 14.1 Create CatalogHelper for cart item enrichment (SWHR3-T-0071)
-- [ ] 14.2 Implement getItem(itemId, locale) lookup method (SWHR3-T-0071)
-- [ ] 14.3 Return full Item object with product details (SWHR3-T-0071)
-- [ ] 14.4 Handle CatalogException gracefully (SWHR3-T-0071)
-- [ ] 14.5 Test catalog integration and exception handling (SWHR3-T-0071)
+- [x] 14.1 Create CatalogHelper for cart item enrichment (SWHR3-T-0071)
+- [x] 14.2 Implement getItem(itemId, locale) lookup method (SWHR3-T-0071)
+- [x] 14.3 Return full Item object with product details (SWHR3-T-0071)
+- [x] 14.4 Handle CatalogException gracefully (SWHR3-T-0071)
+- [x] 14.5 Test catalog integration and exception handling (SWHR3-T-0071)
 
 ## 15. Cart Display View
 

@@ -157,8 +157,8 @@
 
 ## 18. Error Handling
 
-- [ ] 18.1 Test invalid quantity input (non-numeric) handling (SWHR3-T-0075)
-- [ ] 18.2 Test catalog lookup failure graceful degradation (SWHR3-T-0075)
-- [ ] 18.3 Test missing itemId parameter handling (SWHR3-T-0075)
-- [ ] 18.4 Test session timeout behavior (SWHR3-T-0075)
-- [ ] 18.5 Test concurrent cart access in clustered environment (SWHR3-T-0075)
+- [x] 18.1 Test invalid quantity input (non-numeric) handling (SWHR3-T-0075)
+- [x] 18.2 Test catalog lookup failure graceful degradation (SWHR3-T-0075)
+- [x] 18.3 Test missing itemId parameter handling (SWHR3-T-0075)
+- [x] 18.4 Test session timeout behavior (SWHR3-T-0075)
+- [x] 18.5 Test concurrent cart access in clustered environment (SWHR3-T-0075)

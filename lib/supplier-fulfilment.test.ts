@@ -1,5 +1,5 @@
 import { count, eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
 import {
@@ -9,6 +9,7 @@ import {
   inventoryReservations,
   lineItems,
   orders,
+  supplierFulfilmentAttempts,
   supplierPurchaseOrders,
 } from "../db/schema";
 import { setInventory } from "./inventory";
@@ -32,6 +33,17 @@ beforeAll(() => {
     .returning({ id: accounts.id })
     .get().id;
 });
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+const attempts = (poId: number) =>
+  db
+    .select()
+    .from(supplierFulfilmentAttempts)
+    .where(eq(supplierFulfilmentAttempts.supplierPoId, poId))
+    .all();
 
 /** An APPROVED order at CONFIRMED with one line per [itemId, quantity] and one PENDING PO. */
 function makePendingOrder(lines: Array<[string, number]>): { orderId: number; poId: number } {
@@ -205,5 +217,74 @@ describe("processPendingSupplierOrders", () => {
 
     expect(poStatus(first.poId)).toBe("PROCESSING");
     expect(poStatus(second.poId)).toBe("PENDING");
+  });
+});
+
+describe("fulfilment attempt records (design.md D10)", () => {
+  it("[SWHR3-C-0207] a short line deducts nothing and is recorded as unable to fulfil", () => {
+    const [a, b] = [`SF-U${seq}`, `SF-V${seq}`];
+    const { poId } = makePendingOrder([
+      [a, 2],
+      [b, 3],
+    ]);
+    setInventory(a, 5);
+    setInventory(b, 1);
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const outcome = withTransaction((tx) => fulfilSupplierOrder(tx, poId));
+
+    const shortItems = [{ itemId: b, needed: 3, available: 1 }];
+    expect(outcome).toEqual({ result: "UNABLE", shortItems });
+    expect(stock(a)).toBe(5);
+    expect(stock(b)).toBe(1);
+    expect(poStatus(poId)).toBe("PENDING");
+    const rows = attempts(poId);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].result).toBe("UNABLE");
+    expect(rows[0].attemptedAt).toBeInstanceOf(Date);
+    expect(JSON.parse(rows[0].detail)).toEqual(shortItems);
+    expect(info).toHaveBeenCalledWith(expect.stringContaining(`supplier: PO ${poId} UNABLE`));
+    expect(String(info.mock.calls[0][0])).toContain(b);
+  });
+
+  it("a fulfilled PO records one FULFILLED attempt with no short items", () => {
+    const item = `SF-F${seq}`;
+    const { poId } = makePendingOrder([[item, 1]]);
+    setInventory(item, 5);
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    withTransaction((tx) => fulfilSupplierOrder(tx, poId));
+
+    const rows = attempts(poId);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].result).toBe("FULFILLED");
+    expect(JSON.parse(rows[0].detail)).toEqual([]);
+    expect(info).toHaveBeenCalledWith(`supplier: PO ${poId} FULFILLED`);
+  });
+
+  it("a skipped PO records no attempt", () => {
+    const item = `SF-K${seq}`;
+    const { poId } = makePendingOrder([[item, 1]]);
+    setInventory(item, 5);
+    withTransaction((tx) => fulfilSupplierOrder(tx, poId));
+
+    withTransaction((tx) => fulfilSupplierOrder(tx, poId));
+
+    expect(attempts(poId)).toHaveLength(1);
+  });
+
+  it("an attempt rolls back with its transaction", () => {
+    const item = `SF-B${seq}`;
+    const { poId } = makePendingOrder([[item, 1]]);
+    setInventory(item, 5);
+
+    expect(() =>
+      withTransaction((tx) => {
+        fulfilSupplierOrder(tx, poId);
+        throw new Error("boom");
+      }),
+    ).toThrow("boom");
+
+    expect(attempts(poId)).toHaveLength(0);
   });
 });

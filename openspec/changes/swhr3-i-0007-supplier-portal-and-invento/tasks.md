@@ -44,12 +44,12 @@
 
 ## 5. EJB Relationships
 
-- [ ] 5.1 Define one-to-one relationship between SupplierOrder and ContactInfo (SWHR3-T-0132)
-- [ ] 5.2 Define cascade delete for SupplierOrder-ContactInfo relationship (SWHR3-T-0132)
-- [ ] 5.3 Define one-to-one relationship between ContactInfo and Address (SWHR3-T-0132)
-- [ ] 5.4 Define cascade delete for ContactInfo-Address relationship (SWHR3-T-0132)
-- [ ] 5.5 Declare relationship role names in ejb-jar.xml (SWHR3-T-0132)
-- [ ] 5.6 Configure CMR fields for bidirectional access (SWHR3-T-0132)
+- [x] 5.1 Define one-to-one relationship between SupplierOrder and ContactInfo (SWHR3-T-0132)
+- [x] 5.2 Define cascade delete for SupplierOrder-ContactInfo relationship (SWHR3-T-0132)
+- [x] 5.3 Define one-to-one relationship between ContactInfo and Address (SWHR3-T-0132)
+- [x] 5.4 Define cascade delete for ContactInfo-Address relationship (SWHR3-T-0132)
+- [x] 5.5 Declare relationship role names in ejb-jar.xml (SWHR3-T-0132)
+- [x] 5.6 Configure CMR fields for bidirectional access (SWHR3-T-0132)
 
 ## 6. Inventory Management
 

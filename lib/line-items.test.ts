@@ -61,6 +61,8 @@ describe("line_items", () => {
       quantity: 2,
       unitPriceCents: 1650,
       quantityShipped: 0,
+      // Added by the fulfilment schema (C1); unset until allocation groups the line.
+      supplierPoId: null,
     });
   });
 
@@ -88,6 +90,7 @@ describe("line_items", () => {
         "productId",
         "quantity",
         "quantityShipped",
+        "supplierPoId",
         "unitPriceCents",
       ].sort(),
     );

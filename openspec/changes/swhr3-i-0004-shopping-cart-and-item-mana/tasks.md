@@ -1,13 +1,13 @@
 ## 1. Shopping Cart Session Bean
 
-- [ ] 1.1 Create ShoppingCartLocalEJB stateful session bean class (SWHR3-T-0058)
-- [ ] 1.2 Declare private HashMap cart field for storing items (SWHR3-T-0058)
-- [ ] 1.3 Implement ejbCreate() to initialize HashMap (SWHR3-T-0058)
-- [ ] 1.4 Declare private Locale field defaulting to Locale.US (SWHR3-T-0058)
-- [ ] 1.5 Configure ejb-jar.xml with session-type=Stateful (SWHR3-T-0058)
-- [ ] 1.6 Configure transaction-type=Container in ejb-jar.xml (SWHR3-T-0058)
-- [ ] 1.7 Create ShoppingCartLocal interface with method signatures (SWHR3-T-0058)
-- [ ] 1.8 Create ShoppingCartLocalHome interface for JNDI lookup (SWHR3-T-0058)
+- [x] 1.1 Create ShoppingCartLocalEJB stateful session bean class (SWHR3-T-0058)
+- [x] 1.2 Declare private HashMap cart field for storing items (SWHR3-T-0058)
+- [x] 1.3 Implement ejbCreate() to initialize HashMap (SWHR3-T-0058)
+- [x] 1.4 Declare private Locale field defaulting to Locale.US (SWHR3-T-0058)
+- [x] 1.5 Configure ejb-jar.xml with session-type=Stateful (SWHR3-T-0058)
+- [x] 1.6 Configure transaction-type=Container in ejb-jar.xml (SWHR3-T-0058)
+- [x] 1.7 Create ShoppingCartLocal interface with method signatures (SWHR3-T-0058)
+- [x] 1.8 Create ShoppingCartLocalHome interface for JNDI lookup (SWHR3-T-0058)
 
 ## 2. Item Addition Operations
 

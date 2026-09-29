@@ -10,13 +10,13 @@
 
 ## 2. Web-Tier Address Validation
 
-- [ ] 2.1 Create OrderHTMLAction.extractContactInfo() method (SWHR3-T-0084)
-- [ ] 2.2 Implement field extraction with configurable suffix for billing/shipping distinction (SWHR3-T-0084)
-- [ ] 2.3 Implement required field validation for all address fields except address_2 (SWHR3-T-0084)
-- [ ] 2.4 Collect missing field names in ArrayList for error display (SWHR3-T-0084)
-- [ ] 2.5 Throw MissingFormDataException with missing field list when validation fails (SWHR3-T-0084)
-- [ ] 2.6 Convert empty address_2 to null for optional field handling (SWHR3-T-0084)
-- [ ] 2.7 Return ContactInfo object with all extracted address fields (SWHR3-T-0084)
+- [x] 2.1 Create OrderHTMLAction.extractContactInfo() method (SWHR3-T-0084)
+- [x] 2.2 Implement field extraction with configurable suffix for billing/shipping distinction (SWHR3-T-0084)
+- [x] 2.3 Implement required field validation for all address fields except address_2 (SWHR3-T-0084)
+- [x] 2.4 Collect missing field names in ArrayList for error display (SWHR3-T-0084)
+- [x] 2.5 Throw MissingFormDataException with missing field list when validation fails (SWHR3-T-0084)
+- [x] 2.6 Convert empty address_2 to null for optional field handling (SWHR3-T-0084)
+- [x] 2.7 Return ContactInfo object with all extracted address fields (SWHR3-T-0084)
 
 ## 3. Credit Card Collection
 

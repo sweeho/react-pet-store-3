@@ -143,14 +143,14 @@
 
 ## 14. Form Submission Handler
 
-- [ ] 14.1 Configure form action to post to RcvrRequestProcessor (SWHR3-T-0141)
-- [ ] 14.2 Add currentScreen=updateinventory hidden parameter (SWHR3-T-0141)
-- [ ] 14.3 Implement quantity parameter parsing (SWHR3-T-0141)
-- [ ] 14.4 Parse checkbox selections via item_itemId pattern (SWHR3-T-0141)
-- [ ] 14.5 Handle non-numeric quantity input gracefully (SWHR3-T-0141)
-- [ ] 14.6 Validate quantity values are positive (SWHR3-T-0141)
-- [ ] 14.7 Display success message after update (SWHR3-T-0141)
-- [ ] 14.8 Display error message on update failure (SWHR3-T-0141)
+- [x] 14.1 Configure form action to post to RcvrRequestProcessor (SWHR3-T-0141)
+- [x] 14.2 Add currentScreen=updateinventory hidden parameter (SWHR3-T-0141)
+- [x] 14.3 Implement quantity parameter parsing (SWHR3-T-0141)
+- [x] 14.4 Parse checkbox selections via item_itemId pattern (SWHR3-T-0141)
+- [x] 14.5 Handle non-numeric quantity input gracefully (SWHR3-T-0141)
+- [x] 14.6 Validate quantity values are positive (SWHR3-T-0141)
+- [x] 14.7 Display success message after update (SWHR3-T-0141)
+- [x] 14.8 Display error message on update failure (SWHR3-T-0141)
 
 ## 15. Transaction Management
 

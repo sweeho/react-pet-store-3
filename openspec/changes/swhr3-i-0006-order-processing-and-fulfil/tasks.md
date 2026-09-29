@@ -25,11 +25,11 @@
 
 ## 4. Payment Processing
 
-- [ ] 4.1 Invoke payment processor with credit card and order total (SWHR3-T-0112)
-- [ ] 4.2 Handle payment processor response (approved/declined/error) (SWHR3-T-0112)
-- [ ] 4.3 Store transaction ID and authorization code (SWHR3-T-0112)
-- [ ] 4.4 Update order status to PAID on successful charge (SWHR3-T-0112)
-- [ ] 4.5 Implement payment failure handling and error messaging (SWHR3-T-0112)
+- [x] 4.1 Invoke payment processor with credit card and order total (SWHR3-T-0112)
+- [x] 4.2 Handle payment processor response (approved/declined/error) (SWHR3-T-0112)
+- [x] 4.3 Store transaction ID and authorization code (SWHR3-T-0112)
+- [x] 4.4 Update order status to PAID on successful charge (SWHR3-T-0112)
+- [x] 4.5 Implement payment failure handling and error messaging (SWHR3-T-0112)
 
 ## 5. Order Status Management
 

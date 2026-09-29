@@ -157,10 +157,10 @@
 
 ## 16. Security and Validation
 
-- [ ] 16.1 Enforce customer authentication for checkout access (SWHR3-T-0098)
-- [ ] 16.2 Validate customer session validity during checkout (SWHR3-T-0098)
-- [ ] 16.3 Prevent unauthenticated order placement (SWHR3-T-0098)
-- [ ] 16.4 Implement CSRF protection on checkout form (SWHR3-T-0098)
-- [ ] 16.5 Validate credit card format before storage (SWHR3-T-0098)
-- [ ] 16.6 Implement SSL/TLS for payment information transmission (SWHR3-T-0098)
-- [ ] 16.7 Log all order creation events for audit trail (SWHR3-T-0098)
+- [x] 16.1 Enforce customer authentication for checkout access (SWHR3-T-0098)
+- [x] 16.2 Validate customer session validity during checkout (SWHR3-T-0098)
+- [x] 16.3 Prevent unauthenticated order placement (SWHR3-T-0098)
+- [x] 16.4 Implement CSRF protection on checkout form (SWHR3-T-0098)
+- [x] 16.5 Validate credit card format before storage (SWHR3-T-0098)
+- [x] 16.6 Implement SSL/TLS for payment information transmission (SWHR3-T-0098)
+- [x] 16.7 Log all order creation events for audit trail (SWHR3-T-0098)

@@ -183,13 +183,13 @@
 
 ## 18. Testing and Validation
 
-- [ ] 18.1 Test supplier authentication and session management (SWHR3-T-0145)
-- [ ] 18.2 Test inventory display for authorized users (SWHR3-T-0145)
-- [ ] 18.3 Test inventory update with valid quantities (SWHR3-T-0145)
-- [ ] 18.4 Test inventory update with invalid input (SWHR3-T-0145)
-- [ ] 18.5 Test pending order reprocessing after inventory update (SWHR3-T-0145)
-- [ ] 18.6 Test invoice generation for completed orders (SWHR3-T-0145)
-- [ ] 18.7 Test transaction rollback on update failure (SWHR3-T-0145)
-- [ ] 18.8 Test concurrent inventory updates (SWHR3-T-0145)
-- [ ] 18.9 Test supplier portal with multiple administrators (SWHR3-T-0145)
-- [ ] 18.10 Verify role-based access control enforcement (SWHR3-T-0145)
+- [x] 18.1 Test supplier authentication and session management (SWHR3-T-0145)
+- [x] 18.2 Test inventory display for authorized users (SWHR3-T-0145)
+- [x] 18.3 Test inventory update with valid quantities (SWHR3-T-0145)
+- [x] 18.4 Test inventory update with invalid input (SWHR3-T-0145)
+- [x] 18.5 Test pending order reprocessing after inventory update (SWHR3-T-0145)
+- [x] 18.6 Test invoice generation for completed orders (SWHR3-T-0145)
+- [x] 18.7 Test transaction rollback on update failure (SWHR3-T-0145)
+- [x] 18.8 Test concurrent inventory updates (SWHR3-T-0145)
+- [x] 18.9 Test supplier portal with multiple administrators (SWHR3-T-0145)
+- [x] 18.10 Verify role-based access control enforcement (SWHR3-T-0145)

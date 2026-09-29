@@ -104,12 +104,12 @@
 
 ## 11. Form Validation Exceptions
 
-- [ ] 11.1 Create MissingFormDataException extends Exception (SWHR3-T-0093)
-- [ ] 11.2 Add missingFields ArrayList parameter to constructor (SWHR3-T-0093)
-- [ ] 11.3 Implement getMissingFields() accessor (SWHR3-T-0093)
-- [ ] 11.4 Create exception with message listing all missing fields (SWHR3-T-0093)
-- [ ] 11.5 Create ShoppingCartEmptyOrderException extends Exception (SWHR3-T-0093)
-- [ ] 11.6 Implement error message handling for user display (SWHR3-T-0093)
+- [x] 11.1 Create MissingFormDataException extends Exception (SWHR3-T-0093)
+- [x] 11.2 Add missingFields ArrayList parameter to constructor (SWHR3-T-0093)
+- [x] 11.3 Implement getMissingFields() accessor (SWHR3-T-0093)
+- [x] 11.4 Create exception with message listing all missing fields (SWHR3-T-0093)
+- [x] 11.5 Create ShoppingCartEmptyOrderException extends Exception (SWHR3-T-0093)
+- [x] 11.6 Implement error message handling for user display (SWHR3-T-0093)
 
 ## 12. Order Confirmation
 

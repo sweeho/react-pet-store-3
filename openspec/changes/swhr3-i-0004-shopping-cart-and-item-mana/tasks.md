@@ -91,15 +91,15 @@
 
 ## 12. Web Tier Action Handler
 
-- [ ] 12.1 Create CartHTMLAction class extending Struts Action (SWHR3-T-0069)
-- [ ] 12.2 Implement perform(HttpServletRequest) parsing action parameter (SWHR3-T-0069)
-- [ ] 12.3 Handle "purchase" action creating ADD_ITEM CartEvent (SWHR3-T-0069)
-- [ ] 12.4 Handle "remove" action creating DELETE_ITEM CartEvent (SWHR3-T-0069)
-- [ ] 12.5 Handle "update" action parsing itemQuantity\_ parameters (SWHR3-T-0069)
-- [ ] 12.6 Extract itemId from itemQuantity\_ form field names (SWHR3-T-0069)
-- [ ] 12.7 Parse quantity values with NumberFormatException handling (default 0) (SWHR3-T-0069)
-- [ ] 12.8 Create UPDATE_ITEMS CartEvent with items map (SWHR3-T-0069)
-- [ ] 12.9 Handle empty actionType gracefully (SWHR3-T-0069)
+- [x] 12.1 Create CartHTMLAction class extending Struts Action (SWHR3-T-0069)
+- [x] 12.2 Implement perform(HttpServletRequest) parsing action parameter (SWHR3-T-0069)
+- [x] 12.3 Handle "purchase" action creating ADD_ITEM CartEvent (SWHR3-T-0069)
+- [x] 12.4 Handle "remove" action creating DELETE_ITEM CartEvent (SWHR3-T-0069)
+- [x] 12.5 Handle "update" action parsing itemQuantity\_ parameters (SWHR3-T-0069)
+- [x] 12.6 Extract itemId from itemQuantity\_ form field names (SWHR3-T-0069)
+- [x] 12.7 Parse quantity values with NumberFormatException handling (default 0) (SWHR3-T-0069)
+- [x] 12.8 Create UPDATE_ITEMS CartEvent with items map (SWHR3-T-0069)
+- [x] 12.9 Handle empty actionType gracefully (SWHR3-T-0069)
 
 ## 13. EJB Tier Action Handler
 

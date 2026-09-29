@@ -36,7 +36,8 @@ export function allocateOrder(tx: DbOrTx, orderId: number): AllocationResult {
     return "WAITING";
   }
 
-  createSupplierPOs(tx, orderId, lines);
+  // Stock is already reserved above, so the POs start PROCESSING (C12) until allocation is rewritten.
+  createSupplierPOs(tx, orderId, lines, new Date(), { status: "PROCESSING" });
   setWorkflowStage(tx, orderId, "ALLOCATED");
   return "ALLOCATED";
 }

@@ -225,7 +225,7 @@ describe("AdminOrders (/admin/orders)", () => {
     expect(screen.getByText("1 decision staged, not yet sent")).toBeInTheDocument();
   });
 
-  it("Refresh reloads orders from the server", async () => {
+  it("[SWHR3-C-0010] Refresh reloads orders from the server immediately when nothing is staged", async () => {
     const user = userEvent.setup();
     mockFetch({
       ordersResponses: [
@@ -246,6 +246,72 @@ describe("AdminOrders (/admin/orders)", () => {
     await user.click(screen.getByRole("button", { name: "Refresh" }));
 
     expect(await screen.findByText("1006")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("[SWHR3-C-0012] cancelling the discard warning keeps staged decisions and makes no new request", async () => {
+    const user = userEvent.setup();
+    const fetchMock = mockFetch({
+      ordersResponses: [
+        {
+          PENDING: [order(1001, "PENDING"), order(1002, "PENDING")],
+          APPROVED: [],
+          DENIED: [],
+          COMPLETED: [],
+        },
+      ],
+    });
+
+    renderAt();
+    await screen.findByText("1001");
+
+    await user.click(within(rowFor(1001)).getByRole("checkbox", { name: /select order 1001/i }));
+    await user.click(screen.getByRole("button", { name: "Approve selected" }));
+    await user.click(within(rowFor(1002)).getByRole("checkbox", { name: /select order 1002/i }));
+    await user.click(screen.getByRole("button", { name: "Deny selected" }));
+
+    expect(await screen.findByText("2 decisions staged, not yet sent")).toBeInTheDocument();
+    const ordersCallsBeforeRefresh = fetchMock.mock.calls.filter(
+      ([url]) => url === "/api/admin/orders",
+    ).length;
+
+    await user.click(screen.getByRole("button", { name: "Refresh" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "Cancel — keep my changes" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const ordersCallsAfterCancel = fetchMock.mock.calls.filter(
+      ([url]) => url === "/api/admin/orders",
+    ).length;
+    expect(ordersCallsAfterCancel).toBe(ordersCallsBeforeRefresh);
+    expect(screen.getByText("2 decisions staged, not yet sent")).toBeInTheDocument();
+    expect(within(rowFor(1001)).getByRole("combobox")).toHaveValue("APPROVED");
+    expect(within(rowFor(1002)).getByRole("combobox")).toHaveValue("DENIED");
+  });
+
+  it("[SWHR3-C-0011] confirming the discard warning clears staging and reloads from the server", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ordersResponses: [
+        { PENDING: [order(1001, "PENDING")], APPROVED: [], DENIED: [], COMPLETED: [] },
+        { PENDING: [order(1001, "PENDING")], APPROVED: [], DENIED: [], COMPLETED: [] },
+      ],
+    });
+
+    renderAt();
+    await screen.findByText("1001");
+
+    await user.click(within(rowFor(1001)).getByRole("checkbox", { name: /select order 1001/i }));
+    await user.click(screen.getByRole("button", { name: "Approve selected" }));
+    expect(await screen.findByText("1 decision staged, not yet sent")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Refresh" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "Refresh anyway" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByText(/decision staged, not yet sent/)).not.toBeInTheDocument();
+    expect(within(rowFor(1001)).queryByText("Staged")).not.toBeInTheDocument();
   });
 
   it("redirects a signed-out visitor to /admin/signin instead of rendering the queue", async () => {

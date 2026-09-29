@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
 import { accounts, orders } from "../db/schema";
@@ -44,6 +44,14 @@ function insertOrder(
     .returning()
     .get();
 }
+
+// getOrdersGroupedByStatus and listOrdersByStatus scan every order in the
+// db (there is no per-account filter — an admin sees every order), so each
+// test starts from an empty orders table to stay independent of the others
+// sharing this file's in-memory db.
+beforeEach(() => {
+  db.delete(orders).run();
+});
 
 describe("accounts.role (C1)", () => {
   it("an account created without a role reads back as 'customer'", () => {

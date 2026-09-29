@@ -119,14 +119,14 @@
 
 ## 12. Supplier Order Creation
 
-- [ ] 12.1 Implement SupplierOrder creation via ejbCreate() (SWHR3-T-0139)
-- [ ] 12.2 Generate unique poId (purchase order identifier) (SWHR3-T-0139)
-- [ ] 12.3 Set poDate to current timestamp (SWHR3-T-0139)
-- [ ] 12.4 Initialize poStatus to "pending" (SWHR3-T-0139)
-- [ ] 12.5 Create associated ContactInfo in ejbPostCreate() (SWHR3-T-0139)
-- [ ] 12.6 Create associated Address for shipping (SWHR3-T-0139)
-- [ ] 12.7 Establish CMR relationships to ContactInfo (SWHR3-T-0139)
-- [ ] 12.8 Support cascading delete on order removal (SWHR3-T-0139)
+- [x] 12.1 Implement SupplierOrder creation via ejbCreate() (SWHR3-T-0139)
+- [x] 12.2 Generate unique poId (purchase order identifier) (SWHR3-T-0139)
+- [x] 12.3 Set poDate to current timestamp (SWHR3-T-0139)
+- [x] 12.4 Initialize poStatus to "pending" (SWHR3-T-0139)
+- [x] 12.5 Create associated ContactInfo in ejbPostCreate() (SWHR3-T-0139)
+- [x] 12.6 Create associated Address for shipping (SWHR3-T-0139)
+- [x] 12.7 Establish CMR relationships to ContactInfo (SWHR3-T-0139)
+- [x] 12.8 Support cascading delete on order removal (SWHR3-T-0139)
 
 ## 13. Inventory Display View
 

@@ -130,16 +130,16 @@
 
 ## 13. Inventory Display View
 
-- [ ] 13.1 Create displayinventory.jsp page (SWHR3-T-0140)
-- [ ] 13.2 Add authentication check for administrator role (SWHR3-T-0140)
-- [ ] 13.3 Render inventory table with itemId column (SWHR3-T-0140)
-- [ ] 13.4 Display current quantity for each item (SWHR3-T-0140)
-- [ ] 13.5 Create form with input fields for new quantities (SWHR3-T-0140)
-- [ ] 13.6 Name quantity input fields as qty_itemId pattern (SWHR3-T-0140)
-- [ ] 13.7 Add checkboxes to mark items for update (item_itemId) (SWHR3-T-0140)
-- [ ] 13.8 Implement "Update Inventory" submit button (SWHR3-T-0140)
-- [ ] 13.9 Display empty inventory message when no items exist (SWHR3-T-0140)
-- [ ] 13.10 Apply petstore styling to inventory display (SWHR3-T-0140)
+- [x] 13.1 Create displayinventory.jsp page (SWHR3-T-0140)
+- [x] 13.2 Add authentication check for administrator role (SWHR3-T-0140)
+- [x] 13.3 Render inventory table with itemId column (SWHR3-T-0140)
+- [x] 13.4 Display current quantity for each item (SWHR3-T-0140)
+- [x] 13.5 Create form with input fields for new quantities (SWHR3-T-0140)
+- [x] 13.6 Name quantity input fields as qty_itemId pattern (SWHR3-T-0140)
+- [x] 13.7 Add checkboxes to mark items for update (item_itemId) (SWHR3-T-0140)
+- [x] 13.8 Implement "Update Inventory" submit button (SWHR3-T-0140)
+- [x] 13.9 Display empty inventory message when no items exist (SWHR3-T-0140)
+- [x] 13.10 Apply petstore styling to inventory display (SWHR3-T-0140)
 
 ## 14. Form Submission Handler
 

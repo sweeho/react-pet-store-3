@@ -43,15 +43,16 @@ Every form is built from the same pieces, so later forms (checkout, admin) look 
 
 - **Field**: `FormField` stacks a `Label`, the control, optional helper text in `text-muted-foreground`, and an error line in `text-destructive`. The error is linked to the control with `aria-invalid` and `aria-describedby`, so a screen reader reads it with the field.
 - **Controls**: native elements styled with tokens only. `Input` and `Select` have a `border-input` border, `rounded-md` corners and a `--ring` focus outline. `Checkbox` pairs its box with a label and a one-line helper.
-- **Required and optional**: required is the default and is enforced by the browser (`required`, `maxLength`) before anything is sent. The one optional field is labelled "(optional)" rather than marking every required field.
+- **Required and optional**: required is the default. On a short form it is enforced by the browser (`required`, `maxLength`) before anything is sent. A long, multi-section form (checkout) sets `noValidate` and lets the server report every missing field in one response, because the browser stops at the first empty field and accepts whitespace. An optional field is labelled "(optional)" (on checkout, an "Optional" tag beside the label, per its mockup) rather than marking every required field.
 - **Two layers of errors**:
   - A problem with one field shows under that field, and the form keeps every value the user typed.
   - A problem with the whole submission (wrong credentials, a taken user name) shows as an `Alert` (`destructive`, `role="alert"`) above the fields it concerns: above both panels when it applies to the page, inside a panel when it applies only to that panel.
+  - When a long form is refused for several missing fields, a summary `Alert` above the first section counts them and lists each one as "<Section> · <Field>". Focus moves to it, and each field still shows its own message.
 - **Sensitive fields**: a failed sign-in clears the password and keeps the user name. A stored card number is never shown back; it appears as `•••• 1234`, and typing a new number replaces it.
 - **Read-only facts**: something the user cannot change, such as the user name after registration, is shown as text with a one-line explanation, not as a disabled input.
 - **Actions**: the primary action (`Button` default variant) ends the form on the right, with the secondary action (`outline`) beside it.
 
-Reference screens: the sign-in, create-account and account-profile mockups under `artifacts/SWHR3-S-0001/design/`.
+Reference screens: the sign-in, create-account and account-profile mockups under `artifacts/SWHR3-S-0001/design/`, and the checkout mockups under `artifacts/SWHR3-S-0006/design/`.
 
 ## Admin area
 

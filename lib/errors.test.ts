@@ -6,10 +6,12 @@ import {
   DuplicateEmailError,
   ForbiddenError,
   InvalidTransitionError,
+  MissingFormDataError,
   NotFoundError,
   ProfileExistsError,
   ServiceError,
   ServiceUnavailableError,
+  ShoppingCartEmptyError,
   ValidationError,
   toHttpError,
 } from "./errors";
@@ -62,6 +64,40 @@ describe("ServiceError subclasses", () => {
     expect(error.code).toBe("CATALOG_ITEM_NOT_FOUND");
     expect(error.message).toContain("EST-9");
     expect(toHttpError(error).data).toEqual({ code: "CATALOG_ITEM_NOT_FOUND" });
+  });
+
+  it("[SWHR3-C-0128] MissingFormDataError maps to a 422 with the missing list", () => {
+    const error = new MissingFormDataError({ city_a: "Enter a city.", zip_a: "Enter a ZIP." }, [
+      "city_a",
+      "zip_a",
+    ]);
+    expect(error).toBeInstanceOf(ValidationError);
+    expect(error.missingFields).toEqual(["city_a", "zip_a"]);
+
+    const http = toHttpError(new MissingFormDataError({ city_a: "Enter a city." }, ["city_a"]));
+    expect(http.status).toBe(422);
+    expect(http.data).toEqual({
+      code: "VALIDATION_FAILED",
+      fieldErrors: { city_a: "Enter a city." },
+      missingFields: ["city_a"],
+    });
+  });
+
+  it("a plain ValidationError still carries no missingFields", () => {
+    expect(toHttpError(new ValidationError({ a: "x" })).data).toEqual({
+      code: "VALIDATION_FAILED",
+      fieldErrors: { a: "x" },
+    });
+  });
+
+  it("ShoppingCartEmptyError is a 409 SHOPPING_CART_EMPTY", () => {
+    const error = new ShoppingCartEmptyError();
+    expect(error.status).toBe(409);
+    expect(error.code).toBe("SHOPPING_CART_EMPTY");
+    expect(error.message).toBe("Shopping cart is empty");
+    const http = toHttpError(error);
+    expect(http.status).toBe(409);
+    expect(http.data).toEqual({ code: "SHOPPING_CART_EMPTY" });
   });
 
   it("ServiceUnavailableError is a 503 SERVICE_UNAVAILABLE (AC-3)", () => {

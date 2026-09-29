@@ -9,19 +9,23 @@ export interface ApiErrorInit {
   message: string;
   code?: string;
   fieldErrors?: Record<string, string>;
+  /** Request field names the server found missing, in field order (checkout 422). */
+  missingFields?: string[];
 }
 
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
   readonly fieldErrors?: Record<string, string>;
+  readonly missingFields?: string[];
 
-  constructor({ status, message, code, fieldErrors }: ApiErrorInit) {
+  constructor({ status, message, code, fieldErrors, missingFields }: ApiErrorInit) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.fieldErrors = fieldErrors;
+    this.missingFields = missingFields;
   }
 }
 
@@ -34,6 +38,7 @@ interface ErrorBody {
   data?: {
     code?: string;
     fieldErrors?: Record<string, string>;
+    missingFields?: string[];
   };
 }
 
@@ -45,6 +50,7 @@ async function toApiError(response: Response): Promise<ApiError> {
     message: body.message || response.statusText || "Request failed",
     code: body.data?.code,
     fieldErrors: body.data?.fieldErrors,
+    missingFields: body.data?.missingFields,
   });
 }
 

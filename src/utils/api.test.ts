@@ -62,6 +62,31 @@ describe("apiFetch", () => {
     });
   });
 
+  it("carries the server's missingFields list on the ApiError (checkout 422)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            message: "Validation failed",
+            data: {
+              code: "VALIDATION_FAILED",
+              fieldErrors: { city_a: "Enter a city." },
+              missingFields: ["city_a"],
+            },
+          }),
+          { status: 422, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+
+    await expect(apiFetch("/api/orders", { method: "POST", body: {} })).rejects.toMatchObject({
+      status: 422,
+      fieldErrors: { city_a: "Enter a city." },
+      missingFields: ["city_a"],
+    });
+  });
+
   it("throws an ApiError with a fallback message for a non-JSON error body", async () => {
     vi.stubGlobal(
       "fetch",

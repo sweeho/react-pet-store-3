@@ -70,6 +70,26 @@ export class ValidationError extends ServiceError {
   }
 }
 
+// design.md C5/D9: a checkout form with required fields missing. The list
+// keeps submission order and reaches the client beside fieldErrors.
+export class MissingFormDataError extends ValidationError {
+  readonly missingFields: string[];
+
+  constructor(fieldErrors: Record<string, string>, missingFields: string[]) {
+    super(fieldErrors);
+    this.name = "MissingFormDataError";
+    this.missingFields = missingFields;
+  }
+}
+
+// design.md C5/D9: checkout attempted with an empty cart.
+export class ShoppingCartEmptyError extends ServiceError {
+  constructor() {
+    super("SHOPPING_CART_EMPTY", "Shopping cart is empty", 409);
+    this.name = "ShoppingCartEmptyError";
+  }
+}
+
 export class ServiceUnavailableError extends ServiceError {
   constructor(message = "Service unavailable") {
     super("SERVICE_UNAVAILABLE", message, 503);
@@ -95,6 +115,20 @@ export class ForbiddenError extends ServiceError {
   }
 }
 
+function errorData(error: ServiceError): Record<string, unknown> {
+  if (error instanceof MissingFormDataError) {
+    return {
+      code: error.code,
+      fieldErrors: error.fieldErrors,
+      missingFields: error.missingFields,
+    };
+  }
+  if (error instanceof ValidationError) {
+    return { code: error.code, fieldErrors: error.fieldErrors };
+  }
+  return { code: error.code };
+}
+
 /**
  * Converts any thrown value into a safe h3 HTTP error. A ServiceError maps
  * to its own status/code (plus fieldErrors for a ValidationError); an
@@ -111,10 +145,7 @@ export function toHttpError(error: unknown): HTTPError {
     return createError({
       status: error.status,
       message: error.message,
-      data:
-        error instanceof ValidationError
-          ? { code: error.code, fieldErrors: error.fieldErrors }
-          : { code: error.code },
+      data: errorData(error),
     });
   }
 

@@ -4,4 +4,8 @@
  * lib/protected-resources.ts's PROTECTED_API_PATHS shape — the client
  * cannot import from lib/ (D13).
  */
-export const PROTECTED_PAGE_PATHS = Object.freeze(["/users/profile", "/users/create"] as const);
+export const PROTECTED_PAGE_PATHS = Object.freeze([
+  "/users/profile",
+  "/users/create",
+  "/checkout",
+] as const);

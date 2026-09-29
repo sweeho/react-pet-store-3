@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;background:#f4f4f5;color:#3f3f46}
+  .nav{background:#fff;border-bottom:1px solid #e4e4e7;padding:10px 16px;display:flex;align-items:center;gap:14px}
+  .logo{width:92px;height:22px;background:#d4d4d8;border:1px solid #c4c4c8;border-radius:4px;font-size:9px;color:#52525b;display:flex;align-items:center;justify-content:center}
+  .navlinks{display:flex;gap:10px;flex:1}
+  .navlink{height:9px;width:46px;background:#d4d4d8;border-radius:2px}
+  .searchbox{width:120px;height:24px;border:1px solid #d4d4d8;border-radius:6px;background:#fafafa;font-size:10px;color:#a1a1aa;padding:5px 8px}
+  .cart{height:24px;padding:0 10px;border:1px solid #d4d4d8;border-radius:6px;display:flex;align-items:center;font-size:10px;color:#52525b}
+  .page{max-width:688px;margin:0 auto;padding:16px}
+  h1{font-size:19px;color:#27272a;font-weight:600}
+  .alert{margin-top:12px;border:1px solid #a1a1aa;border-left:4px solid #52525b;background:#fff;border-radius:8px;padding:10px 12px}
+  .alert h3{font-size:12px;color:#27272a;font-weight:600;margin-bottom:5px}
+  .alert ul{margin:0 0 0 15px;font-size:11px;color:#52525b}
+  .alert li{margin-bottom:2px}
+  .card{background:#fff;border:1px solid #e4e4e7;border-radius:8px;padding:12px;margin-bottom:12px}
+  .card h2{font-size:13px;color:#27272a;font-weight:600;margin-bottom:9px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+  .full{grid-column:1 / -1}
+  label{display:block;font-size:10px;color:#71717a;margin-bottom:3px}
+  .in{height:26px;border:1px solid #d4d4d8;border-radius:6px;background:#fafafa;display:flex;align-items:center;padding:0 7px}
+  .in.err{border:1.5px solid #52525b;background:#fff}
+  .val{height:7px;background:#d4d4d8;border-radius:2px;width:70%}
+  .val.s{width:40%}.val.l{width:88%}
+  .errmsg{font-size:9px;color:#3f3f46;margin-top:3px}
+  .sel{height:26px;border:1px solid #d4d4d8;border-radius:6px;background:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 7px;font-size:10px;color:#52525b}
+  .caret{color:#a1a1aa;font-size:9px}
+  .opt{font-size:9px;color:#a1a1aa}
+  .collapsed{display:flex;align-items:center;justify-content:space-between}
+  .bars{flex:1}
+  .bar{height:7px;background:#e4e4e7;border-radius:2px;margin:5px 0;width:92%}
+  .bar.s{width:60%}
+  .tag{font-size:9px;color:#71717a;border:1px solid #e4e4e7;border-radius:10px;padding:2px 7px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 10px}
+  .btn{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;padding:0 16px}
+  .primary{background:#3f3f46;color:#fff}
+  .outline{border:1px solid #d4d4d8;background:#fff;color:#52525b}
+  .actions{display:flex;gap:8px;justify-content:flex-end}
+</style></head>
+<body>
+  <div class="nav">
+    <div class="logo">Pet Store</div>
+    <div class="navlinks"><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div></div>
+    <div class="searchbox">Search</div>
+    <div class="cart">Cart (3)</div>
+  </div>
+
+  <div class="page">
+    <h1>Checkout</h1>
+
+    <div class="alert">
+      <h3>Your order was not submitted — 3 required fields are missing</h3>
+      <ul>
+        <li>Billing address — City</li>
+        <li>Billing address — Postal code</li>
+        <li>Shipping address — Telephone</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Billing address</h2>
+      <div class="grid">
+        <div><label>Given name *</label><div class="in"><div class="val"></div></div></div>
+        <div><label>Family name *</label><div class="in"><div class="val"></div></div></div>
+        <div class="full"><label>Address line 1 *</label><div class="in"><div class="val l"></div></div></div>
+        <div class="full"><label>Address line 2 <span class="opt">(optional — left blank, accepted)</span></label><div class="in"></div></div>
+        <div><label>City *</label><div class="in err"></div><div class="errmsg">City is required</div></div>
+        <div><label>State / Province *</label><div class="in"><div class="val s"></div></div></div>
+        <div><label>Postal code *</label><div class="in err"></div><div class="errmsg">Postal code is required (spaces only is not a value)</div></div>
+        <div><label>Country *</label><div class="sel"><span>United States</span><span class="caret">▾</span></div></div>
+        <div><label>Telephone *</label><div class="in"><div class="val"></div></div></div>
+        <div><label>Email *</label><div class="in"><div class="val l"></div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Shipping address</h2>
+      <div class="grid">
+        <div><label>Telephone *</label><div class="in err"></div><div class="errmsg">Telephone is required</div></div>
+        <div><label>Email *</label><div class="in"><div class="val l"></div></div></div>
+      </div>
+      <div class="collapsed" style="margin-top:9px">
+        <div class="bars"><div class="bar"></div><div class="bar s"></div></div>
+        <div class="tag">other shipping fields — entered</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Payment</h2>
+      <div class="grid">
+        <div class="full"><label>Card number *</label><div class="in"><div class="val l"></div></div></div>
+        <div class="full"><label>Card type *</label><div class="sel"><span>Java Card</span><span class="caret">▾</span></div></div>
+      </div>
+      <div class="row3" style="margin-top:8px">
+        <div><label>Expiry month *</label><div class="sel"><span>03</span><span class="caret">▾</span></div></div>
+        <div><label>Expiry year *</label><div class="sel"><span>2027</span><span class="caret">▾</span></div></div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="btn outline">Back to cart</div>
+      <div class="btn primary">Submit order</div>
+    </div>
+  </div>
+</body>
+</html>

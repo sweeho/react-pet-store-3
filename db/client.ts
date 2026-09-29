@@ -12,6 +12,7 @@ import {
   creditCards,
   customers,
   lineItems,
+  orderContacts,
   orders,
   users,
 } from "./schema";
@@ -57,6 +58,7 @@ export const db = drizzle(sqlite, {
     catalogItems,
     catalogItemDetails,
     lineItems,
+    orderContacts,
   },
 });
 

@@ -109,13 +109,13 @@
 
 ## 11. Invoice Generation
 
-- [ ] 11.1 Create invoice generation system (SWHR3-T-0138)
-- [ ] 11.2 Trigger invoice on order status change to "completed" (SWHR3-T-0138)
-- [ ] 11.3 Include order details in invoice (order ID, items, quantities) (SWHR3-T-0138)
-- [ ] 11.4 Include supplier/receiver contact information (SWHR3-T-0138)
-- [ ] 11.5 Calculate totals (quantity × unit price per line) (SWHR3-T-0138)
-- [ ] 11.6 Store generated invoices (SWHR3-T-0138)
-- [ ] 11.7 Handle invoice generation errors (SWHR3-T-0138)
+- [x] 11.1 Create invoice generation system (SWHR3-T-0138)
+- [x] 11.2 Trigger invoice on order status change to "completed" (SWHR3-T-0138)
+- [x] 11.3 Include order details in invoice (order ID, items, quantities) (SWHR3-T-0138)
+- [x] 11.4 Include supplier/receiver contact information (SWHR3-T-0138)
+- [x] 11.5 Calculate totals (quantity × unit price per line) (SWHR3-T-0138)
+- [x] 11.6 Store generated invoices (SWHR3-T-0138)
+- [x] 11.7 Handle invoice generation errors (SWHR3-T-0138)
 
 ## 12. Supplier Order Creation
 

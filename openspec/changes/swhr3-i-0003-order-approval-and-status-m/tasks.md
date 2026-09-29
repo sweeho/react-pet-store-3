@@ -92,11 +92,11 @@
 
 ## 12. Testing and Validation
 
-- [ ] 12.1 Unit test OrderApproval value object serialization (SWHR3-T-0047)
-- [ ] 12.2 Unit test ChangedOrder creation and status validation (SWHR3-T-0047)
-- [ ] 12.3 Integration test order update workflow end-to-end (SWHR3-T-0047)
-- [ ] 12.4 Test batch update with multiple orders (SWHR3-T-0047)
-- [ ] 12.5 Test uncommitted changes detection and confirmation dialog (SWHR3-T-0047)
-- [ ] 12.6 Test session timeout and authentication error handling (SWHR3-T-0047)
-- [ ] 12.7 Test XML parsing for malformed order approval messages (SWHR3-T-0047)
-- [ ] 12.8 Test transaction rollback on partial failure (SWHR3-T-0047)
+- [x] 12.1 Unit test OrderApproval value object serialization (SWHR3-T-0047)
+- [x] 12.2 Unit test ChangedOrder creation and status validation (SWHR3-T-0047)
+- [x] 12.3 Integration test order update workflow end-to-end (SWHR3-T-0047)
+- [x] 12.4 Test batch update with multiple orders (SWHR3-T-0047)
+- [x] 12.5 Test uncommitted changes detection and confirmation dialog (SWHR3-T-0047)
+- [x] 12.6 Test session timeout and authentication error handling (SWHR3-T-0047)
+- [x] 12.7 Test XML parsing for malformed order approval messages (SWHR3-T-0047)
+- [x] 12.8 Test transaction rollback on partial failure (SWHR3-T-0047)

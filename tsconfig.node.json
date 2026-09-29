@@ -23,6 +23,7 @@
     "lib",
     "e2e",
     "src/constants/auth.ts",
+    "src/constants/order-status.ts",
     "src/types/customer-profile.ts"
   ]
 }

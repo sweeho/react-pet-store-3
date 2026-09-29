@@ -70,6 +70,24 @@ export class ServiceUnavailableError extends ServiceError {
   }
 }
 
+// design.md D2/C7: thrown by lib/order-status.ts's assertTransition for any
+// pair other than PENDING -> APPROVED / PENDING -> DENIED.
+export class InvalidTransitionError extends ServiceError {
+  constructor(orderId: number, status: string) {
+    super("INVALID_TRANSITION", `Order ${orderId} is ${status} and cannot be transitioned`, 409);
+    this.name = "InvalidTransitionError";
+  }
+}
+
+// design.md D4/C7: thrown by an admin route when the signed-in account's
+// role is not "admin".
+export class ForbiddenError extends ServiceError {
+  constructor(message = "Administrator credentials required") {
+    super("FORBIDDEN", message, 403);
+    this.name = "ForbiddenError";
+  }
+}
+
 /**
  * Converts any thrown value into a safe h3 HTTP error. A ServiceError maps
  * to its own status/code (plus fieldErrors for a ValidationError); an

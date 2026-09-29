@@ -16,6 +16,7 @@ import { apiFetch } from "@/utils/api";
 export interface SessionUser {
   id: number;
   username: string;
+  role: "customer" | "admin";
 }
 
 interface SessionResponse {

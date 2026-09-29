@@ -1,9 +1,9 @@
 ## 1. Order Validation
 
-- [ ] 1.1 Implement cart validation (must not be empty) before order creation (SWHR3-T-0109)
-- [ ] 1.2 Implement customer authentication and session validation (SWHR3-T-0109)
-- [ ] 1.3 Validate billing and shipping address completeness (SWHR3-T-0109)
-- [ ] 1.4 Validate credit card information present (SWHR3-T-0109)
+- [x] 1.1 Implement cart validation (must not be empty) before order creation (SWHR3-T-0109)
+- [x] 1.2 Implement customer authentication and session validation (SWHR3-T-0109)
+- [x] 1.3 Validate billing and shipping address completeness (SWHR3-T-0109)
+- [x] 1.4 Validate credit card information present (SWHR3-T-0109)
 
 ## 2. Order Creation
 

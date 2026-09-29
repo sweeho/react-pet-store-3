@@ -53,14 +53,14 @@
 
 ## 6. Inventory Management
 
-- [ ] 6.1 Create InventoryLocal interface for inventory access (SWHR3-T-0133)
-- [ ] 6.2 Implement findByPrimaryKey(itemId) for item retrieval (SWHR3-T-0133)
-- [ ] 6.3 Implement getQuantity() method for inventory levels (SWHR3-T-0133)
-- [ ] 6.4 Implement updateQuantity(itemId, newQuantity) for updates (SWHR3-T-0133)
-- [ ] 6.5 Create DisplayInventoryBean for inventory display (SWHR3-T-0133)
-- [ ] 6.6 Implement getInventory() method returning all items (SWHR3-T-0133)
-- [ ] 6.7 Support real-time quantity lookup (SWHR3-T-0133)
-- [ ] 6.8 Test inventory retrieval and updates (SWHR3-T-0133)
+- [x] 6.1 Create InventoryLocal interface for inventory access (SWHR3-T-0133)
+- [x] 6.2 Implement findByPrimaryKey(itemId) for item retrieval (SWHR3-T-0133)
+- [x] 6.3 Implement getQuantity() method for inventory levels (SWHR3-T-0133)
+- [x] 6.4 Implement updateQuantity(itemId, newQuantity) for updates (SWHR3-T-0133)
+- [x] 6.5 Create DisplayInventoryBean for inventory display (SWHR3-T-0133)
+- [x] 6.6 Implement getInventory() method returning all items (SWHR3-T-0133)
+- [x] 6.7 Support real-time quantity lookup (SWHR3-T-0133)
+- [x] 6.8 Test inventory retrieval and updates (SWHR3-T-0133)
 
 ## 7. Request Processing Servlet
 

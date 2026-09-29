@@ -4,8 +4,19 @@
  * is a prefix rule in middleware/auth.ts (D4) owned by another ticket —
  * this handler does not itself check the caller's role.
  */
-import { defineHandler } from "nitro/h3";
+import { defineHandler, readBody } from "nitro/h3";
 
-export default defineHandler(() => {
-  throw new Error("VortexNotImplemented");
+import { toHttpError } from "../../../../lib/errors";
+import { updateOrders } from "../../../../lib/order-approval";
+import { parseOrderApprovalRequest } from "../../../../lib/order-approval-request";
+
+export default defineHandler(async (event) => {
+  try {
+    const body = await readBody(event);
+    const approval = parseOrderApprovalRequest(body);
+    const { updated } = updateOrders(approval);
+    return { type: "UPDATEORDERS", status: "SUCCESS", updated };
+  } catch (error) {
+    throw toHttpError(error);
+  }
 });

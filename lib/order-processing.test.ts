@@ -15,7 +15,7 @@ import {
 import { getDetails } from "./cart";
 import type { ContactInfo } from "./contact-info";
 import { createCreditCard } from "./credit-card";
-import { PaymentDeclinedError } from "./errors";
+import { PaymentDeclinedError, ShoppingCartEmptyError } from "./errors";
 import { processOrder } from "./order-processing";
 import type { PaymentAuthorizer } from "./payment";
 import { withTransaction } from "./transaction";
@@ -200,5 +200,49 @@ describe("processOrder", () => {
 
     expect(orderCount()).toBe(before);
     expect(getDetails(token)).toEqual({ "OP-1": 2, "OP-2": 1 });
+  });
+
+  it("logs a decline as a warning naming the account, with no card data", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    expect(() => run(fillCart(), DECLINED_EVENT)).toThrow(PaymentDeclinedError);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith(`order-workflow: payment declined for account ${accountId}`);
+    expect(warn.mock.calls.flat().join(" ")).not.toMatch(/4000|0002/);
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("logs an unexpected failure with the order context and rethrows it", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const boom = new Error("processor unreachable");
+    const authorizer: PaymentAuthorizer = {
+      authorize: () => {
+        throw boom;
+      },
+    };
+    const token = fillCart();
+    const before = orderCount();
+
+    expect(() => run(token, EVENT, authorizer)).toThrow(boom);
+
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain(`account ${accountId}`);
+    expect(error.mock.calls[0]).toContain(boom);
+    expect(warn).not.toHaveBeenCalled();
+    expect(orderCount()).toBe(before);
+    expect(getDetails(token)).toEqual({ "OP-1": 2, "OP-2": 1 });
+  });
+
+  it("does not log an empty cart as a workflow failure", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    expect(() => run(randomUUID())).toThrow(ShoppingCartEmptyError);
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
   });
 });

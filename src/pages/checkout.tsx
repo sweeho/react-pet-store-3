@@ -78,6 +78,7 @@ export default function Checkout() {
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitFailed, setSubmitFailed] = useState(false);
+  const [declinedMessage, setDeclinedMessage] = useState<string | null>(null);
   const [refusal, setRefusal] = useState<{
     fieldErrors: Record<string, string>;
     missingFields: string[];
@@ -137,6 +138,7 @@ export default function Checkout() {
     }
     setSubmitting(true);
     setSubmitFailed(false);
+    setDeclinedMessage(null);
     setRefusal(null);
     placeOrder(fields)
       .then((placed) => navigate(ORDER_CONFIRMATION_PATH(placed.orderId)))
@@ -147,6 +149,9 @@ export default function Checkout() {
             fieldErrors: error.fieldErrors ?? {},
             missingFields: error.missingFields ?? [],
           });
+        } else if (error instanceof ApiError && error.code === "PAYMENT_DECLINED") {
+          // Whole-submission error: nothing was placed and every value is kept (D2).
+          setDeclinedMessage(error.message);
         } else if (error instanceof ApiError && error.code === "SHOPPING_CART_EMPTY") {
           setOrderRefusedEmpty(true);
         } else {
@@ -178,6 +183,14 @@ export default function Checkout() {
               missingFields={refusal.missingFields}
               fieldErrors={refusal.fieldErrors}
             />
+          )}
+          {declinedMessage !== null && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                <p className="font-medium">{declinedMessage}</p>
+                <p>Check your card details or use another card.</p>
+              </AlertDescription>
+            </Alert>
           )}
           {submitFailed && (
             <Alert variant="destructive">

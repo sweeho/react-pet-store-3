@@ -113,14 +113,14 @@
 
 ## 12. Order Confirmation
 
-- [ ] 12.1 Create order_confirmation.jsp page (SWHR3-T-0094)
-- [ ] 12.2 Display order ID and confirmation number (SWHR3-T-0094)
-- [ ] 12.3 Display order date (SWHR3-T-0094)
-- [ ] 12.4 Display billing address details (SWHR3-T-0094)
-- [ ] 12.5 Display shipping address details (SWHR3-T-0094)
-- [ ] 12.6 Display order line items with quantities and prices (SWHR3-T-0094)
-- [ ] 12.7 Display order total and payment method (SWHR3-T-0094)
-- [ ] 12.8 Add link to email address for order confirmation (SWHR3-T-0094)
+- [x] 12.1 Create order_confirmation.jsp page (SWHR3-T-0094)
+- [x] 12.2 Display order ID and confirmation number (SWHR3-T-0094)
+- [x] 12.3 Display order date (SWHR3-T-0094)
+- [x] 12.4 Display billing address details (SWHR3-T-0094)
+- [x] 12.5 Display shipping address details (SWHR3-T-0094)
+- [x] 12.6 Display order line items with quantities and prices (SWHR3-T-0094)
+- [x] 12.7 Display order total and payment method (SWHR3-T-0094)
+- [x] 12.8 Add link to email address for order confirmation (SWHR3-T-0094)
 
 ## 13. Struts Configuration
 

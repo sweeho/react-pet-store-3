@@ -59,3 +59,10 @@ export function addItem(
       .run();
   }, outer);
 }
+
+export function deleteItem(sessionToken: string | undefined, itemId: string, outer?: DbOrTx): void {
+  void sessionToken;
+  void itemId;
+  void outer;
+  throw new Error("VortexNotImplemented");
+}

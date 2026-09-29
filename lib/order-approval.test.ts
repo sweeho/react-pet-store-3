@@ -2,7 +2,15 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
-import { accounts, orders } from "../db/schema";
+import {
+  accounts,
+  catalogItems,
+  inventory,
+  inventoryReservations,
+  lineItems,
+  orders,
+} from "../db/schema";
+import { setInventory } from "./inventory";
 import { InvalidTransitionError, NotFoundError } from "./errors";
 import { updateOrders } from "./order-approval";
 import type { OrderStatus } from "./order-status";
@@ -146,5 +154,93 @@ describe("updateOrders", () => {
     expect(infoSpy).not.toHaveBeenCalled();
 
     infoSpy.mockRestore();
+  });
+});
+
+describe("updateOrders allocation hook (design.md D5, D8)", () => {
+  function confirmedOrder(username: string, lines: Array<[string, number]>) {
+    const account = makeAccount(username);
+    const order = db
+      .insert(orders)
+      .values({
+        accountId: account.id,
+        customerName: "Alice Anderson",
+        orderDate: new Date("2026-01-01T00:00:00.000Z"),
+        totalCents: 1999,
+        workflowStage: "CONFIRMED",
+      })
+      .returning()
+      .get();
+    lines.forEach(([itemId, quantity], i) => {
+      db.insert(catalogItems)
+        .values({ itemId, productId: "P-1", category: "FISH", unitCostCents: 100 })
+        .onConflictDoNothing()
+        .run();
+      db.insert(lineItems)
+        .values({
+          orderId: order.id,
+          lineNumber: i + 1,
+          categoryId: "FISH",
+          productId: "P-1",
+          itemId,
+          quantity,
+          unitPriceCents: 100,
+        })
+        .run();
+    });
+    return order;
+  }
+
+  const stage = (id: number) =>
+    db.select().from(orders).where(eq(orders.id, id)).get()?.workflowStage;
+  const stock = (itemId: string) =>
+    db.select().from(inventory).where(eq(inventory.itemId, itemId)).get()?.quantity;
+
+  it("[SWHR3-C-0172] approval reserves stock and decrements inventory", () => {
+    const order = confirmedOrder("alloc-approve", [
+      ["EST-1", 2],
+      ["EST-2", 1],
+    ]);
+    setInventory("EST-1", 5);
+    setInventory("EST-2", 3);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    updateOrders({ changes: [{ orderId: order.id, status: "APPROVED" }] });
+
+    expect(stock("EST-1")).toBe(3);
+    expect(stock("EST-2")).toBe(2);
+    const reservations = db
+      .select()
+      .from(inventoryReservations)
+      .where(eq(inventoryReservations.orderId, order.id))
+      .all();
+    expect(reservations.map((r) => [r.itemId, r.quantity]).sort()).toEqual([
+      ["EST-1", 2],
+      ["EST-2", 1],
+    ]);
+    expect(stage(order.id)).toBe("ALLOCATED");
+  });
+
+  it("an unstocked approval still commits and waits at CONFIRMED", () => {
+    const order = confirmedOrder("alloc-wait", [["EST-NOSTOCK", 1]]);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    expect(updateOrders({ changes: [{ orderId: order.id, status: "APPROVED" }] })).toEqual({
+      updated: 1,
+    });
+
+    expect(db.select().from(orders).where(eq(orders.id, order.id)).get()?.status).toBe("APPROVED");
+    expect(stage(order.id)).toBe("CONFIRMED");
+  });
+
+  it("a denied order is never allocated", () => {
+    const order = confirmedOrder("alloc-deny", [["EST-DENY", 1]]);
+    setInventory("EST-DENY", 5);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    updateOrders({ changes: [{ orderId: order.id, status: "DENIED" }] });
+
+    expect(stock("EST-DENY")).toBe(5);
+    expect(stage(order.id)).toBe("CONFIRMED");
   });
 });

@@ -44,18 +44,18 @@
 
 ## 5. EJB Order Processing
 
-- [ ] 5.1 Create OrderEJBAction for stateless order processing (SWHR3-T-0087)
-- [ ] 5.2 Implement ejbCreate() with required transaction attributes (CMT Required) (SWHR3-T-0087)
-- [ ] 5.3 Implement perform(OrderEvent) method (SWHR3-T-0087)
-- [ ] 5.4 Retrieve shopping cart from customer session via ShoppingClientFacade (SWHR3-T-0087)
-- [ ] 5.5 Validate cart is not empty (check items.size() > 0) (SWHR3-T-0087)
-- [ ] 5.6 Throw ShoppingCartEmptyOrderException if cart validation fails (SWHR3-T-0087)
-- [ ] 5.7 Retrieve customer ID from ShoppingClientFacade.getUserId() (SWHR3-T-0087)
-- [ ] 5.8 Generate unique order ID via UniqueIdGenerator.getUniqueId("1001") (SWHR3-T-0087)
-- [ ] 5.9 Create PurchaseOrder with order ID, current date, customer ID (SWHR3-T-0087)
-- [ ] 5.10 Set billing and shipping ContactInfo from order event (SWHR3-T-0087)
-- [ ] 5.11 Set credit card payment method (SWHR3-T-0087)
-- [ ] 5.12 Persist order via entity bean home interface (SWHR3-T-0087)
+- [x] 5.1 Create OrderEJBAction for stateless order processing (SWHR3-T-0087)
+- [x] 5.2 Implement ejbCreate() with required transaction attributes (CMT Required) (SWHR3-T-0087)
+- [x] 5.3 Implement perform(OrderEvent) method (SWHR3-T-0087)
+- [x] 5.4 Retrieve shopping cart from customer session via ShoppingClientFacade (SWHR3-T-0087)
+- [x] 5.5 Validate cart is not empty (check items.size() > 0) (SWHR3-T-0087)
+- [x] 5.6 Throw ShoppingCartEmptyOrderException if cart validation fails (SWHR3-T-0087)
+- [x] 5.7 Retrieve customer ID from ShoppingClientFacade.getUserId() (SWHR3-T-0087)
+- [x] 5.8 Generate unique order ID via UniqueIdGenerator.getUniqueId("1001") (SWHR3-T-0087)
+- [x] 5.9 Create PurchaseOrder with order ID, current date, customer ID (SWHR3-T-0087)
+- [x] 5.10 Set billing and shipping ContactInfo from order event (SWHR3-T-0087)
+- [x] 5.11 Set credit card payment method (SWHR3-T-0087)
+- [x] 5.12 Persist order via entity bean home interface (SWHR3-T-0087)
 
 ## 6. Order ID Generation
 

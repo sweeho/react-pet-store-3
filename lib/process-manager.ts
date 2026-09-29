@@ -3,12 +3,12 @@
  * order or leaves it waiting at CONFIRMED, retries waiting orders, and
  * completes an order once every supplier PO has shipped.
  */
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { lineItems, orders, supplierPurchaseOrders } from "../db/schema";
-import { reserveInventory } from "./inventory";
 import { NotFoundError } from "./errors";
 import { completeOrder } from "./orders";
+import { fulfilSupplierOrder, processPendingSupplierOrders } from "./supplier-fulfilment";
 import { createSupplierPOs, markPoShipped } from "./supplier-pos";
 import { type DbOrTx, withTransaction } from "./transaction";
 import { setWorkflowStage } from "./workflow-stage";
@@ -16,9 +16,11 @@ import { setWorkflowStage } from "./workflow-stage";
 export type AllocationResult = "ALLOCATED" | "WAITING" | "SKIPPED";
 
 /**
- * SKIPPED unless the order is APPROVED and at CONFIRMED. Otherwise reserves
- * stock; when covered, creates the supplier POs and moves to ALLOCATED, and
- * when not, returns WAITING having written nothing.
+ * SKIPPED unless the order is APPROVED and at CONFIRMED. Otherwise creates
+ * the order's supplier POs as PENDING (with delivery contact and address) and
+ * tries to fulfil each (design.md D3, supplier-portal-and-inventory). ALLOCATED
+ * when the order reached that stage; WAITING when stock was short, leaving the
+ * order at CONFIRMED with its PENDING PO and nothing deducted.
  */
 export function allocateOrder(tx: DbOrTx, orderId: number): AllocationResult {
   const order = tx.select().from(orders).where(eq(orders.id, orderId)).get();
@@ -32,37 +34,20 @@ export function allocateOrder(tx: DbOrTx, orderId: number): AllocationResult {
     .where(eq(lineItems.orderId, orderId))
     .orderBy(asc(lineItems.lineNumber))
     .all();
-  if (!reserveInventory(tx, orderId, lines)) {
-    return "WAITING";
+
+  for (const poId of createSupplierPOs(tx, orderId, lines)) {
+    fulfilSupplierOrder(tx, poId);
   }
 
-  // Stock is already reserved above, so the POs start PROCESSING (C12) until allocation is rewritten.
-  createSupplierPOs(tx, orderId, lines, new Date(), { status: "PROCESSING" });
-  setWorkflowStage(tx, orderId, "ALLOCATED");
-  return "ALLOCATED";
+  const after = tx.select().from(orders).where(eq(orders.id, orderId)).get();
+  return after?.workflowStage === "ALLOCATED" ? "ALLOCATED" : "WAITING";
 }
 
-/** Re-runs allocation for every APPROVED order still at CONFIRMED; returns how many were allocated. */
+/** Retries every PENDING supplier PO in one immediate transaction; returns how many were fulfilled. */
 export function retryWaitingAllocations(): number {
-  const candidates = withTransaction((tx) =>
-    tx
-      .select({ id: orders.id })
-      .from(orders)
-      .where(and(eq(orders.status, "APPROVED"), eq(orders.workflowStage, "CONFIRMED")))
-      .orderBy(asc(orders.id))
-      .all(),
-  );
-
-  let allocated = 0;
-  for (const { id } of candidates) {
-    const result = withTransaction((tx) => allocateOrder(tx, id), undefined, {
-      behavior: "immediate",
-    });
-    if (result === "ALLOCATED") {
-      allocated += 1;
-    }
-  }
-  return allocated;
+  return withTransaction((tx) => processPendingSupplierOrders(tx).fulfilled, undefined, {
+    behavior: "immediate",
+  });
 }
 
 /**

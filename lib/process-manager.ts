@@ -5,13 +5,11 @@
  */
 import { asc, eq } from "drizzle-orm";
 
-import { lineItems, orders, supplierPurchaseOrders } from "../db/schema";
-import { NotFoundError } from "./errors";
-import { completeOrder } from "./orders";
+import { lineItems, orders } from "../db/schema";
+import { generateInvoice, receiveInvoice } from "./invoices";
 import { fulfilSupplierOrder, processPendingSupplierOrders } from "./supplier-fulfilment";
 import { createSupplierPOs, markPoShipped } from "./supplier-pos";
 import { type DbOrTx, withTransaction } from "./transaction";
-import { setWorkflowStage } from "./workflow-stage";
 
 export type AllocationResult = "ALLOCATED" | "WAITING" | "SKIPPED";
 
@@ -51,38 +49,21 @@ export function retryWaitingAllocations(): number {
 }
 
 /**
- * Marks the PO shipped with its tracking number. When every PO of the order
- * has shipped, the stage becomes SHIPPED and the status COMPLETED.
+ * Ships a PO in one immediate transaction: marks it COMPLETED with its
+ * tracking number, generates its invoice, and delivers the invoice to the
+ * order side, which records shipped quantities and completes the order once
+ * every PO is done (design.md D9, supplier-portal-and-inventory).
  */
 export function recordShipment(
   supplierPoId: number,
   trackingNumber: string,
-): { orderCompleted: boolean } {
+): { orderCompleted: boolean; invoiceId: number } {
   return withTransaction(
     (tx) => {
-      const po = tx
-        .select()
-        .from(supplierPurchaseOrders)
-        .where(eq(supplierPurchaseOrders.id, supplierPoId))
-        .get();
-      if (!po) {
-        throw new NotFoundError(`Supplier PO ${supplierPoId} not found`);
-      }
-
       markPoShipped(tx, supplierPoId, trackingNumber);
-
-      const all = tx
-        .select()
-        .from(supplierPurchaseOrders)
-        .where(eq(supplierPurchaseOrders.orderId, po.orderId))
-        .all();
-      if (!all.every((p) => p.status === "COMPLETED")) {
-        return { orderCompleted: false };
-      }
-
-      setWorkflowStage(tx, po.orderId, "SHIPPED");
-      completeOrder(tx, po.orderId);
-      return { orderCompleted: true };
+      const invoiceId = generateInvoice(tx, supplierPoId);
+      const { orderCompleted } = receiveInvoice(tx, invoiceId);
+      return { orderCompleted, invoiceId };
     },
     undefined,
     { behavior: "immediate" },

@@ -80,11 +80,11 @@
 
 ## 11. EJB Transaction Management
 
-- [ ] 11.1 Configure CMT (Container-Managed Transactions) for all order operations (SWHR3-T-0119)
-- [ ] 11.2 Set transaction attribute to Required for order creation (SWHR3-T-0119)
-- [ ] 11.3 Set transaction attribute to Required for line item creation (SWHR3-T-0119)
-- [ ] 11.4 Set transaction attribute to Required for payment processing (SWHR3-T-0119)
-- [ ] 11.5 Implement rollback on payment failures (SWHR3-T-0119)
+- [x] 11.1 Configure CMT (Container-Managed Transactions) for all order operations (SWHR3-T-0119)
+- [x] 11.2 Set transaction attribute to Required for order creation (SWHR3-T-0119)
+- [x] 11.3 Set transaction attribute to Required for line item creation (SWHR3-T-0119)
+- [x] 11.4 Set transaction attribute to Required for payment processing (SWHR3-T-0119)
+- [x] 11.5 Implement rollback on payment failures (SWHR3-T-0119)
 
 ## 12. Order Persistence
 

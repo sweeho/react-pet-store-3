@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
-import { accounts } from "../db/schema";
+import { accounts, catalogItemDetails, catalogItems } from "../db/schema";
 import type { CartItem } from "./cart-item";
 import type { ContactInfo } from "./contact-info";
 import { createCreditCard } from "./credit-card";
@@ -68,6 +68,21 @@ function makeAccount(username: string): number {
 }
 
 beforeAll(() => {
+  // Line items store ids and prices; names come from the catalogue.
+  db.insert(catalogItems)
+    .values([
+      { itemId: "EST-6", productId: "K9-BD-01", category: "DOGS", unitCostCents: 1850 },
+      { itemId: "EST-16", productId: "FL-DLH-02", category: "CATS", unitCostCents: 9350 },
+    ])
+    .onConflictDoNothing()
+    .run();
+  db.insert(catalogItemDetails)
+    .values([
+      { itemId: "EST-6", locale: "en_US", name: "Male Adult Bulldog", attribute: "Spotted" },
+      { itemId: "EST-16", locale: "en_US", name: "Adult Female Persian", attribute: "White" },
+    ])
+    .onConflictDoNothing()
+    .run();
   ownerId = makeAccount("confirmation-owner");
   strangerId = makeAccount("confirmation-stranger");
   const po = toPurchaseOrder(
@@ -118,6 +133,23 @@ describe("getOrderConfirmation", () => {
       name: "Male Adult Bulldog",
       unitCostCents: 1850,
     });
+  });
+
+  it("falls back to the item id as the name when the catalogue no longer has the item", () => {
+    const po = toPurchaseOrder(
+      ownerId,
+      {
+        shipper: BILL_TO,
+        receiver: SHIP_TO,
+        creditCard: createCreditCard("4111111111111111", "Java Card", 1, 2030),
+      },
+      [{ ...LINES[0], itemId: "GONE-1" }],
+    );
+    const id = withTransaction((tx) => insertPurchaseOrder(tx, po));
+
+    const [line] = getOrderConfirmation(ownerId, id).lines;
+
+    expect(line).toMatchObject({ itemId: "GONE-1", name: "GONE-1", attribute: "", quantity: 2 });
   });
 
   it("never exposes the full card number", () => {

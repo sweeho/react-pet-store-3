@@ -136,11 +136,11 @@
 
 ## 16. Struts Configuration
 
-- [ ] 16.1 Map CartHTMLAction in struts-config.xml (SWHR3-T-0073)
-- [ ] 16.2 Map CartEJBAction in struts-config.xml (SWHR3-T-0073)
-- [ ] 16.3 Configure forward for cart display page (SWHR3-T-0073)
-- [ ] 16.4 Configure forward for checkout transition (SWHR3-T-0073)
-- [ ] 16.5 Configure exception handlers for cart errors (SWHR3-T-0073)
+- [x] 16.1 Map CartHTMLAction in struts-config.xml (SWHR3-T-0073)
+- [x] 16.2 Map CartEJBAction in struts-config.xml (SWHR3-T-0073)
+- [x] 16.3 Configure forward for cart display page (SWHR3-T-0073)
+- [x] 16.4 Configure forward for checkout transition (SWHR3-T-0073)
+- [x] 16.5 Configure exception handlers for cart errors (SWHR3-T-0073)
 
 ## 17. Integration Testing
 

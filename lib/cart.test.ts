@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
-import { cartItems } from "../db/schema";
-import { addItem, deleteItem, getDetails, updateItemQuantity } from "./cart";
+import { cartItems, catalogItemDetails, catalogItems } from "../db/schema";
+import { addItem, deleteItem, getDetails, getItems, updateItemQuantity } from "./cart";
 import { ValidationError } from "./errors";
 
 /**
@@ -131,5 +131,58 @@ describe("updateItemQuantity", () => {
   it("writes nothing for an undefined token", () => {
     expect(() => updateItemQuantity(undefined, "EST-1", 2)).not.toThrow();
     expect(getDetails(undefined)).toEqual({});
+  });
+});
+
+describe("getItems", () => {
+  beforeAll(() => {
+    db.insert(catalogItems)
+      .values({ itemId: "EST-1", productId: "FI-SW-01", category: "FISH", unitCostCents: 1650 })
+      .onConflictDoNothing()
+      .run();
+    db.insert(catalogItemDetails)
+      .values({ itemId: "EST-1", locale: "en_US", name: "Angelfish", attribute: "Large" })
+      .onConflictDoNothing()
+      .run();
+  });
+
+  it("[SWHR3-C-0069] returns CartItems carrying catalogue details", () => {
+    const token = randomUUID();
+    db.insert(cartItems).values({ sessionToken: token, itemId: "EST-1", quantity: 2 }).run();
+
+    expect(getItems(token)).toEqual([
+      {
+        itemId: "EST-1",
+        productId: "FI-SW-01",
+        category: "FISH",
+        name: "Angelfish",
+        attribute: "Large",
+        quantity: 2,
+        unitCostCents: 1650,
+      },
+    ]);
+  });
+
+  it("[SWHR3-C-0070] an item missing from the catalogue is logged and skipped", () => {
+    const token = randomUUID();
+    db.insert(cartItems)
+      .values([
+        { sessionToken: token, itemId: "EST-1", quantity: 1 },
+        { sessionToken: token, itemId: "GHOST-1", quantity: 4 },
+      ])
+      .run();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    try {
+      const items = getItems(token);
+      expect(items.map((i) => i.itemId)).toEqual(["EST-1"]);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("GHOST-1"));
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("returns an empty list for an undefined token", () => {
+    expect(getItems(undefined)).toEqual([]);
   });
 });

@@ -1,7 +1,9 @@
 import { and, eq } from "drizzle-orm";
 
 import { cartItems } from "../db/schema";
-import { ValidationError } from "./errors";
+import { type CartItem, createCartItem } from "./cart-item";
+import { getItem } from "./catalog";
+import { CatalogItemNotFoundError, ValidationError } from "./errors";
 import { type DbOrTx, withTransaction } from "./transaction";
 
 export const CART_COOKIE_NAME = "petstore_cart";
@@ -87,4 +89,38 @@ export function updateItemQuantity(
     return;
   }
   addItem(sessionToken, itemId, quantity, outer);
+}
+
+/**
+ * The cart's items enriched from the catalogue, in insertion order. An item
+ * the catalogue cannot supply is logged and skipped (D4, SD5).
+ */
+export function getItems(
+  sessionToken: string | undefined,
+  locale: string = DEFAULT_CART_LOCALE,
+  outer?: DbOrTx,
+): CartItem[] {
+  if (sessionToken === undefined) {
+    return [];
+  }
+  return withTransaction((tx) => {
+    const rows = tx
+      .select({ itemId: cartItems.itemId, quantity: cartItems.quantity })
+      .from(cartItems)
+      .where(eq(cartItems.sessionToken, sessionToken))
+      .orderBy(cartItems.id)
+      .all();
+    const items: CartItem[] = [];
+    for (const row of rows) {
+      try {
+        items.push(createCartItem(getItem(row.itemId, locale, tx), row.quantity));
+      } catch (error) {
+        if (!(error instanceof CatalogItemNotFoundError)) {
+          throw error;
+        }
+        console.warn(`Cart item ${row.itemId} skipped: not found in the catalogue`);
+      }
+    }
+    return items;
+  }, outer);
 }

@@ -88,11 +88,11 @@
 
 ## 12. Order Persistence
 
-- [ ] 12.1 Create PurchaseOrder entity bean deployment (SWHR3-T-0120)
-- [ ] 12.2 Create LineItem entity bean deployment (SWHR3-T-0120)
-- [ ] 12.3 Create SupplierPO entity bean deployment (SWHR3-T-0120)
-- [ ] 12.4 Define entity relationships and mappings (SWHR3-T-0120)
-- [ ] 12.5 Create finder methods for order queries (SWHR3-T-0120)
+- [x] 12.1 Create PurchaseOrder entity bean deployment (SWHR3-T-0120)
+- [x] 12.2 Create LineItem entity bean deployment (SWHR3-T-0120)
+- [x] 12.3 Create SupplierPO entity bean deployment (SWHR3-T-0120)
+- [x] 12.4 Define entity relationships and mappings (SWHR3-T-0120)
+- [x] 12.5 Create finder methods for order queries (SWHR3-T-0120)
 
 ## 13. Error Handling
 

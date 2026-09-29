@@ -5,6 +5,7 @@
  */
 import { CHECKOUT_CARD_TYPES, createCreditCard, type CreditCard } from "./credit-card";
 import { CONTACT_INFO_FIELDS, type ContactInfo } from "./contact-info";
+import { MissingFormDataError } from "./errors";
 import { validateEmail } from "./validation";
 
 export class FieldErrorCollector {
@@ -129,4 +130,16 @@ export function extractCreditCard(
   }
 
   return ok && cardType !== undefined ? createCreditCard(number, cardType, month, year) : null;
+}
+
+export interface OrderEvent {
+  shipper: ContactInfo;
+  receiver: ContactInfo;
+  creditCard: CreditCard;
+}
+
+export function parseCheckoutRequest(body: unknown): OrderEvent {
+  void body;
+  void MissingFormDataError;
+  throw new Error("VortexNotImplemented");
 }

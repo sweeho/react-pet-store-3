@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { FieldErrorCollector, extractContactInfo, extractCreditCard } from "./checkout-request";
+import {
+  FieldErrorCollector,
+  extractContactInfo,
+  extractCreditCard,
+  parseCheckoutRequest,
+} from "./checkout-request";
+import { MissingFormDataError } from "./errors";
 
 /**
  * UNIT TEST (server project). design.md C4/C6, D2: one address read from
@@ -206,4 +212,84 @@ describe("extractCreditCard", () => {
     expect(extractCreditCard(card({ credit_card_type: "Visa" }), errors)).toBeNull();
     expect(errors.fieldErrors).toHaveProperty("credit_card_type");
   });
+});
+
+describe("parseCheckoutRequest", () => {
+  const year = new Date().getFullYear();
+  const card = (overrides: Record<string, string> = {}): Record<string, string> => ({
+    credit_card_number: "4111 1111 1111 4412",
+    credit_card_type: "Meow Card",
+    expiration_month: "03",
+    expiration_year: String(year + 3),
+    ...overrides,
+  });
+  const body = (
+    billing: Record<string, string> = {},
+    shipping: Record<string, string> = {},
+    cardOverrides: Record<string, string> = {},
+  ) => ({
+    ...fullSet("_a", billing),
+    ...fullSet("_b", { given_name: "Alex", ...shipping }),
+    ...card(cardOverrides),
+  });
+
+  function thrown(input: unknown): MissingFormDataError {
+    try {
+      parseCheckoutRequest(input);
+    } catch (error) {
+      expect(error).toBeInstanceOf(MissingFormDataError);
+      return error as MissingFormDataError;
+    }
+    throw new Error("expected parseCheckoutRequest to throw");
+  }
+
+  it("[SWHR3-C-0132] the OrderEvent holds shipper, receiver and payment", () => {
+    const event = parseCheckoutRequest(body());
+
+    expect(event.shipper.givenName).toBe("Sarah");
+    expect(event.receiver.givenName).toBe("Alex");
+    expect(event.creditCard.cardType).toBe("Meow Card");
+    expect(event.creditCard.cardNumber).toBe("4111111111114412");
+  });
+
+  it("[SWHR3-C-0127] every missing field is reported in one error, in order", () => {
+    const error = thrown(body({ city: "" }, { telephone_number: "" }, { credit_card_number: "" }));
+
+    expect(error.missingFields).toEqual(["city_a", "telephone_number_b", "credit_card_number"]);
+    for (const param of error.missingFields) {
+      expect(error.fieldErrors[param]).toEqual(expect.any(String));
+    }
+  });
+
+  it("[SWHR3-C-0135] a body with only _a fields reports the nine required _b fields", () => {
+    const error = thrown({ ...fullSet("_a"), ...card() });
+
+    expect(error.missingFields).toEqual([
+      "family_name_b",
+      "given_name_b",
+      "address_1_b",
+      "city_b",
+      "state_or_province_b",
+      "postal_code_b",
+      "country_b",
+      "telephone_number_b",
+      "email_b",
+    ]);
+    expect(error.missingFields.some((f) => f.endsWith("_a"))).toBe(false);
+  });
+
+  it("an invalid value is in fieldErrors but not in missingFields", () => {
+    const error = thrown(body({}, {}, { expiration_month: "13" }));
+
+    expect(error.fieldErrors.expiration_month).toEqual(expect.any(String));
+    expect(error.missingFields).toEqual([]);
+  });
+
+  it.each([null, undefined, "text", 42])(
+    "rejects a non-object body %j with an empty list",
+    (input) => {
+      const error = thrown(input);
+      expect(error.missingFields).toEqual([]);
+    },
+  );
 });

@@ -7,13 +7,13 @@
 
 ## 2. Order Creation
 
-- [ ] 2.1 Generate unique order ID via UniqueIdGenerator (SWHR3-T-0110)
-- [ ] 2.2 Create PurchaseOrder entity with order ID, date, customer ID (SWHR3-T-0110)
-- [ ] 2.3 Set billing address (BillTo) from checkout form (SWHR3-T-0110)
-- [ ] 2.4 Set shipping address (ShipTo) from checkout form (SWHR3-T-0110)
-- [ ] 2.5 Set credit card payment method (SWHR3-T-0110)
-- [ ] 2.6 Calculate order total from cart line items (SWHR3-T-0110)
-- [ ] 2.7 Persist PurchaseOrder entity (SWHR3-T-0110)
+- [x] 2.1 Generate unique order ID via UniqueIdGenerator (SWHR3-T-0110)
+- [x] 2.2 Create PurchaseOrder entity with order ID, date, customer ID (SWHR3-T-0110)
+- [x] 2.3 Set billing address (BillTo) from checkout form (SWHR3-T-0110)
+- [x] 2.4 Set shipping address (ShipTo) from checkout form (SWHR3-T-0110)
+- [x] 2.5 Set credit card payment method (SWHR3-T-0110)
+- [x] 2.6 Calculate order total from cart line items (SWHR3-T-0110)
+- [x] 2.7 Persist PurchaseOrder entity (SWHR3-T-0110)
 
 ## 3. Line Item Management
 

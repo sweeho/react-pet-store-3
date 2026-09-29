@@ -96,11 +96,11 @@
 
 ## 13. Error Handling
 
-- [ ] 13.1 Implement payment processor error handling (SWHR3-T-0121)
-- [ ] 13.2 Implement inventory system error handling (SWHR3-T-0121)
-- [ ] 13.3 Implement supplier PO generation errors (SWHR3-T-0121)
-- [ ] 13.4 Implement exception-to-user-message mapping (SWHR3-T-0121)
-- [ ] 13.5 Log all errors for diagnostics (SWHR3-T-0121)
+- [x] 13.1 Implement payment processor error handling (SWHR3-T-0121)
+- [x] 13.2 Implement inventory system error handling (SWHR3-T-0121)
+- [x] 13.3 Implement supplier PO generation errors (SWHR3-T-0121)
+- [x] 13.4 Implement exception-to-user-message mapping (SWHR3-T-0121)
+- [x] 13.5 Log all errors for diagnostics (SWHR3-T-0121)
 
 ## 14. Testing
 

@@ -75,13 +75,13 @@
 
 ## 8. Inventory Display Handler
 
-- [ ] 8.1 Implement inventory display request handling in RcvrRequestProcessor (SWHR3-T-0135)
-- [ ] 8.2 Check currentScreen equals "displayinventory" (SWHR3-T-0135)
-- [ ] 8.3 Retrieve DisplayInventoryBean (SWHR3-T-0135)
-- [ ] 8.4 Call getInventory() to fetch all items (SWHR3-T-0135)
-- [ ] 8.5 Store inventory data in request for JSP display (SWHR3-T-0135)
-- [ ] 8.6 Forward to displayinventory.jsp (SWHR3-T-0135)
-- [ ] 8.7 Test inventory display page rendering (SWHR3-T-0135)
+- [x] 8.1 Implement inventory display request handling in RcvrRequestProcessor (SWHR3-T-0135)
+- [x] 8.2 Check currentScreen equals "displayinventory" (SWHR3-T-0135)
+- [x] 8.3 Retrieve DisplayInventoryBean (SWHR3-T-0135)
+- [x] 8.4 Call getInventory() to fetch all items (SWHR3-T-0135)
+- [x] 8.5 Store inventory data in request for JSP display (SWHR3-T-0135)
+- [x] 8.6 Forward to displayinventory.jsp (SWHR3-T-0135)
+- [x] 8.7 Test inventory display page rendering (SWHR3-T-0135)
 
 ## 9. Inventory Update Handler
 

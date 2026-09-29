@@ -2,12 +2,18 @@
  * Supplier order fulfilment (design.md D5, C8, supplier-portal-and-inventory).
  * Fulfilling a PENDING PO checks every line against stock and deducts it
  * all-or-nothing; when every PO of an order is PROCESSING the order reaches
- * ALLOCATED. Pending POs are retried in bulk, oldest first. Recording and
- * logging of unable attempts belong to a later ticket.
+ * ALLOCATED. Pending POs are retried in bulk, oldest first. Every attempt on
+ * a PENDING PO is recorded and logged (design.md D10).
  */
 import { asc, eq } from "drizzle-orm";
 
-import { inventory, lineItems, orders, supplierPurchaseOrders } from "../db/schema";
+import {
+  inventory,
+  lineItems,
+  orders,
+  supplierFulfilmentAttempts,
+  supplierPurchaseOrders,
+} from "../db/schema";
 import { NotFoundError } from "./errors";
 import { reserveInventory } from "./inventory";
 import { assertSupplierOrderTransition } from "./supplier-order-status";
@@ -23,6 +29,26 @@ export interface ShortItem {
 export interface FulfilmentOutcome {
   result: "FULFILLED" | "UNABLE" | "SKIPPED";
   shortItems: ShortItem[];
+}
+
+function recordAttempt(
+  tx: DbOrTx,
+  poId: number,
+  result: "FULFILLED" | "UNABLE",
+  shortItems: ShortItem[],
+): void {
+  tx.insert(supplierFulfilmentAttempts)
+    .values({
+      supplierPoId: poId,
+      attemptedAt: new Date(),
+      result,
+      detail: JSON.stringify(shortItems),
+    })
+    .run();
+  const detail = shortItems
+    .map((s) => `${s.itemId} needed ${s.needed}, available ${s.available}`)
+    .join("; ");
+  console.info(`supplier: PO ${poId} ${result}${detail ? ` (short: ${detail})` : ""}`);
 }
 
 /**
@@ -63,6 +89,7 @@ export function fulfilSupplierOrder(tx: DbOrTx, poId: number): FulfilmentOutcome
     }
   }
   if (shortItems.length > 0 || !reserveInventory(tx, po.orderId, lines)) {
+    recordAttempt(tx, poId, "UNABLE", shortItems);
     return { result: "UNABLE", shortItems };
   }
 
@@ -81,6 +108,7 @@ export function fulfilSupplierOrder(tx: DbOrTx, poId: number): FulfilmentOutcome
   if (order?.workflowStage === "CONFIRMED" && siblings.every((p) => p.status === "PROCESSING")) {
     setWorkflowStage(tx, po.orderId, "ALLOCATED");
   }
+  recordAttempt(tx, poId, "FULFILLED", []);
   return { result: "FULFILLED", shortItems: [] };
 }
 

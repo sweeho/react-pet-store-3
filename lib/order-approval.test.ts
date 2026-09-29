@@ -10,6 +10,7 @@ import {
   lineItems,
   orderStageHistory,
   orders,
+  supplierFulfilmentAttempts,
   supplierPurchaseOrders,
 } from "../db/schema";
 import { setInventory } from "./inventory";
@@ -165,6 +166,7 @@ describe("updateOrders allocation hook (design.md D5, D8)", () => {
     db.delete(inventoryReservations).run();
     db.delete(orderStageHistory).run();
     db.delete(lineItems).run();
+    db.delete(supplierFulfilmentAttempts).run();
     db.delete(supplierPurchaseOrders).run();
   });
 

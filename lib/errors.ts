@@ -98,6 +98,14 @@ export class UnsupportedMediaTypeError extends ServiceError {
   }
 }
 
+// design.md D2/C4 (order-processing-and-fulfilment): the payment seam declined the card.
+export class PaymentDeclinedError extends ServiceError {
+  constructor() {
+    super("PAYMENT_DECLINED", "Your card was declined. No order was placed.", 402);
+    this.name = "PaymentDeclinedError";
+  }
+}
+
 export class ServiceUnavailableError extends ServiceError {
   constructor(message = "Service unavailable") {
     super("SERVICE_UNAVAILABLE", message, 503);

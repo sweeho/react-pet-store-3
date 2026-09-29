@@ -8,6 +8,7 @@ import {
   InvalidTransitionError,
   MissingFormDataError,
   NotFoundError,
+  PaymentDeclinedError,
   ProfileExistsError,
   ServiceError,
   ServiceUnavailableError,
@@ -109,6 +110,16 @@ describe("ServiceError subclasses", () => {
     const http = toHttpError(error);
     expect(http.status).toBe(415);
     expect(http.data).toEqual({ code: "UNSUPPORTED_MEDIA_TYPE" });
+  });
+
+  it("PaymentDeclinedError is a 402 PAYMENT_DECLINED", () => {
+    const error = new PaymentDeclinedError();
+    expect(error.status).toBe(402);
+    expect(error.code).toBe("PAYMENT_DECLINED");
+    expect(error.message).toBe("Your card was declined. No order was placed.");
+    const http = toHttpError(error);
+    expect(http.status).toBe(402);
+    expect(http.data).toEqual({ code: "PAYMENT_DECLINED" });
   });
 
   it("ServiceUnavailableError is a 503 SERVICE_UNAVAILABLE (AC-3)", () => {

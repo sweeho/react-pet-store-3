@@ -86,12 +86,12 @@
 
 ## 9. Contact Information Integration
 
-- [ ] 9.1 Create ContactInfo value object class (SWHR3-T-0091)
-- [ ] 9.2 Implement fields: familyName, givenName, address1, address2, city, stateOrProvince, postalCode, country, telephoneNumber, email (SWHR3-T-0091)
-- [ ] 9.3 Implement getters and setters for all fields (SWHR3-T-0091)
-- [ ] 9.4 Implement serialization support for EJB communication (SWHR3-T-0091)
-- [ ] 9.5 Integrate with existing contact info component API (SWHR3-T-0091)
-- [ ] 9.6 Support optional address2 field (nullable) (SWHR3-T-0091)
+- [x] 9.1 Create ContactInfo value object class (SWHR3-T-0091)
+- [x] 9.2 Implement fields: familyName, givenName, address1, address2, city, stateOrProvince, postalCode, country, telephoneNumber, email (SWHR3-T-0091)
+- [x] 9.3 Implement getters and setters for all fields (SWHR3-T-0091)
+- [x] 9.4 Implement serialization support for EJB communication (SWHR3-T-0091)
+- [x] 9.5 Integrate with existing contact info component API (SWHR3-T-0091)
+- [x] 9.6 Support optional address2 field (nullable) (SWHR3-T-0091)
 
 ## 10. Credit Card Value Object
 

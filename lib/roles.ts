@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/client";
 import { accounts } from "../db/schema";
 
-export type AccountRole = "customer" | "admin";
+export type AccountRole = "customer" | "admin" | "supplier";
 
 export function getAccountRole(accountId: number): AccountRole {
   const account = db
@@ -17,5 +17,8 @@ export function getAccountRole(accountId: number): AccountRole {
     .where(eq(accounts.id, accountId))
     .get();
 
-  return account?.role === "admin" ? "admin" : "customer";
+  if (account?.role === "admin" || account?.role === "supplier") {
+    return account.role;
+  }
+  return "customer";
 }

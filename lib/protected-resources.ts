@@ -22,3 +22,11 @@ export const ADMIN_API_PREFIX = "/api/admin/";
 export function isAdminApiPath(pathname: string): boolean {
   return pathname.startsWith(ADMIN_API_PREFIX);
 }
+
+// design.md D1 (supplier-portal-and-inventory): a prefix, for the supplier
+// role only. Store administrators are refused here too.
+export const SUPPLIER_API_PREFIX = "/api/supplier/";
+
+export function isSupplierApiPath(pathname: string): boolean {
+  return pathname.startsWith(SUPPLIER_API_PREFIX);
+}

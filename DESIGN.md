@@ -62,6 +62,16 @@ Administrator screens share one shell, so every admin capability looks like the 
 - **Access**: a visitor without the admin role sees the administrator sign-in page, not a blank or broken screen. A signed-in non-admin is told plainly that the account is not an administrator, and is offered sign-in as a different user.
 - **Queues**: a queue is a `Table` under tabs, one tab per state, each labelled with its count. Only the tab whose rows can still change is editable; the others say they are read-only.
 
+## Supplier area
+
+Supplier screens (`/supplier/**`) have their own shell, separate from the storefront and admin areas, because supplier staff use a different account and see no customer or order data:
+
+- **Shell**: a masthead reading "Pet Store Supplier", then the signed-in user name with a "Supplier administrator" label and Sign out. Desktop, fixed width.
+- **Access**: signed out goes to the supplier sign-in page. A signed-in account without the supplier role, a store administrator included, sees an "Access denied" page that explains the role is assigned by the store administrator and offers sign-in as a different user.
+- **Bulk row edits**: a `Table` with a new-value input and a checkbox per row. Typing a value ticks its row, a footer counts the ticked rows, and only ticked rows are saved. A success banner reports how many were saved, and saved rows are marked. Invalid rows are skipped without a per-row error.
+
+Reference screens: the supplier mockups under `artifacts/SWHR3-S-0009/design/`.
+
 ## Staged edits and confirmations
 
 For work done in batches, where the user makes several decisions and saves them together:

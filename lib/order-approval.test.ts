@@ -10,6 +10,7 @@ import {
   lineItems,
   orderStageHistory,
   orders,
+  supplierFulfilmentAttempts,
   supplierPurchaseOrders,
 } from "../db/schema";
 import { setInventory } from "./inventory";
@@ -165,6 +166,7 @@ describe("updateOrders allocation hook (design.md D5, D8)", () => {
     db.delete(inventoryReservations).run();
     db.delete(orderStageHistory).run();
     db.delete(lineItems).run();
+    db.delete(supplierFulfilmentAttempts).run();
     db.delete(supplierPurchaseOrders).run();
   });
 
@@ -241,6 +243,30 @@ describe("updateOrders allocation hook (design.md D5, D8)", () => {
 
     expect(db.select().from(orders).where(eq(orders.id, order.id)).get()?.status).toBe("APPROVED");
     expect(stage(order.id)).toBe("CONFIRMED");
+    // SD9 (supplier-portal-and-inventory): it waits with a PENDING supplier PO.
+    const pos = db
+      .select()
+      .from(supplierPurchaseOrders)
+      .where(eq(supplierPurchaseOrders.orderId, order.id))
+      .all();
+    expect(pos.map((p) => p.status)).toEqual(["PENDING"]);
+  });
+
+  it("[SWHR3-C-0214] approval with stock still allocates immediately", () => {
+    const order = confirmedOrder("alloc-now", [["EST-NOW", 2]]);
+    setInventory("EST-NOW", 5);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    updateOrders({ changes: [{ orderId: order.id, status: "APPROVED" }] });
+
+    const pos = db
+      .select()
+      .from(supplierPurchaseOrders)
+      .where(eq(supplierPurchaseOrders.orderId, order.id))
+      .all();
+    expect(pos.map((p) => p.status)).toEqual(["PROCESSING"]);
+    expect(stock("EST-NOW")).toBe(3);
+    expect(stage(order.id)).toBe("ALLOCATED");
   });
 
   it("a denied order is never allocated", () => {

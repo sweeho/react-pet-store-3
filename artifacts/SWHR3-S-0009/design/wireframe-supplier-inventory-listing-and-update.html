@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Supplier inventory — wireframe</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: #27272a; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 24px; border-bottom: 1px solid #e4e4e7; }
+  .brand { font-weight: 600; font-size: 13px; color: #3f3f46; }
+  .brand span { color: #a1a1aa; font-weight: 400; }
+  .topright { display: flex; align-items: center; gap: 14px; font-size: 12px; color: #71717a; }
+  .link { text-decoration: underline; color: #52525b; }
+  .page { max-width: 672px; margin: 0 auto; padding: 32px 24px 48px; }
+  h1 { margin: 0 0 4px; font-size: 28px; font-weight: 700; }
+  .sub { margin: 0 0 20px; font-size: 13px; color: #71717a; }
+  .card { border: 1px solid #e4e4e7; border-radius: 10px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #71717a; padding: 10px 14px; background: #fafafa; border-bottom: 1px solid #e4e4e7; }
+  td { padding: 9px 14px; border-bottom: 1px solid #f4f4f5; font-size: 13px; }
+  tr:last-child td { border-bottom: 0; }
+  th.num, td.num { text-align: right; width: 120px; }
+  th.qty, td.qty { width: 140px; }
+  th.chk, td.chk { width: 78px; text-align: center; }
+  .input { display: inline-block; width: 110px; height: 30px; border: 1px solid #d4d4d8; border-radius: 6px; background: #fff; vertical-align: middle; }
+  .input.typed { background: #f4f4f5; position: relative; }
+  .input.typed::after { content: attr(data-v); position: absolute; left: 9px; top: 6px; font-size: 12px; color: #52525b; }
+  .box { display: inline-block; width: 15px; height: 15px; border: 1px solid #a1a1aa; border-radius: 3px; background: #fff; vertical-align: middle; }
+  .box.on { background: #3f3f46; border-color: #3f3f46; position: relative; }
+  .box.on::after { content: "✓"; position: absolute; left: 2px; top: -3px; font-size: 12px; color: #fff; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .footer { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #fafafa; border-top: 1px solid #e4e4e7; }
+  .hint { font-size: 11px; color: #71717a; }
+  .btn { height: 36px; line-height: 36px; padding: 0 18px; border-radius: 8px; font-size: 13px; font-weight: 500; background: #3f3f46; color: #fff; }
+  .anno { margin-top: 14px; font-size: 11px; color: #a1a1aa; border-left: 2px solid #e4e4e7; padding-left: 8px; }
+  .anno b { color: #71717a; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Pet Store <span>/ Supplier</span></div>
+    <div class="topright"><span>Signed in as supplier staff</span><span class="link">Sign out</span></div>
+  </div>
+
+  <div class="page">
+    <h1>Inventory</h1>
+    <p class="sub">Enter a new quantity and tick the items you want to write. Only ticked rows are updated.</p>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th class="num">Current quantity</th>
+            <th class="qty">New quantity</th>
+            <th class="chk">Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">EST-1</td><td class="num">10000</td><td class="qty"><span class="input"></span></td><td class="chk"><span class="box"></span></td></tr>
+          <tr><td class="mono">EST-2</td><td class="num">0</td><td class="qty"><span class="input typed" data-v="250"></span></td><td class="chk"><span class="box on"></span></td></tr>
+          <tr><td class="mono">EST-3</td><td class="num">42</td><td class="qty"><span class="input"></span></td><td class="chk"><span class="box"></span></td></tr>
+          <tr><td class="mono">EST-4</td><td class="num">7</td><td class="qty"><span class="input typed" data-v="60"></span></td><td class="chk"><span class="box on"></span></td></tr>
+          <tr><td class="mono">EST-5</td><td class="num">10000</td><td class="qty"><span class="input"></span></td><td class="chk"><span class="box"></span></td></tr>
+          <tr><td class="mono">EST-6</td><td class="num">3</td><td class="qty"><span class="input typed" data-v="0"></span></td><td class="chk"><span class="box on"></span></td></tr>
+          <tr><td class="mono">EST-7</td><td class="num">128</td><td class="qty"><span class="input"></span></td><td class="chk"><span class="box"></span></td></tr>
+          <tr><td class="mono">EST-8</td><td class="num">10000</td><td class="qty"><span class="input"></span></td><td class="chk"><span class="box"></span></td></tr>
+        </tbody>
+      </table>
+      <div class="footer">
+        <span class="hint">18 items</span>
+        <span class="btn">Update inventory</span>
+      </div>
+    </div>
+
+    <p class="anno">
+      <b>Fields</b> — one <span class="mono">qty_&lt;itemId&gt;</span> input and one <span class="mono">item_&lt;itemId&gt;</span> checkbox per row.<br />
+      <b>Skipped silently</b> — ticked rows whose value is empty, non-numeric or negative are left unchanged with no error shown.<br />
+      <b>On submit</b> — quantities are written and every pending supplier order is re-evaluated in the same transaction.
+    </p>
+  </div>
+</body>
+</html>

@@ -231,9 +231,58 @@ export const supplierPurchaseOrders = sqliteTable("supplier_purchase_orders", {
     .notNull()
     .references(() => orders.id),
   supplierId: text("supplier_id").notNull(),
-  status: text("status").notNull().default("OPEN"),
+  // design.md D2 (supplier-portal-and-inventory): PENDING -> PROCESSING -> COMPLETED.
+  status: text("status").notNull().default("PENDING"),
   expectedDeliveryDate: integer("expected_delivery_date", { mode: "timestamp" }).notNull(),
   trackingNumber: text("tracking_number"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   shippedAt: integer("shipped_at", { mode: "timestamp" }),
+});
+
+// design.md C1 (supplier-portal-and-inventory): the supplier-side tables.
+export const supplierPoContacts = sqliteTable("supplier_po_contacts", {
+  supplierPoId: integer("supplier_po_id")
+    .primaryKey()
+    .references(() => supplierPurchaseOrders.id, { onDelete: "cascade" }),
+  givenName: text("given_name").notNull(),
+  familyName: text("family_name").notNull(),
+  email: text("email").notNull(),
+  telephone: text("telephone").notNull(),
+});
+
+export const supplierPoAddresses = sqliteTable("supplier_po_addresses", {
+  supplierPoId: integer("supplier_po_id")
+    .primaryKey()
+    .references(() => supplierPoContacts.supplierPoId, { onDelete: "cascade" }),
+  address1: text("address1").notNull(),
+  address2: text("address2"),
+  city: text("city").notNull(),
+  stateOrProvince: text("state_or_province").notNull(),
+  postalCode: text("postal_code").notNull(),
+  country: text("country").notNull(),
+});
+
+export const supplierInvoices = sqliteTable("supplier_invoices", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  supplierPoId: integer("supplier_po_id")
+    .notNull()
+    .unique()
+    .references(() => supplierPurchaseOrders.id),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  invoiceDate: integer("invoice_date", { mode: "timestamp" }).notNull(),
+  lines: text("lines").notNull(),
+  totalCents: integer("total_cents").notNull(),
+  status: text("status").notNull().default("SENT"),
+});
+
+export const supplierFulfilmentAttempts = sqliteTable("supplier_fulfilment_attempts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  supplierPoId: integer("supplier_po_id")
+    .notNull()
+    .references(() => supplierPurchaseOrders.id),
+  attemptedAt: integer("attempted_at", { mode: "timestamp" }).notNull(),
+  result: text("result").notNull(),
+  detail: text("detail").notNull(),
 });

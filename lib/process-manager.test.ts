@@ -11,6 +11,7 @@ import {
   supplierPurchaseOrders,
 } from "../db/schema";
 import { setInventory } from "./inventory";
+import { processPendingSupplierOrders } from "./supplier-fulfilment";
 import { allocateOrder, recordShipment, retryWaitingAllocations } from "./process-manager";
 import { withTransaction } from "./transaction";
 
@@ -89,7 +90,7 @@ describe("allocateOrder", () => {
 
     expect(orderRow(id)?.workflowStage).toBe("ALLOCATED");
     expect(stockOf(item)).toBe(3);
-    expect(pos(id)).toHaveLength(1);
+    expect(pos(id).map((p) => p.status)).toEqual(["PROCESSING"]);
   });
 
   it("waits at CONFIRMED with no writes when stock is short", () => {
@@ -101,7 +102,8 @@ describe("allocateOrder", () => {
 
     expect(orderRow(id)?.workflowStage).toBe("CONFIRMED");
     expect(stockOf(item)).toBe(1);
-    expect(pos(id)).toHaveLength(0);
+    // SD9 (supplier-portal-and-inventory): a waiting order now has a PENDING PO.
+    expect(pos(id).map((p) => p.status)).toEqual(["PENDING"]);
   });
 
   it.each([
@@ -132,6 +134,17 @@ describe("retryWaitingAllocations", () => {
     expect(allocated).toBeGreaterThanOrEqual(1);
     expect(orderRow(id)?.workflowStage).toBe("ALLOCATED");
     expect(stockOf(item)).toBe(2);
+    expect(pos(id).map((p) => p.status)).toEqual(["PROCESSING"]);
+  });
+
+  it("returns the number of POs it fulfilled", () => {
+    const item = `PM-N${seq}`;
+    const id = makeOrder([[item, 2]]);
+    allocate(id);
+    setInventory(item, 2);
+
+    expect(retryWaitingAllocations()).toBeGreaterThanOrEqual(1);
+    expect(retryWaitingAllocations()).toBe(0);
   });
 });
 
@@ -149,9 +162,9 @@ describe("recordShipment", () => {
 
     const result = recordShipment(poIds[0], "TRK-123");
 
-    expect(result).toEqual({ orderCompleted: true });
+    expect(result).toEqual({ orderCompleted: true, invoiceId: expect.any(Number) });
     const po = pos(id)[0];
-    expect(po).toMatchObject({ status: "SHIPPED", trackingNumber: "TRK-123" });
+    expect(po).toMatchObject({ status: "COMPLETED", trackingNumber: "TRK-123" });
     expect(po.shippedAt).toBeInstanceOf(Date);
     expect(orderRow(id)).toMatchObject({ workflowStage: "SHIPPED", status: "COMPLETED" });
   });
@@ -164,7 +177,7 @@ describe("recordShipment", () => {
       .values({
         orderId: id,
         supplierId: "OTHER-SUPPLIER",
-        status: "OPEN",
+        status: "PROCESSING",
         expectedDeliveryDate: new Date("2026-02-01T00:00:00.000Z"),
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
       })
@@ -173,9 +186,27 @@ describe("recordShipment", () => {
 
     const result = recordShipment(poIds[0], "TRK-1");
 
-    expect(result).toEqual({ orderCompleted: false });
-    expect(pos(id).find((p) => p.id === poIds[0])?.status).toBe("SHIPPED");
-    expect(pos(id).find((p) => p.id === second)?.status).toBe("OPEN");
+    expect(result).toEqual({ orderCompleted: false, invoiceId: expect.any(Number) });
+    expect(pos(id).find((p) => p.id === poIds[0])?.status).toBe("COMPLETED");
+    expect(pos(id).find((p) => p.id === second)?.status).toBe("PROCESSING");
     expect(orderRow(id)).toMatchObject({ workflowStage: "ALLOCATED", status: "APPROVED" });
+  });
+
+  it("[SWHR3-C-0199] a supplier PO passes through PENDING, PROCESSING and COMPLETED", () => {
+    const item = `PM-L${seq}`;
+    const id = makeOrder([[item, 2]]);
+    expect(allocate(id)).toBe("WAITING");
+    const [poId] = pos(id).map((p) => p.id);
+    const statusOf = () =>
+      db.select().from(supplierPurchaseOrders).where(eq(supplierPurchaseOrders.id, poId)).get()
+        ?.status;
+    expect(statusOf()).toBe("PENDING");
+
+    setInventory(item, 5);
+    withTransaction((tx) => processPendingSupplierOrders(tx));
+    expect(statusOf()).toBe("PROCESSING");
+
+    recordShipment(poId, "TRK-1");
+    expect(statusOf()).toBe("COMPLETED");
   });
 });

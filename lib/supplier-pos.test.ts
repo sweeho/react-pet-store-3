@@ -16,6 +16,8 @@ import type { ContactInfo } from "./contact-info";
 import { createCreditCard } from "./credit-card";
 import { InvalidTransitionError, NotFoundError } from "./errors";
 import { createSupplierPOs, markPoShipped } from "./supplier-pos";
+import { getSupplierAddress } from "./supplier-order-addresses";
+import { getSupplierContact, insertSupplierContact } from "./supplier-order-contacts";
 import * as suppliers from "./suppliers";
 import { withTransaction } from "./transaction";
 
@@ -35,9 +37,21 @@ const BILL_TO: ContactInfo = {
   telephoneNumber: "555-0100",
   email: "sarah.chen@example.com",
 };
+const SHIP_TO: ContactInfo = {
+  familyName: "Chen",
+  givenName: "Alex",
+  address1: "88 Market Street",
+  address2: null,
+  city: "San Francisco",
+  stateOrProvince: "CA",
+  postalCode: "94103",
+  country: "United States",
+  telephoneNumber: "+1 415 555 0177",
+  email: "alex@example.com",
+};
 const EVENT = {
   shipper: BILL_TO,
-  receiver: BILL_TO,
+  receiver: SHIP_TO,
   creditCard: createCreditCard("4111 1111 1111 4412", "Java Card", 3, 2030),
 };
 const ITEMS = ["SPO-1", "SPO-2", "SPO-3"];
@@ -110,7 +124,7 @@ function poIdsOfLines(orderId: number): (number | null)[] {
 }
 
 describe("createSupplierPOs", () => {
-  it("[SWHR3-C-0174] one supplier gives one OPEN PO due 7 days out, referenced by every line", () => {
+  it("[SWHR3-C-0174] one supplier gives one PO due 7 days out, referenced by every line", () => {
     const { orderId, lines } = placeThreeLineOrder();
 
     const ids = withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW));
@@ -118,7 +132,7 @@ describe("createSupplierPOs", () => {
     const rows = pos(orderId);
     expect(ids).toEqual(rows.map((r) => r.id));
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ supplierId: "PETSTORE-SUPPLIER", status: "OPEN" });
+    expect(rows[0]).toMatchObject({ supplierId: "PETSTORE-SUPPLIER", status: "PENDING" });
     expect(rows[0].expectedDeliveryDate.toISOString()).toBe("2026-10-08T09:00:00.000Z");
     expect(poIdsOfLines(orderId)).toEqual([ids[0], ids[0], ids[0]]);
   });
@@ -143,13 +157,96 @@ describe("createSupplierPOs", () => {
   });
 });
 
+describe("createSupplierPOs creation fields and delivery contact", () => {
+  it("[SWHR3-C-0197] a new PO has an id, the creation time and PENDING status; another order gets another id", () => {
+    const first = placeThreeLineOrder();
+    const second = placeThreeLineOrder();
+
+    const [firstId] = withTransaction((tx) =>
+      createSupplierPOs(tx, first.orderId, first.lines, NOW),
+    );
+    const [secondId] = withTransaction((tx) =>
+      createSupplierPOs(tx, second.orderId, second.lines, NOW),
+    );
+
+    expect(Number.isInteger(firstId)).toBe(true);
+    expect(secondId).not.toBe(firstId);
+    const [row] = pos(first.orderId);
+    expect(row.createdAt.toISOString()).toBe("2026-10-01T09:00:00.000Z");
+    expect(row.status).toBe("PENDING");
+  });
+
+  it("an explicit status is used", () => {
+    const { orderId, lines } = placeThreeLineOrder();
+
+    withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW, { status: "PROCESSING" }));
+
+    expect(pos(orderId)[0].status).toBe("PROCESSING");
+  });
+
+  it("[SWHR3-C-0202] creating a PO creates its delivery contact from the shipping snapshot", () => {
+    const { orderId, lines } = placeThreeLineOrder();
+
+    const [poId] = withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW));
+
+    expect(getSupplierContact(poId)).toEqual({
+      givenName: "Alex",
+      familyName: "Chen",
+      email: "alex@example.com",
+      telephone: "+1 415 555 0177",
+    });
+    expect(() =>
+      withTransaction((tx) =>
+        insertSupplierContact(tx, poId, {
+          givenName: "Other",
+          familyName: "Person",
+          email: "o@example.com",
+          telephone: "1",
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it("[SWHR3-C-0203] the PO contact links to a complete delivery address", () => {
+    const { orderId, lines } = placeThreeLineOrder();
+
+    const [poId] = withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW));
+
+    expect(getSupplierAddress(poId)).toEqual({
+      address1: "88 Market Street",
+      address2: null,
+      city: "San Francisco",
+      stateOrProvince: "CA",
+      postalCode: "94103",
+      country: "United States",
+    });
+  });
+
+  it("two suppliers give two POs, each with its own contact and address", () => {
+    const { orderId, lines } = placeThreeLineOrder();
+    vi.spyOn(suppliers, "supplierForItem").mockImplementation((itemId) =>
+      itemId === "SPO-2" ? "SUPPLIER-B" : "PETSTORE-SUPPLIER",
+    );
+
+    const ids = withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW));
+
+    expect(ids).toHaveLength(2);
+    for (const id of ids) {
+      expect(getSupplierContact(id).givenName).toBe("Alex");
+      expect(getSupplierAddress(id).city).toBe("San Francisco");
+    }
+  });
+});
+
 describe("markPoShipped", () => {
   function openPo(): number {
     const { orderId, lines } = placeThreeLineOrder();
-    return withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW))[0];
+    return withTransaction((tx) =>
+      createSupplierPOs(tx, orderId, lines, NOW, { status: "PROCESSING" }),
+    )[0];
   }
 
-  it("stores SHIPPED, the tracking number and shippedAt", () => {
+  it("stores COMPLETED, the tracking number and shippedAt", () => {
     const poId = openPo();
 
     withTransaction((tx) => markPoShipped(tx, poId, "TRK-123"));
@@ -159,7 +256,7 @@ describe("markPoShipped", () => {
       .from(supplierPurchaseOrders)
       .where(eq(supplierPurchaseOrders.id, poId))
       .get();
-    expect(row).toMatchObject({ status: "SHIPPED", trackingNumber: "TRK-123" });
+    expect(row).toMatchObject({ status: "COMPLETED", trackingNumber: "TRK-123" });
     expect(row?.shippedAt).toBeInstanceOf(Date);
   });
 

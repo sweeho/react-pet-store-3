@@ -50,6 +50,13 @@
       "when": 1790709094520,
       "tag": "0006_wild_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1790714667403,
+      "tag": "0007_condemned_pyro",
+      "breakpoints": true
     }
   ]
 }

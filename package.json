@@ -24,6 +24,7 @@
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "admin:grant": "bun run db/grant-admin.ts",
+    "supplier:grant": "bun run db/grant-supplier.ts",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },

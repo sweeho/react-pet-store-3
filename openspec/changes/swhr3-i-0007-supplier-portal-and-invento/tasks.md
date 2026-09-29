@@ -173,13 +173,13 @@
 
 ## 17. Supplier Portal Configuration
 
-- [ ] 17.1 Configure web.xml security-constraint for supplier portal (SWHR3-T-0144)
-- [ ] 17.2 Restrict access to administrator role (SWHR3-T-0144)
-- [ ] 17.3 Map RcvrRequestProcessor servlet URL pattern (SWHR3-T-0144)
-- [ ] 17.4 Configure struts-config.xml for form actions (SWHR3-T-0144)
-- [ ] 17.5 Define form bean for inventory display (SWHR3-T-0144)
-- [ ] 17.6 Map JSP forwards for screen navigation (SWHR3-T-0144)
-- [ ] 17.7 Configure exception handlers for portal errors (SWHR3-T-0144)
+- [x] 17.1 Configure web.xml security-constraint for supplier portal (SWHR3-T-0144)
+- [x] 17.2 Restrict access to administrator role (SWHR3-T-0144)
+- [x] 17.3 Map RcvrRequestProcessor servlet URL pattern (SWHR3-T-0144)
+- [x] 17.4 Configure struts-config.xml for form actions (SWHR3-T-0144)
+- [x] 17.5 Define form bean for inventory display (SWHR3-T-0144)
+- [x] 17.6 Map JSP forwards for screen navigation (SWHR3-T-0144)
+- [x] 17.7 Configure exception handlers for portal errors (SWHR3-T-0144)
 
 ## 18. Testing and Validation
 

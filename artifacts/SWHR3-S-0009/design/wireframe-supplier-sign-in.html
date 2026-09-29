@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Supplier sign-in — wireframe</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: #27272a; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 24px; border-bottom: 1px solid #e4e4e7; }
+  .brand { font-weight: 600; font-size: 13px; color: #3f3f46; }
+  .brand span { color: #a1a1aa; font-weight: 400; }
+  .wrap { display: flex; justify-content: center; padding: 72px 24px; }
+  .card { width: 360px; border: 1px solid #e4e4e7; border-radius: 10px; padding: 24px; }
+  h1 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .muted { margin: 0 0 20px; font-size: 12px; color: #71717a; }
+  label { display: block; font-size: 12px; font-weight: 500; margin: 0 0 6px; }
+  .field { width: 100%; height: 36px; border: 1px solid #d4d4d8; border-radius: 8px; background: #fff; margin-bottom: 14px; }
+  .field.filled { background: #f4f4f5; }
+  .btn { display: block; width: 100%; height: 38px; line-height: 38px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: 500; }
+  .btn.primary { background: #3f3f46; color: #fff; }
+  .note { margin-top: 16px; font-size: 11px; color: #a1a1aa; text-align: center; }
+  .anno { max-width: 360px; margin: 16px auto 0; font-size: 11px; color: #a1a1aa; border-left: 2px solid #e4e4e7; padding-left: 8px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Pet Store <span>/ Supplier</span></div>
+    <div class="brand"><span>Not signed in</span></div>
+  </div>
+
+  <div class="wrap">
+    <div>
+      <div class="card">
+        <h1>Supplier sign in</h1>
+        <p class="muted">Supplier staff credentials.</p>
+
+        <label for="u">Username</label>
+        <div class="field" id="u"></div>
+
+        <label for="p">Password</label>
+        <div class="field" id="p"></div>
+
+        <div class="btn primary">Sign in</div>
+
+        <p class="note">Inventory only. No customer or order data here.</p>
+      </div>
+      <p class="anno">Supplier sessions are separate from the admin client and cannot both be open in one browser.</p>
+    </div>
+  </div>
+</body>
+</html>

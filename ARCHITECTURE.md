@@ -99,6 +99,7 @@ Commands and file locations:
 - `bun run db:generate`: after editing `db/schema.ts`, generates a new migration into `drizzle/` (via `drizzle-kit`, config in `drizzle.config.ts`).
 - `bun run db:studio`: browse the db in Drizzle Studio.
 - The db file itself is `sqlite.db` at the project root (gitignored, created on first run). `drizzle/` migrations are committed.
+- Every connection is opened through `db/client.ts`, which waits up to 5 s on a lock held by another process (busy timeout) and runs the file-backed db in WAL mode. Operator scripts and the server share `sqlite.db` concurrently; WAL adds `sqlite.db-wal` / `sqlite.db-shm` sidecars and requires the db on a local filesystem, and a backup must include the sidecars or checkpoint first.
 - Under Vitest (`VITEST=true`), `db/client.ts` swaps in an in-memory db instead, so tests never touch the dev database.
 
 ## Testing
@@ -120,5 +121,6 @@ Four tiers, one worked example each. Commands and how to extend: [README.md](./R
 - **Roles live on `accounts.role` and are read from the database per request, never from the session cookie.** A revoked role applies on the next request, and adding a role invalidates no existing session. Authored in change `swhr3-i-0003-order-approval-and-status-m`, design.md D3.
 - **`/api/admin/**`is administrator-only by path prefix, enforced in`middleware/auth.ts`(401 signed out, 403`FORBIDDEN`otherwise).** A new admin route cannot be added unprotected; customer paths keep the exact-match list. Authored in change`swhr3-i-0003-order-approval-and-status-m`, design.md D4.
 - **Order status changes go only through `lib/orders.ts` under the transition rule in `lib/order-status.ts`, and a multi-order change is one immediate-mode `withTransaction`.** Approval, fulfilment and any later status writer share one vocabulary and one rule, and overlapping batches cannot lost-update each other. Money is stored in integer cents. Authored in change `swhr3-i-0003-order-approval-and-status-m`, design.md D1, D2 and D6.
+- **Every `bun:sqlite` connection is opened through `db/client.ts` with a 5 s busy timeout, and the file-backed db runs in WAL.** Bun defaults to failing a contended lock instantly, so a connection opened any other way reintroduces 500 "database is locked" under concurrent operator scripts. Authored in change `swhr3-s-0004-bugfix-swhr3-t-0048-server`, design.md D1-D3.
 - **Customer-owned data in later capabilities references `accounts.id`.** Every session carries it, and a profile may not exist yet. Contact and address data is read from the profile and snapshotted onto orders. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D16.
 - **Server-shared logic lives in `lib/`; services throw `lib/errors.ts` types; routes convert with `toHttpError`; the client calls through `apiFetch`.** One error body shape across every API. Authored in change `swhr3-i-0002-customer-management-and-aut`, design.md D11 and D13.

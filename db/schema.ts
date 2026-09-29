@@ -85,7 +85,36 @@ export const orders = sqliteTable("orders", {
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
+  // design.md D3/C1: checkout snapshots. Nullable because orders seeded
+  // before checkout existed have none.
+  email: text("email"),
+  cardType: text("card_type"),
+  cardNumber: text("card_number"),
+  cardExpiry: text("card_expiry"),
 });
+
+// design.md D3/C1: billing (BILL_TO) and shipping (SHIP_TO) addresses as
+// snapshots of what the customer entered; later profile edits never touch them.
+export const orderContacts = sqliteTable(
+  "order_contacts",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id),
+    role: text("role").notNull(),
+    familyName: text("family_name").notNull(),
+    givenName: text("given_name").notNull(),
+    address1: text("address1").notNull(),
+    address2: text("address2"),
+    city: text("city").notNull(),
+    stateOrProvince: text("state_or_province").notNull(),
+    postalCode: text("postal_code").notNull(),
+    country: text("country").notNull(),
+    telephoneNumber: text("telephone_number").notNull(),
+    email: text("email").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.orderId, t.role] })],
+);
 
 // design.md D1/C1: anonymous cart state, keyed by the petstore_cart cookie
 // token. item_id is deliberately not a foreign key (D4).

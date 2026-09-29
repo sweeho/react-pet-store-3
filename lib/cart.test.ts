@@ -6,6 +6,7 @@ import { cartItems, catalogItemDetails, catalogItems } from "../db/schema";
 import {
   addItem,
   deleteItem,
+  empty,
   getDetails,
   getCount,
   getItems,
@@ -264,5 +265,31 @@ describe("getCount", () => {
     db.insert(cartItems).values({ sessionToken: b, itemId: "EST-2", quantity: 1 }).run();
 
     expect(getCount(a)).toBe(1);
+  });
+});
+
+describe("empty", () => {
+  it("[SWHR3-C-0074] removes every item of the cart and no other cart", () => {
+    const t = randomUUID();
+    const u = randomUUID();
+    db.insert(cartItems)
+      .values([
+        { sessionToken: t, itemId: "EST-1", quantity: 1 },
+        { sessionToken: t, itemId: "EST-2", quantity: 2 },
+        { sessionToken: t, itemId: "EST-3", quantity: 3 },
+        { sessionToken: u, itemId: "EST-1", quantity: 1 },
+      ])
+      .run();
+
+    empty(t);
+
+    expect(getDetails(t)).toEqual({});
+    expect(getCount(t)).toBe(0);
+    expect(getDetails(u)).toEqual({ "EST-1": 1 });
+  });
+
+  it("emptying an empty or undefined cart throws nothing", () => {
+    expect(() => empty(randomUUID())).not.toThrow();
+    expect(() => empty(undefined)).not.toThrow();
   });
 });

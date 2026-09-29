@@ -17,11 +17,11 @@
 
 ## 3. Line Item Management
 
-- [ ] 3.1 Create LineItem entity for each cart item (SWHR3-T-0111)
-- [ ] 3.2 Set product ID, item ID, quantity on line items (SWHR3-T-0111)
-- [ ] 3.3 Set unit price and calculate line total (SWHR3-T-0111)
-- [ ] 3.4 Associate line items with PurchaseOrder (SWHR3-T-0111)
-- [ ] 3.5 Persist line items to database (SWHR3-T-0111)
+- [x] 3.1 Create LineItem entity for each cart item (SWHR3-T-0111)
+- [x] 3.2 Set product ID, item ID, quantity on line items (SWHR3-T-0111)
+- [x] 3.3 Set unit price and calculate line total (SWHR3-T-0111)
+- [x] 3.4 Associate line items with PurchaseOrder (SWHR3-T-0111)
+- [x] 3.5 Persist line items to database (SWHR3-T-0111)
 
 ## 4. Payment Processing
 

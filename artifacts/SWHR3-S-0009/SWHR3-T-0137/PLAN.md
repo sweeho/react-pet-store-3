@@ -22,7 +22,7 @@ Approval always creates PENDING POs and tries to fulfil them. Fulfilling checks 
 
 1. Create `lib/supplier-fulfilment.ts` per C8. `fulfilSupplierOrder` returns SKIPPED unless the PO is PENDING. It checks every line against inventory; if all are covered it calls `reserveInventory` and moves the PO to PROCESSING through `assertSupplierOrderTransition`. On a shortage it deducts nothing and returns UNABLE with `shortItems` (recording and logging are SWHR3-T-0143's).
    When every PO of the order is PROCESSING and the stage is CONFIRMED, it sets the stage to ALLOCATED. `processPendingSupplierOrders` runs every PENDING PO, oldest first.
-2. Change `lib/process-manager.ts` `allocateOrder` per D3. It creates the POs with `createSupplierPOs` (PENDING, with contact and address, per SWHR3-T-0139), then calls `fulfilSupplierOrder` for each. It returns ALLOCATED when the stage reached ALLOCATED and WAITING otherwise. `retryWaitingAllocations()` delegates to `processPendingSupplierOrders` in one immediate transaction and returns the fulfilled count.
+2. Change `lib/process-manager.ts` `allocateOrder` per D3. It creates the POs with `createSupplierPOs`, dropping the temporary `{ status: 'PROCESSING' }` so they are PENDING with contact and address (C12), then calls `fulfilSupplierOrder` for each. It returns ALLOCATED when the stage reached ALLOCATED and WAITING otherwise. `retryWaitingAllocations()` delegates to `processPendingSupplierOrders` in one immediate transaction and returns the fulfilled count.
 3. Tests (`lib/supplier-fulfilment.test.ts`, updated `lib/process-manager.test.ts`):
    - A stocked approval gives a PROCESSING PO, deducted inventory and ALLOCATED.
    - A short approval gives a PENDING PO, unchanged inventory and CONFIRMED.

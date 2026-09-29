@@ -248,6 +248,7 @@ Everything above this heading was extracted from the legacy system. Everything b
   - `GET /api/supplier/inventory` answers 200 `{ items: InventoryRow[] }`.
   - `POST /api/supplier/inventory` takes a C6 body (JSON only) and answers 200 per D7.
   - Both answer 401 without a session and 403 `FORBIDDEN` for a non-supplier.
+- **C12 — `lib/supplier-pos.ts`:** `createSupplierPOs(tx, orderId, lines, now = new Date(), options?: { status?: SupplierOrderStatus })` defaults `status` to `PENDING`. Until SWHR3-T-0137 rewrites `allocateOrder`, that one call passes `{ status: "PROCESSING" }` to keep today's behaviour, because stock is already reserved there.
 - **C11 — Client:**
   - `src/types/supplier.ts` (`InventoryRow`, `InventoryUpdateResult`).
   - `src/utils/supplier-api.ts` (`getInventory()`, `updateInventory(fields)`).

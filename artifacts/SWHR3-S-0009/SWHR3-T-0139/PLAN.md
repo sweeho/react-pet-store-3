@@ -20,7 +20,7 @@ Change: `swhr3-i-0007-supplier-portal-and-invento`, tasks.md group 12. Requireme
 
 ## Steps
 
-1. Change `lib/supplier-pos.ts` `createSupplierPOs`. Status is `PENDING` and `createdAt` is `now` (poDate). For each PO it reads the order's `SHIP_TO` row from `order_contacts` and calls `insertSupplierContact` and `insertSupplierAddress`, mapping `telephoneNumber`→`telephone` and `address1/2` as they are. Grouping and delivery dates are unchanged.
+1. Change `lib/supplier-pos.ts` `createSupplierPOs` per C12: an `options.status` defaulting to `PENDING`. In `lib/process-manager.ts`, change the one existing `allocateOrder` call to pass `{ status: 'PROCESSING' }`, so behaviour is unchanged until SWHR3-T-0137. Status is the given status and `createdAt` is `now` (poDate). For each PO it reads the order's `SHIP_TO` row from `order_contacts` and calls `insertSupplierContact` and `insertSupplierAddress`, mapping `telephoneNumber`→`telephone` and `address1/2` as they are. Grouping and delivery dates are unchanged.
 2. Extend `lib/supplier-pos.test.ts`: a new PO has an integer id, `created_at` equal to the fixed `now`, and status PENDING; its contact and address match the order's shipping snapshot; two suppliers give two POs, each with its own contact.
 
 ## File/module ownership

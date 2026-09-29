@@ -1,12 +1,12 @@
 ## 1. Address Collection Forms
 
-- [ ] 1.1 Create enter_order_information.jsp form with billing address section (SWHR3-T-0083)
-- [ ] 1.2 Add billing address input fields: family name, given name, address 1, address 2, city, state, postal, country, phone, email (SWHR3-T-0083)
-- [ ] 1.3 Add shipping address section to same form with duplicate field sets (SWHR3-T-0083)
-- [ ] 1.4 Implement address field labels and form layout for usability (SWHR3-T-0083)
-- [ ] 1.5 Add "Use Billing Address for Shipping" checkbox option (SWHR3-T-0083)
-- [ ] 1.6 Add credit card fields to checkout form (SWHR3-T-0083)
-- [ ] 1.7 Add form submission button and JavaScript form validation (SWHR3-T-0083)
+- [x] 1.1 Create enter_order_information.jsp form with billing address section (SWHR3-T-0083)
+- [x] 1.2 Add billing address input fields: family name, given name, address 1, address 2, city, state, postal, country, phone, email (SWHR3-T-0083)
+- [x] 1.3 Add shipping address section to same form with duplicate field sets (SWHR3-T-0083)
+- [x] 1.4 Implement address field labels and form layout for usability (SWHR3-T-0083)
+- [x] 1.5 Add "Use Billing Address for Shipping" checkbox option (SWHR3-T-0083)
+- [x] 1.6 Add credit card fields to checkout form (SWHR3-T-0083)
+- [x] 1.7 Add form submission button and JavaScript form validation (SWHR3-T-0083)
 
 ## 2. Web-Tier Address Validation
 

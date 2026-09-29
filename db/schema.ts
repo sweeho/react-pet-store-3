@@ -91,6 +91,9 @@ export const orders = sqliteTable("orders", {
   cardType: text("card_type"),
   cardNumber: text("card_number"),
   cardExpiry: text("card_expiry"),
+  // design.md D1/C1: the fulfilment lifecycle, separate from the approval
+  // status above. Existing rows read PENDING.
+  workflowStage: text("workflow_stage").notNull().default("PENDING"),
 });
 
 // design.md D3/C1: billing (BILL_TO) and shipping (SHIP_TO) addresses as
@@ -164,6 +167,73 @@ export const lineItems = sqliteTable(
     quantity: integer("quantity").notNull(),
     unitPriceCents: integer("unit_price_cents").notNull(),
     quantityShipped: integer("quantity_shipped").notNull().default(0),
+    // design.md C1/D6: set when allocation groups the line into a supplier PO.
+    supplierPoId: integer("supplier_po_id").references(() => supplierPurchaseOrders.id),
   },
   (t) => [primaryKey({ columns: [t.orderId, t.lineNumber] })],
 );
+
+// design.md C1 (order-processing-and-fulfilment): the workflow tables.
+export const orderStageHistory = sqliteTable("order_stage_history", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  stage: text("stage").notNull(),
+  changedAt: integer("changed_at", { mode: "timestamp" }).notNull(),
+});
+
+export const paymentAuthorizations = sqliteTable("payment_authorizations", {
+  orderId: integer("order_id")
+    .primaryKey()
+    .references(() => orders.id),
+  processor: text("processor").notNull(),
+  transactionId: text("transaction_id").notNull().unique(),
+  authorizationCode: text("authorization_code").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  authorizedAt: integer("authorized_at", { mode: "timestamp" }).notNull(),
+});
+
+export const notificationOutbox = sqliteTable("notification_outbox", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  kind: text("kind").notNull(),
+  recipient: text("recipient").notNull(),
+  payload: text("payload").notNull(),
+  status: text("status").notNull().default("QUEUED"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const inventory = sqliteTable("inventory", {
+  itemId: text("item_id")
+    .primaryKey()
+    .references(() => catalogItems.itemId),
+  quantity: integer("quantity").notNull(),
+});
+
+export const inventoryReservations = sqliteTable(
+  "inventory_reservations",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id),
+    itemId: text("item_id").notNull(),
+    quantity: integer("quantity").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.orderId, t.itemId] })],
+);
+
+export const supplierPurchaseOrders = sqliteTable("supplier_purchase_orders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  supplierId: text("supplier_id").notNull(),
+  status: text("status").notNull().default("OPEN"),
+  expectedDeliveryDate: integer("expected_delivery_date", { mode: "timestamp" }).notNull(),
+  trackingNumber: text("tracking_number"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  shippedAt: integer("shipped_at", { mode: "timestamp" }),
+});

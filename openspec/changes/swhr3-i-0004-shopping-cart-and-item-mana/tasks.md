@@ -144,16 +144,16 @@
 
 ## 17. Integration Testing
 
-- [ ] 17.1 Test add item workflow with purchase action (SWHR3-T-0074)
-- [ ] 17.2 Test remove item workflow with remove action (SWHR3-T-0074)
-- [ ] 17.3 Test update quantity workflow with update action (SWHR3-T-0074)
-- [ ] 17.4 Test empty cart display with zero items (SWHR3-T-0074)
-- [ ] 17.5 Test populated cart with multiple items (SWHR3-T-0074)
-- [ ] 17.6 Test quantity defaults and overloads (SWHR3-T-0074)
-- [ ] 17.7 Test subtotal calculation accuracy (SWHR3-T-0074)
-- [ ] 17.8 Test cart clearing operation (SWHR3-T-0074)
-- [ ] 17.9 Test locale propagation to catalog (SWHR3-T-0074)
-- [ ] 17.10 Test transaction rollback on failures (SWHR3-T-0074)
+- [x] 17.1 Test add item workflow with purchase action (SWHR3-T-0074)
+- [x] 17.2 Test remove item workflow with remove action (SWHR3-T-0074)
+- [x] 17.3 Test update quantity workflow with update action (SWHR3-T-0074)
+- [x] 17.4 Test empty cart display with zero items (SWHR3-T-0074)
+- [x] 17.5 Test populated cart with multiple items (SWHR3-T-0074)
+- [x] 17.6 Test quantity defaults and overloads (SWHR3-T-0074)
+- [x] 17.7 Test subtotal calculation accuracy (SWHR3-T-0074)
+- [x] 17.8 Test cart clearing operation (SWHR3-T-0074)
+- [x] 17.9 Test locale propagation to catalog (SWHR3-T-0074)
+- [x] 17.10 Test transaction rollback on failures (SWHR3-T-0074)
 
 ## 18. Error Handling
 

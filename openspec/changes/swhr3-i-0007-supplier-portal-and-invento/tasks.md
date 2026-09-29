@@ -163,13 +163,13 @@
 
 ## 16. Error Handling and Logging
 
-- [ ] 16.1 Implement inventory lookup error handling (SWHR3-T-0143)
-- [ ] 16.2 Implement order processing error handling (SWHR3-T-0143)
-- [ ] 16.3 Log all supplier portal activities (SWHR3-T-0143)
-- [ ] 16.4 Log inventory update events with before/after values (SWHR3-T-0143)
-- [ ] 16.5 Log order reprocessing attempts and results (SWHR3-T-0143)
-- [ ] 16.6 Display user-friendly error messages for failures (SWHR3-T-0143)
-- [ ] 16.7 Implement exception recovery for partial failures (SWHR3-T-0143)
+- [x] 16.1 Implement inventory lookup error handling (SWHR3-T-0143)
+- [x] 16.2 Implement order processing error handling (SWHR3-T-0143)
+- [x] 16.3 Log all supplier portal activities (SWHR3-T-0143)
+- [x] 16.4 Log inventory update events with before/after values (SWHR3-T-0143)
+- [x] 16.5 Log order reprocessing attempts and results (SWHR3-T-0143)
+- [x] 16.6 Display user-friendly error messages for failures (SWHR3-T-0143)
+- [x] 16.7 Implement exception recovery for partial failures (SWHR3-T-0143)
 
 ## 17. Supplier Portal Configuration
 

@@ -110,7 +110,7 @@ function poIdsOfLines(orderId: number): (number | null)[] {
 }
 
 describe("createSupplierPOs", () => {
-  it("[SWHR3-C-0174] one supplier gives one OPEN PO due 7 days out, referenced by every line", () => {
+  it("[SWHR3-C-0174] one supplier gives one PROCESSING PO due 7 days out, referenced by every line", () => {
     const { orderId, lines } = placeThreeLineOrder();
 
     const ids = withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW));
@@ -118,7 +118,7 @@ describe("createSupplierPOs", () => {
     const rows = pos(orderId);
     expect(ids).toEqual(rows.map((r) => r.id));
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ supplierId: "PETSTORE-SUPPLIER", status: "OPEN" });
+    expect(rows[0]).toMatchObject({ supplierId: "PETSTORE-SUPPLIER", status: "PROCESSING" });
     expect(rows[0].expectedDeliveryDate.toISOString()).toBe("2026-10-08T09:00:00.000Z");
     expect(poIdsOfLines(orderId)).toEqual([ids[0], ids[0], ids[0]]);
   });
@@ -149,7 +149,7 @@ describe("markPoShipped", () => {
     return withTransaction((tx) => createSupplierPOs(tx, orderId, lines, NOW))[0];
   }
 
-  it("stores SHIPPED, the tracking number and shippedAt", () => {
+  it("stores COMPLETED, the tracking number and shippedAt", () => {
     const poId = openPo();
 
     withTransaction((tx) => markPoShipped(tx, poId, "TRK-123"));
@@ -159,7 +159,7 @@ describe("markPoShipped", () => {
       .from(supplierPurchaseOrders)
       .where(eq(supplierPurchaseOrders.id, poId))
       .get();
-    expect(row).toMatchObject({ status: "SHIPPED", trackingNumber: "TRK-123" });
+    expect(row).toMatchObject({ status: "COMPLETED", trackingNumber: "TRK-123" });
     expect(row?.shippedAt).toBeInstanceOf(Date);
   });
 

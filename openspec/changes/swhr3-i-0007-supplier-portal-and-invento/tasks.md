@@ -31,16 +31,16 @@
 
 ## 4. Address Entity Bean
 
-- [ ] 4.1 Create Address CMP 2.x entity bean (SWHR3-T-0131)
-- [ ] 4.2 Declare address line 1 field (String) (SWHR3-T-0131)
-- [ ] 4.3 Declare address line 2 field (String, optional) (SWHR3-T-0131)
-- [ ] 4.4 Declare city field (String) (SWHR3-T-0131)
-- [ ] 4.5 Declare state/province field (String) (SWHR3-T-0131)
-- [ ] 4.6 Declare postal code field (String) (SWHR3-T-0131)
-- [ ] 4.7 Declare country field (String) (SWHR3-T-0131)
-- [ ] 4.8 Implement abstract getter/setter methods (SWHR3-T-0131)
-- [ ] 4.9 Create AddressLocal interface (SWHR3-T-0131)
-- [ ] 4.10 Create AddressLocalHome interface (SWHR3-T-0131)
+- [x] 4.1 Create Address CMP 2.x entity bean (SWHR3-T-0131)
+- [x] 4.2 Declare address line 1 field (String) (SWHR3-T-0131)
+- [x] 4.3 Declare address line 2 field (String, optional) (SWHR3-T-0131)
+- [x] 4.4 Declare city field (String) (SWHR3-T-0131)
+- [x] 4.5 Declare state/province field (String) (SWHR3-T-0131)
+- [x] 4.6 Declare postal code field (String) (SWHR3-T-0131)
+- [x] 4.7 Declare country field (String) (SWHR3-T-0131)
+- [x] 4.8 Implement abstract getter/setter methods (SWHR3-T-0131)
+- [x] 4.9 Create AddressLocal interface (SWHR3-T-0131)
+- [x] 4.10 Create AddressLocalHome interface (SWHR3-T-0131)
 
 ## 5. EJB Relationships
 

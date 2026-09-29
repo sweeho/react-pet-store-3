@@ -9,7 +9,7 @@ import { and, asc, eq } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 
 import { NotFoundError } from "./errors";
-import { ORDER_STATUSES, assertTransition } from "./order-status";
+import { ORDER_STATUSES, assertSystemTransition, assertTransition } from "./order-status";
 import type { AssignableStatus, OrderStatus } from "./order-status";
 import type { DbOrTx } from "./transaction";
 import { orders } from "../db/schema";
@@ -69,5 +69,20 @@ export function updateOrderStatus(tx: DbOrTx, orderId: number, to: AssignableSta
   tx.update(orders)
     .set({ status: to, updatedAt: new Date() })
     .where(and(eq(orders.id, orderId), eq(orders.status, "PENDING")))
+    .run();
+}
+
+/** Completes an APPROVED order once every supplier PO has shipped (design.md D7). */
+export function completeOrder(tx: DbOrTx, orderId: number): void {
+  const row = tx.select().from(orders).where(eq(orders.id, orderId)).get();
+  if (!row) {
+    throw new NotFoundError(`Order ${orderId} not found`);
+  }
+
+  assertSystemTransition(orderId, row.status as OrderStatus, "COMPLETED");
+
+  tx.update(orders)
+    .set({ status: "COMPLETED", updatedAt: new Date() })
+    .where(and(eq(orders.id, orderId), eq(orders.status, "APPROVED")))
     .run();
 }

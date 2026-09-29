@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ASSIGNABLE_STATUSES,
   ORDER_STATUSES,
+  assertSystemTransition,
   assertTransition,
   isAssignableStatus,
   isOrderStatus,
@@ -74,5 +75,22 @@ describe("assertTransition", () => {
       expect((error as Error).message).toContain("99");
       expect((error as Error).message).toContain("COMPLETED");
     }
+  });
+});
+
+describe("assertSystemTransition", () => {
+  it("allows APPROVED to COMPLETED, which an administrator may not assign (D7)", () => {
+    expect(() => assertSystemTransition(1, "APPROVED", "COMPLETED")).not.toThrow();
+    expect(() => assertTransition(1, "APPROVED", "COMPLETED")).toThrow(InvalidTransitionError);
+    expect(isAssignableStatus("COMPLETED")).toBe(false);
+  });
+
+  it.each([
+    ["PENDING", "COMPLETED"],
+    ["APPROVED", "APPROVED"],
+    ["DENIED", "COMPLETED"],
+    ["COMPLETED", "COMPLETED"],
+  ] as Array<[OrderStatus, OrderStatus]>)("refuses %s to %s", (from, to) => {
+    expect(() => assertSystemTransition(1, from, to)).toThrow(InvalidTransitionError);
   });
 });

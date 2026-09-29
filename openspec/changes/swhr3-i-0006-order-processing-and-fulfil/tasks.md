@@ -1,27 +1,27 @@
 ## 1. Order Validation
 
-- [ ] 1.1 Implement cart validation (must not be empty) before order creation (SWHR3-T-0109)
-- [ ] 1.2 Implement customer authentication and session validation (SWHR3-T-0109)
-- [ ] 1.3 Validate billing and shipping address completeness (SWHR3-T-0109)
-- [ ] 1.4 Validate credit card information present (SWHR3-T-0109)
+- [x] 1.1 Implement cart validation (must not be empty) before order creation (SWHR3-T-0109)
+- [x] 1.2 Implement customer authentication and session validation (SWHR3-T-0109)
+- [x] 1.3 Validate billing and shipping address completeness (SWHR3-T-0109)
+- [x] 1.4 Validate credit card information present (SWHR3-T-0109)
 
 ## 2. Order Creation
 
-- [ ] 2.1 Generate unique order ID via UniqueIdGenerator (SWHR3-T-0110)
-- [ ] 2.2 Create PurchaseOrder entity with order ID, date, customer ID (SWHR3-T-0110)
-- [ ] 2.3 Set billing address (BillTo) from checkout form (SWHR3-T-0110)
-- [ ] 2.4 Set shipping address (ShipTo) from checkout form (SWHR3-T-0110)
-- [ ] 2.5 Set credit card payment method (SWHR3-T-0110)
-- [ ] 2.6 Calculate order total from cart line items (SWHR3-T-0110)
-- [ ] 2.7 Persist PurchaseOrder entity (SWHR3-T-0110)
+- [x] 2.1 Generate unique order ID via UniqueIdGenerator (SWHR3-T-0110)
+- [x] 2.2 Create PurchaseOrder entity with order ID, date, customer ID (SWHR3-T-0110)
+- [x] 2.3 Set billing address (BillTo) from checkout form (SWHR3-T-0110)
+- [x] 2.4 Set shipping address (ShipTo) from checkout form (SWHR3-T-0110)
+- [x] 2.5 Set credit card payment method (SWHR3-T-0110)
+- [x] 2.6 Calculate order total from cart line items (SWHR3-T-0110)
+- [x] 2.7 Persist PurchaseOrder entity (SWHR3-T-0110)
 
 ## 3. Line Item Management
 
-- [ ] 3.1 Create LineItem entity for each cart item (SWHR3-T-0111)
-- [ ] 3.2 Set product ID, item ID, quantity on line items (SWHR3-T-0111)
-- [ ] 3.3 Set unit price and calculate line total (SWHR3-T-0111)
-- [ ] 3.4 Associate line items with PurchaseOrder (SWHR3-T-0111)
-- [ ] 3.5 Persist line items to database (SWHR3-T-0111)
+- [x] 3.1 Create LineItem entity for each cart item (SWHR3-T-0111)
+- [x] 3.2 Set product ID, item ID, quantity on line items (SWHR3-T-0111)
+- [x] 3.3 Set unit price and calculate line total (SWHR3-T-0111)
+- [x] 3.4 Associate line items with PurchaseOrder (SWHR3-T-0111)
+- [x] 3.5 Persist line items to database (SWHR3-T-0111)
 
 ## 4. Payment Processing
 
@@ -72,11 +72,11 @@
 
 ## 10. Process Manager
 
-- [ ] 10.1 Create ProcessManager state machine (SWHR3-T-0118)
-- [ ] 10.2 Implement order status state transitions (SWHR3-T-0118)
-- [ ] 10.3 Validate state transition rules (SWHR3-T-0118)
-- [ ] 10.4 Implement status change notifications (SWHR3-T-0118)
-- [ ] 10.5 Coordinate subprocess execution per state (SWHR3-T-0118)
+- [x] 10.1 Create ProcessManager state machine (SWHR3-T-0118)
+- [x] 10.2 Implement order status state transitions (SWHR3-T-0118)
+- [x] 10.3 Validate state transition rules (SWHR3-T-0118)
+- [x] 10.4 Implement status change notifications (SWHR3-T-0118)
+- [x] 10.5 Coordinate subprocess execution per state (SWHR3-T-0118)
 
 ## 11. EJB Transaction Management
 
@@ -96,11 +96,11 @@
 
 ## 13. Error Handling
 
-- [ ] 13.1 Implement payment processor error handling (SWHR3-T-0121)
-- [ ] 13.2 Implement inventory system error handling (SWHR3-T-0121)
-- [ ] 13.3 Implement supplier PO generation errors (SWHR3-T-0121)
-- [ ] 13.4 Implement exception-to-user-message mapping (SWHR3-T-0121)
-- [ ] 13.5 Log all errors for diagnostics (SWHR3-T-0121)
+- [x] 13.1 Implement payment processor error handling (SWHR3-T-0121)
+- [x] 13.2 Implement inventory system error handling (SWHR3-T-0121)
+- [x] 13.3 Implement supplier PO generation errors (SWHR3-T-0121)
+- [x] 13.4 Implement exception-to-user-message mapping (SWHR3-T-0121)
+- [x] 13.5 Log all errors for diagnostics (SWHR3-T-0121)
 
 ## 14. Testing
 

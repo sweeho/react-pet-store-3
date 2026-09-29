@@ -3,7 +3,14 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
 import { cartItems, catalogItemDetails, catalogItems } from "../db/schema";
-import { addItem, deleteItem, getDetails, getItems, updateItemQuantity } from "./cart";
+import {
+  addItem,
+  deleteItem,
+  getDetails,
+  getItems,
+  getSubTotalCents,
+  updateItemQuantity,
+} from "./cart";
 import { ValidationError } from "./errors";
 
 /**
@@ -184,5 +191,48 @@ describe("getItems", () => {
 
   it("returns an empty list for an undefined token", () => {
     expect(getItems(undefined)).toEqual([]);
+  });
+});
+
+describe("getSubTotalCents", () => {
+  beforeAll(() => {
+    db.insert(catalogItems)
+      .values([
+        { itemId: "SUB-1", productId: "K9-BD-01", category: "DOGS", unitCostCents: 1999 },
+        { itemId: "SUB-2", productId: "FL-DSH-01", category: "CATS", unitCostCents: 550 },
+      ])
+      .onConflictDoNothing()
+      .run();
+    db.insert(catalogItemDetails)
+      .values([
+        { itemId: "SUB-1", locale: "en_US", name: "Bulldog", attribute: "Adult" },
+        { itemId: "SUB-2", locale: "en_US", name: "Manx", attribute: "Kitten" },
+      ])
+      .onConflictDoNothing()
+      .run();
+  });
+
+  it("[SWHR3-C-0067] is the sum of unit cost times quantity in cents", () => {
+    const token = randomUUID();
+    addItem(token, "SUB-1", 2);
+    addItem(token, "SUB-2", 1);
+    expect(getSubTotalCents(token)).toBe(4548);
+  });
+
+  it("[SWHR3-C-0068] is 0 for an empty cart and an undefined token", () => {
+    expect(getSubTotalCents(randomUUID())).toBe(0);
+    expect(getSubTotalCents(undefined)).toBe(0);
+  });
+
+  it("an item skipped by enrichment contributes nothing", () => {
+    const token = randomUUID();
+    addItem(token, "SUB-1", 1);
+    addItem(token, "GHOST-1", 3);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    try {
+      expect(getSubTotalCents(token)).toBe(1999);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

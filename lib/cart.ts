@@ -124,3 +124,14 @@ export function getItems(
     return items;
   }, outer);
 }
+
+export function getSubTotalCents(
+  sessionToken: string | undefined,
+  locale: string = DEFAULT_CART_LOCALE,
+  outer?: DbOrTx,
+): number {
+  void sessionToken;
+  void locale;
+  void outer;
+  throw new Error("VortexNotImplemented");
+}

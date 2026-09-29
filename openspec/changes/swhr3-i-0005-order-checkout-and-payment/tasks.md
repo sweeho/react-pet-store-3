@@ -67,12 +67,12 @@
 
 ## 7. Shopping Cart Validation
 
-- [ ] 7.1 Implement cart retrieval from customer session (SWHR3-T-0089)
-- [ ] 7.2 Implement getItems() method to retrieve line items from cart (SWHR3-T-0089)
-- [ ] 7.3 Implement cart.size() or items.size() check (SWHR3-T-0089)
-- [ ] 7.4 Create ShoppingCartEmptyOrderException class (SWHR3-T-0089)
-- [ ] 7.5 Implement exception throwing with descriptive error message (SWHR3-T-0089)
-- [ ] 7.6 Propagate exception to web tier for user display (SWHR3-T-0089)
+- [x] 7.1 Implement cart retrieval from customer session (SWHR3-T-0089)
+- [x] 7.2 Implement getItems() method to retrieve line items from cart (SWHR3-T-0089)
+- [x] 7.3 Implement cart.size() or items.size() check (SWHR3-T-0089)
+- [x] 7.4 Create ShoppingCartEmptyOrderException class (SWHR3-T-0089)
+- [x] 7.5 Implement exception throwing with descriptive error message (SWHR3-T-0089)
+- [x] 7.6 Propagate exception to web tier for user display (SWHR3-T-0089)
 
 ## 8. Purchase Order Entity
 

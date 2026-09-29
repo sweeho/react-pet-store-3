@@ -93,11 +93,6 @@ async function ordersByStatus(
 }
 
 test.describe("Order approval (SWHR3-I-0003)", () => {
-  // db/client.ts sets no busy_timeout, so the dev server itself can answer
-  // 500 "database is locked" while a spawned seed/grant script holds the
-  // write lock. Retry until that is fixed server-side (follow-up defect).
-  test.describe.configure({ retries: 3 });
-
   test("[SWHR3-C-0005] an admin stages one order as APPROVED in the browser", async ({ page }) => {
     const admin = await createAdmin(page.request, "apr5");
     const [orderId] = seedOrders(admin, 1);

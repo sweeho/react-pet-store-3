@@ -59,11 +59,11 @@
 
 ## 6. Order ID Generation
 
-- [ ] 6.1 Implement UniqueIdGenerator component (SWHR3-T-0088)
-- [ ] 6.2 Implement getUniqueId(baseId) method (SWHR3-T-0088)
-- [ ] 6.3 Generate unique identifiers without database collision (SWHR3-T-0088)
-- [ ] 6.4 Initialize generator with base ID "1001" (SWHR3-T-0088)
-- [ ] 6.5 Ensure thread-safe ID generation for concurrent checkout (SWHR3-T-0088)
+- [x] 6.1 Implement UniqueIdGenerator component (SWHR3-T-0088)
+- [x] 6.2 Implement getUniqueId(baseId) method (SWHR3-T-0088)
+- [x] 6.3 Generate unique identifiers without database collision (SWHR3-T-0088)
+- [x] 6.4 Initialize generator with base ID "1001" (SWHR3-T-0088)
+- [x] 6.5 Ensure thread-safe ID generation for concurrent checkout (SWHR3-T-0088)
 
 ## 7. Shopping Cart Validation
 

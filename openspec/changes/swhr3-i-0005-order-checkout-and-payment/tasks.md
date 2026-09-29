@@ -134,16 +134,16 @@
 
 ## 14. Integration Testing
 
-- [ ] 14.1 Test complete checkout flow with valid addresses and payment (SWHR3-T-0096)
-- [ ] 14.2 Test billing address required field validation (SWHR3-T-0096)
-- [ ] 14.3 Test shipping address field validation (SWHR3-T-0096)
-- [ ] 14.4 Test optional address_2 field handling (SWHR3-T-0096)
-- [ ] 14.5 Test credit card field validation (SWHR3-T-0096)
-- [ ] 14.6 Test empty cart checkout rejection (SWHR3-T-0096)
-- [ ] 14.7 Test order ID uniqueness with concurrent checkouts (SWHR3-T-0096)
-- [ ] 14.8 Test order persistence and retrieval (SWHR3-T-0096)
-- [ ] 14.9 Test customer ID and email assignment to order (SWHR3-T-0096)
-- [ ] 14.10 Test order confirmation page display (SWHR3-T-0096)
+- [x] 14.1 Test complete checkout flow with valid addresses and payment (SWHR3-T-0096)
+- [x] 14.2 Test billing address required field validation (SWHR3-T-0096)
+- [x] 14.3 Test shipping address field validation (SWHR3-T-0096)
+- [x] 14.4 Test optional address_2 field handling (SWHR3-T-0096)
+- [x] 14.5 Test credit card field validation (SWHR3-T-0096)
+- [x] 14.6 Test empty cart checkout rejection (SWHR3-T-0096)
+- [x] 14.7 Test order ID uniqueness with concurrent checkouts (SWHR3-T-0096)
+- [x] 14.8 Test order persistence and retrieval (SWHR3-T-0096)
+- [x] 14.9 Test customer ID and email assignment to order (SWHR3-T-0096)
+- [x] 14.10 Test order confirmation page display (SWHR3-T-0096)
 
 ## 15. Error Handling and Recovery
 

@@ -68,11 +68,11 @@
 
 ## 9. EJB Transaction Management
 
-- [ ] 9.1 Configure container-managed transactions (CMT) for order update methods (SWHR3-T-0044)
-- [ ] 9.2 Set transaction attribute to Required for all order operations (SWHR3-T-0044)
-- [ ] 9.3 Ensure ACID semantics for batch order updates (SWHR3-T-0044)
-- [ ] 9.4 Implement rollback on any individual order update failure (SWHR3-T-0044)
-- [ ] 9.5 Test transaction isolation and atomicity requirements (SWHR3-T-0044)
+- [x] 9.1 Configure container-managed transactions (CMT) for order update methods (SWHR3-T-0044)
+- [x] 9.2 Set transaction attribute to Required for all order operations (SWHR3-T-0044)
+- [x] 9.3 Ensure ACID semantics for batch order updates (SWHR3-T-0044)
+- [x] 9.4 Implement rollback on any individual order update failure (SWHR3-T-0044)
+- [x] 9.5 Test transaction isolation and atomicity requirements (SWHR3-T-0044)
 
 ## 10. Error Handling and Validation
 

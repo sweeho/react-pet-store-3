@@ -26,6 +26,7 @@
     "src/constants/order-status.ts",
     "src/types/cart.ts",
     "src/types/checkout.ts",
-    "src/types/customer-profile.ts"
+    "src/types/customer-profile.ts",
+    "src/types/supplier.ts"
   ]
 }

@@ -1,11 +1,11 @@
 ## 1. Supplier Portal Authentication
 
-- [ ] 1.1 Implement supplier administrator login mechanism (SWHR3-T-0128)
-- [ ] 1.2 Add role-based access control for administrator role (SWHR3-T-0128)
-- [ ] 1.3 Protect portal access via web.xml security-constraint (SWHR3-T-0128)
-- [ ] 1.4 Implement session management for authenticated suppliers (SWHR3-T-0128)
-- [ ] 1.5 Create login failure error handling (SWHR3-T-0128)
-- [ ] 1.6 Implement logout functionality (SWHR3-T-0128)
+- [x] 1.1 Implement supplier administrator login mechanism (SWHR3-T-0128)
+- [x] 1.2 Add role-based access control for administrator role (SWHR3-T-0128)
+- [x] 1.3 Protect portal access via web.xml security-constraint (SWHR3-T-0128)
+- [x] 1.4 Implement session management for authenticated suppliers (SWHR3-T-0128)
+- [x] 1.5 Create login failure error handling (SWHR3-T-0128)
+- [x] 1.6 Implement logout functionality (SWHR3-T-0128)
 
 ## 2. Supplier Order Entity Bean
 

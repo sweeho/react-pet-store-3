@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
 import {
@@ -8,7 +8,9 @@ import {
   inventory,
   inventoryReservations,
   lineItems,
+  orderStageHistory,
   orders,
+  supplierPurchaseOrders,
 } from "../db/schema";
 import { setInventory } from "./inventory";
 import { InvalidTransitionError, NotFoundError } from "./errors";
@@ -158,6 +160,14 @@ describe("updateOrders", () => {
 });
 
 describe("updateOrders allocation hook (design.md D5, D8)", () => {
+  // The top-level beforeEach deletes orders, so clear the rows that reference them.
+  afterEach(() => {
+    db.delete(inventoryReservations).run();
+    db.delete(orderStageHistory).run();
+    db.delete(lineItems).run();
+    db.delete(supplierPurchaseOrders).run();
+  });
+
   function confirmedOrder(username: string, lines: Array<[string, number]>) {
     const account = makeAccount(username);
     const order = db

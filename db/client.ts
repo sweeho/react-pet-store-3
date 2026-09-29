@@ -4,7 +4,17 @@ import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 
-import { accounts, creditCards, customers, orders, users } from "./schema";
+import {
+  accounts,
+  cartItems,
+  catalogItemDetails,
+  catalogItems,
+  creditCards,
+  customers,
+  lineItems,
+  orders,
+  users,
+} from "./schema";
 
 // Opens a connection with the pragmas every connection needs. Bun's defaults
 // are busy_timeout 0 and journal_mode delete, so a lock held by another
@@ -36,7 +46,19 @@ const sqlite = openDatabase(
   process.env.VITEST ? ":memory:" : path.join(process.cwd(), "sqlite.db"),
 );
 
-export const db = drizzle(sqlite, { schema: { users, accounts, customers, creditCards, orders } });
+export const db = drizzle(sqlite, {
+  schema: {
+    users,
+    accounts,
+    customers,
+    creditCards,
+    orders,
+    cartItems,
+    catalogItems,
+    catalogItemDetails,
+    lineItems,
+  },
+});
 
 migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
 

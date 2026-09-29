@@ -53,6 +53,13 @@ export class NotFoundError extends ServiceError {
   }
 }
 
+export class CatalogItemNotFoundError extends ServiceError {
+  constructor(itemId: string) {
+    super("CATALOG_ITEM_NOT_FOUND", `Catalog item ${itemId} not found`, 404);
+    this.name = "CatalogItemNotFoundError";
+  }
+}
+
 export class ValidationError extends ServiceError {
   readonly fieldErrors: Record<string, string>;
 

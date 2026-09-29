@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -86,3 +86,55 @@ export const orders = sqliteTable("orders", {
     .notNull()
     .default(sql`(unixepoch())`),
 });
+
+// design.md D1/C1: anonymous cart state, keyed by the petstore_cart cookie
+// token. item_id is deliberately not a foreign key (D4).
+export const cartItems = sqliteTable(
+  "cart_items",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sessionToken: text("session_token").notNull(),
+    itemId: text("item_id").notNull(),
+    quantity: integer("quantity").notNull(),
+  },
+  (t) => [uniqueIndex("cart_items_session_token_item_id_unique").on(t.sessionToken, t.itemId)],
+);
+
+// design.md D3/C1: minimal catalogue; unit cost is integer cents (D6).
+export const catalogItems = sqliteTable("catalog_items", {
+  itemId: text("item_id").primaryKey(),
+  productId: text("product_id").notNull(),
+  category: text("category").notNull(),
+  unitCostCents: integer("unit_cost_cents").notNull(),
+});
+
+export const catalogItemDetails = sqliteTable(
+  "catalog_item_details",
+  {
+    itemId: text("item_id")
+      .notNull()
+      .references(() => catalogItems.itemId),
+    locale: text("locale").notNull(),
+    name: text("name").notNull(),
+    attribute: text("attribute").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.itemId, t.locale] })],
+);
+
+// design.md D11/C1: defined now, written by order-checkout later.
+export const lineItems = sqliteTable(
+  "line_items",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id),
+    lineNumber: integer("line_number").notNull(),
+    categoryId: text("category_id").notNull(),
+    productId: text("product_id").notNull(),
+    itemId: text("item_id").notNull(),
+    quantity: integer("quantity").notNull(),
+    unitPriceCents: integer("unit_price_cents").notNull(),
+    quantityShipped: integer("quantity_shipped").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.orderId, t.lineNumber] })],
+);

@@ -27,11 +27,11 @@
 
 ## 4. Quantity Update Operations
 
-- [ ] 4.1 Implement updateItemQuantity(String itemId, int newQty) method (SWHR3-T-0061)
-- [ ] 4.2 Add updateItemQuantity method to ShoppingCartLocal interface (SWHR3-T-0061)
-- [ ] 4.3 Implement quantity 0 or negative removal logic (remove and re-add only if > 0) (SWHR3-T-0061)
-- [ ] 4.4 Declare container-transaction with trans-attribute=Required for updateItemQuantity (SWHR3-T-0061)
-- [ ] 4.5 Test quantity update with positive, zero, and negative values (SWHR3-T-0061)
+- [x] 4.1 Implement updateItemQuantity(String itemId, int newQty) method (SWHR3-T-0061)
+- [x] 4.2 Add updateItemQuantity method to ShoppingCartLocal interface (SWHR3-T-0061)
+- [x] 4.3 Implement quantity 0 or negative removal logic (remove and re-add only if > 0) (SWHR3-T-0061)
+- [x] 4.4 Declare container-transaction with trans-attribute=Required for updateItemQuantity (SWHR3-T-0061)
+- [x] 4.5 Test quantity update with positive, zero, and negative values (SWHR3-T-0061)
 
 ## 5. Cart Retrieval and Enrichment
 

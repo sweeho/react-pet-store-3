@@ -103,13 +103,13 @@
 
 ## 13. EJB Tier Action Handler
 
-- [ ] 13.1 Create CartEJBAction class for EJB-tier dispatch (SWHR3-T-0070)
-- [ ] 13.2 Implement perform(CartEvent) method (SWHR3-T-0070)
-- [ ] 13.3 Handle CartEvent.ADD_ITEM action calling cart.addItem() (SWHR3-T-0070)
-- [ ] 13.4 Handle CartEvent.DELETE_ITEM action calling cart.deleteItem() (SWHR3-T-0070)
-- [ ] 13.5 Handle CartEvent.UPDATE_ITEMS iterating map and calling updateItemQuantity() (SWHR3-T-0070)
-- [ ] 13.6 Handle CartEvent.EMPTY action calling cart.empty() (SWHR3-T-0070)
-- [ ] 13.7 Test action dispatch routing (SWHR3-T-0070)
+- [x] 13.1 Create CartEJBAction class for EJB-tier dispatch (SWHR3-T-0070)
+- [x] 13.2 Implement perform(CartEvent) method (SWHR3-T-0070)
+- [x] 13.3 Handle CartEvent.ADD_ITEM action calling cart.addItem() (SWHR3-T-0070)
+- [x] 13.4 Handle CartEvent.DELETE_ITEM action calling cart.deleteItem() (SWHR3-T-0070)
+- [x] 13.5 Handle CartEvent.UPDATE_ITEMS iterating map and calling updateItemQuantity() (SWHR3-T-0070)
+- [x] 13.6 Handle CartEvent.EMPTY action calling cart.empty() (SWHR3-T-0070)
+- [x] 13.7 Test action dispatch routing (SWHR3-T-0070)
 
 ## 14. Catalog Integration
 

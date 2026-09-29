@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 
 import { cartItems } from "../db/schema";
-import { type CartItem, createCartItem } from "./cart-item";
+import { type CartItem, cartItemTotalCostCents, createCartItem } from "./cart-item";
 import { getItem } from "./catalog";
 import { CatalogItemNotFoundError, ValidationError } from "./errors";
 import { type DbOrTx, withTransaction } from "./transaction";
@@ -125,13 +125,14 @@ export function getItems(
   }, outer);
 }
 
+/** Sum of quantity * unit cost over the enriched items, in integer cents (D6). */
 export function getSubTotalCents(
   sessionToken: string | undefined,
   locale: string = DEFAULT_CART_LOCALE,
   outer?: DbOrTx,
 ): number {
-  void sessionToken;
-  void locale;
-  void outer;
-  throw new Error("VortexNotImplemented");
+  return getItems(sessionToken, locale, outer).reduce(
+    (sum, item) => sum + cartItemTotalCostCents(item),
+    0,
+  );
 }

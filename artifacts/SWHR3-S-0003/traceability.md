@@ -14,9 +14,9 @@
 | Order approval via inline status editing / Multiple orders are denied in batch | SWHR3-T-0037 | pass | yes |
 | Batch order status updates / Changes are batched and sent on commit | SWHR3-T-0043 | pass | yes |
 | Batch order status updates / Order changes are serialized to XML format | SWHR3-T-0038 | pass | yes |
-| Uncommitted changes detection / Warning is displayed for pending changes | SWHR3-T-0042 | pass | no |
-| Uncommitted changes detection / Refresh requires confirmation | SWHR3-T-0042 | pass | no |
-| Uncommitted changes detection / Refresh is canceled | SWHR3-T-0042 | pass | no |
+| Uncommitted changes detection / Warning is displayed for pending changes | SWHR3-T-0042 | pass | yes |
+| Uncommitted changes detection / Refresh requires confirmation | SWHR3-T-0042 | pass | yes |
+| Uncommitted changes detection / Refresh is canceled | SWHR3-T-0042 | pass | yes |
 | Server-side order update processing / UPDATESTATUS request is processed | SWHR3-T-0039 | pass | yes |
 | Server-side order update processing / Order changes are parsed from XML | SWHR3-T-0045 | pass | yes |
 | Server-side order update processing / All changes are persisted or all rolled back | SWHR3-T-0040 | pass | yes |

@@ -20,14 +20,14 @@
 
 ## 3. Contact Information Entity
 
-- [ ] 3.1 Create ContactInfo CMP 2.x entity bean (SWHR3-T-0130)
-- [ ] 3.2 Declare givenName field (String) (SWHR3-T-0130)
-- [ ] 3.3 Declare familyName field (String) (SWHR3-T-0130)
-- [ ] 3.4 Declare email field (String) (SWHR3-T-0130)
-- [ ] 3.5 Declare telephone field (String) (SWHR3-T-0130)
-- [ ] 3.6 Implement abstract getter/setter methods (SWHR3-T-0130)
-- [ ] 3.7 Create ContactInfoLocal interface (SWHR3-T-0130)
-- [ ] 3.8 Create ContactInfoLocalHome interface (SWHR3-T-0130)
+- [x] 3.1 Create ContactInfo CMP 2.x entity bean (SWHR3-T-0130)
+- [x] 3.2 Declare givenName field (String) (SWHR3-T-0130)
+- [x] 3.3 Declare familyName field (String) (SWHR3-T-0130)
+- [x] 3.4 Declare email field (String) (SWHR3-T-0130)
+- [x] 3.5 Declare telephone field (String) (SWHR3-T-0130)
+- [x] 3.6 Implement abstract getter/setter methods (SWHR3-T-0130)
+- [x] 3.7 Create ContactInfoLocal interface (SWHR3-T-0130)
+- [x] 3.8 Create ContactInfoLocalHome interface (SWHR3-T-0130)
 
 ## 4. Address Entity Bean
 

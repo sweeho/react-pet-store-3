@@ -138,8 +138,25 @@ export interface OrderEvent {
   creditCard: CreditCard;
 }
 
+/**
+ * Parses the whole flat checkout request into an OrderEvent (design.md C6,
+ * D1, D2): billing from the `_a` fields, shipping from `_b`, then the card.
+ * Every problem across all three is collected first, then thrown as one
+ * MissingFormDataError. A body that is not an object throws with no fields.
+ */
 export function parseCheckoutRequest(body: unknown): OrderEvent {
-  void body;
-  void MissingFormDataError;
-  throw new Error("VortexNotImplemented");
+  if (typeof body !== "object" || body === null) {
+    throw new MissingFormDataError({}, []);
+  }
+  const fields = body as Record<string, unknown>;
+  const errors = new FieldErrorCollector();
+
+  const billTo = extractContactInfo(fields, "_a", errors);
+  const shipTo = extractContactInfo(fields, "_b", errors);
+  const creditCard = extractCreditCard(fields, errors);
+
+  if (billTo === null || shipTo === null || creditCard === null) {
+    throw new MissingFormDataError(errors.fieldErrors, errors.missingFields);
+  }
+  return { shipper: billTo, receiver: shipTo, creditCard };
 }

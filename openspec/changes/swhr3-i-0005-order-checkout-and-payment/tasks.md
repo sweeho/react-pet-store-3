@@ -76,13 +76,13 @@
 
 ## 8. Purchase Order Entity
 
-- [ ] 8.1 Create PurchaseOrder entity bean (stateless or stateful) (SWHR3-T-0090)
-- [ ] 8.2 Define PurchaseOrder fields: orderId, orderDate, userId, emailId, billTo, shipTo, creditCard (SWHR3-T-0090)
-- [ ] 8.3 Implement ejbCreate() lifecycle methods for entity (SWHR3-T-0090)
-- [ ] 8.4 Create PurchaseOrderHome interface for JNDI lookup (SWHR3-T-0090)
-- [ ] 8.5 Create PurchaseOrderLocal interface for local access (SWHR3-T-0090)
-- [ ] 8.6 Implement transaction support with CMT Required semantics (SWHR3-T-0090)
-- [ ] 8.7 Map entity bean to persistent storage (EJB ORM) (SWHR3-T-0090)
+- [x] 8.1 Create PurchaseOrder entity bean (stateless or stateful) (SWHR3-T-0090)
+- [x] 8.2 Define PurchaseOrder fields: orderId, orderDate, userId, emailId, billTo, shipTo, creditCard (SWHR3-T-0090)
+- [x] 8.3 Implement ejbCreate() lifecycle methods for entity (SWHR3-T-0090)
+- [x] 8.4 Create PurchaseOrderHome interface for JNDI lookup (SWHR3-T-0090)
+- [x] 8.5 Create PurchaseOrderLocal interface for local access (SWHR3-T-0090)
+- [x] 8.6 Implement transaction support with CMT Required semantics (SWHR3-T-0090)
+- [x] 8.7 Map entity bean to persistent storage (EJB ORM) (SWHR3-T-0090)
 
 ## 9. Contact Information Integration
 

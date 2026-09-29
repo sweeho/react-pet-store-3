@@ -1,10 +1,10 @@
 ## 1. Order Status Management
 
-- [ ] 1.1 Define order status enumeration with values: PENDING, APPROVED, DENIED, COMPLETED (SWHR3-T-0036)
-- [ ] 1.2 Create Order entity bean with OrderStatus field (SWHR3-T-0036)
-- [ ] 1.3 Implement order query methods filtered by status (getOrdersByStatus) (SWHR3-T-0036)
-- [ ] 1.4 Implement order status update method via EJB (updateOrderStatus) (SWHR3-T-0036)
-- [ ] 1.5 Define status transition rules and validate transitions in business logic (SWHR3-T-0036)
+- [x] 1.1 Define order status enumeration with values: PENDING, APPROVED, DENIED, COMPLETED (SWHR3-T-0036)
+- [x] 1.2 Create Order entity bean with OrderStatus field (SWHR3-T-0036)
+- [x] 1.3 Implement order query methods filtered by status (getOrdersByStatus) (SWHR3-T-0036)
+- [x] 1.4 Implement order status update method via EJB (updateOrderStatus) (SWHR3-T-0036)
+- [x] 1.5 Define status transition rules and validate transitions in business logic (SWHR3-T-0036)
 
 ## 2. Rich Client UI - Orders Approval Panel
 

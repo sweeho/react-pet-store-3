@@ -154,12 +154,12 @@
 
 ## 15. Transaction Management
 
-- [ ] 15.1 Configure container-managed transactions for entity beans (SWHR3-T-0142)
-- [ ] 15.2 Set transaction attribute to Required for SupplierOrder operations (SWHR3-T-0142)
-- [ ] 15.3 Set transaction attribute to Required for inventory updates (SWHR3-T-0142)
-- [ ] 15.4 Implement transaction boundaries in RcvrRequestProcessor (SWHR3-T-0142)
-- [ ] 15.5 Ensure inventory update + order reprocessing within single transaction (SWHR3-T-0142)
-- [ ] 15.6 Test transactional consistency with rollback scenarios (SWHR3-T-0142)
+- [x] 15.1 Configure container-managed transactions for entity beans (SWHR3-T-0142)
+- [x] 15.2 Set transaction attribute to Required for SupplierOrder operations (SWHR3-T-0142)
+- [x] 15.3 Set transaction attribute to Required for inventory updates (SWHR3-T-0142)
+- [x] 15.4 Implement transaction boundaries in RcvrRequestProcessor (SWHR3-T-0142)
+- [x] 15.5 Ensure inventory update + order reprocessing within single transaction (SWHR3-T-0142)
+- [x] 15.6 Test transactional consistency with rollback scenarios (SWHR3-T-0142)
 
 ## 16. Error Handling and Logging
 

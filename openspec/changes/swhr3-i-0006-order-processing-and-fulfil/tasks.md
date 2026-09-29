@@ -41,10 +41,10 @@
 
 ## 6. Order Notifications
 
-- [ ] 6.1 Create order confirmation notification message (SWHR3-T-0114)
-- [ ] 6.2 Queue notification to async message queue (SWHR3-T-0114)
-- [ ] 6.3 Include order details in notification (order ID, items, total, shipping date estimate) (SWHR3-T-0114)
-- [ ] 6.4 Implement notification error handling (SWHR3-T-0114)
+- [x] 6.1 Create order confirmation notification message (SWHR3-T-0114)
+- [x] 6.2 Queue notification to async message queue (SWHR3-T-0114)
+- [x] 6.3 Include order details in notification (order ID, items, total, shipping date estimate) (SWHR3-T-0114)
+- [x] 6.4 Implement notification error handling (SWHR3-T-0114)
 
 ## 7. Inventory Integration
 

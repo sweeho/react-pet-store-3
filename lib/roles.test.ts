@@ -13,7 +13,7 @@ import { accounts } from "../db/schema";
  * so a role change takes effect on the very next read. Each test picks its
  * own username so tests in this file never collide.
  */
-function makeAccount(username: string, role?: "customer" | "admin") {
+function makeAccount(username: string, role?: "customer" | "admin" | "supplier") {
   return db
     .insert(accounts)
     .values({ username, passwordHash: "not-a-real-hash", ...(role ? { role } : {}) })
@@ -32,6 +32,12 @@ describe("getAccountRole", () => {
     const account = makeAccount("roles-admin-1", "admin");
 
     expect(getAccountRole(account.id)).toBe("admin");
+  });
+
+  it('returns "supplier" for an account granted the supplier role', () => {
+    const account = makeAccount("roles-supplier-1", "supplier");
+
+    expect(getAccountRole(account.id)).toBe("supplier");
   });
 
   it("reflects a role change on the very next read, without any caching", () => {

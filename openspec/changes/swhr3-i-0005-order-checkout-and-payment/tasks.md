@@ -20,16 +20,16 @@
 
 ## 3. Credit Card Collection
 
-- [ ] 3.1 Add credit card form fields to checkout page (card number, type, month, year) (SWHR3-T-0085)
-- [ ] 3.2 Implement card type combo box with options: Java Card, Duke Express, Meow Card (SWHR3-T-0085)
-- [ ] 3.3 Implement expiry month dropdown (01-12) (SWHR3-T-0085)
-- [ ] 3.4 Implement expiry year dropdown with future years (SWHR3-T-0085)
-- [ ] 3.5 Create CustomerHTMLAction.extractCreditCard() method (SWHR3-T-0085)
-- [ ] 3.6 Extract credit card fields from request parameters (SWHR3-T-0085)
-- [ ] 3.7 Validate credit card fields are non-empty (SWHR3-T-0085)
-- [ ] 3.8 Concatenate month/year to MM/YYYY format (SWHR3-T-0085)
-- [ ] 3.9 Create CreditCard value object with number, type, formatted expiry (SWHR3-T-0085)
-- [ ] 3.10 Throw validation exception on missing required credit card fields (SWHR3-T-0085)
+- [x] 3.1 Add credit card form fields to checkout page (card number, type, month, year) (SWHR3-T-0085)
+- [x] 3.2 Implement card type combo box with options: Java Card, Duke Express, Meow Card (SWHR3-T-0085)
+- [x] 3.3 Implement expiry month dropdown (01-12) (SWHR3-T-0085)
+- [x] 3.4 Implement expiry year dropdown with future years (SWHR3-T-0085)
+- [x] 3.5 Create CustomerHTMLAction.extractCreditCard() method (SWHR3-T-0085)
+- [x] 3.6 Extract credit card fields from request parameters (SWHR3-T-0085)
+- [x] 3.7 Validate credit card fields are non-empty (SWHR3-T-0085)
+- [x] 3.8 Concatenate month/year to MM/YYYY format (SWHR3-T-0085)
+- [x] 3.9 Create CreditCard value object with number, type, formatted expiry (SWHR3-T-0085)
+- [x] 3.10 Throw validation exception on missing required credit card fields (SWHR3-T-0085)
 
 ## 4. Order Creation Action
 

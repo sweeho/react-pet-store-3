@@ -89,7 +89,7 @@ describe("allocateOrder", () => {
 
     expect(orderRow(id)?.workflowStage).toBe("ALLOCATED");
     expect(stockOf(item)).toBe(3);
-    expect(pos(id)).toHaveLength(1);
+    expect(pos(id).map((p) => p.status)).toEqual(["PROCESSING"]);
   });
 
   it("waits at CONFIRMED with no writes when stock is short", () => {
@@ -101,7 +101,8 @@ describe("allocateOrder", () => {
 
     expect(orderRow(id)?.workflowStage).toBe("CONFIRMED");
     expect(stockOf(item)).toBe(1);
-    expect(pos(id)).toHaveLength(0);
+    // SD9 (supplier-portal-and-inventory): a waiting order now has a PENDING PO.
+    expect(pos(id).map((p) => p.status)).toEqual(["PENDING"]);
   });
 
   it.each([
@@ -132,6 +133,17 @@ describe("retryWaitingAllocations", () => {
     expect(allocated).toBeGreaterThanOrEqual(1);
     expect(orderRow(id)?.workflowStage).toBe("ALLOCATED");
     expect(stockOf(item)).toBe(2);
+    expect(pos(id).map((p) => p.status)).toEqual(["PROCESSING"]);
+  });
+
+  it("returns the number of POs it fulfilled", () => {
+    const item = `PM-N${seq}`;
+    const id = makeOrder([[item, 2]]);
+    allocate(id);
+    setInventory(item, 2);
+
+    expect(retryWaitingAllocations()).toBeGreaterThanOrEqual(1);
+    expect(retryWaitingAllocations()).toBe(0);
   });
 });
 

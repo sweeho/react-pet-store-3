@@ -95,12 +95,12 @@
 
 ## 10. Credit Card Value Object
 
-- [ ] 10.1 Create CreditCard class (SWHR3-T-0092)
-- [ ] 10.2 Implement fields: cardNumber, cardType, expiryDate (SWHR3-T-0092)
-- [ ] 10.3 Implement constructor with three string parameters (SWHR3-T-0092)
-- [ ] 10.4 Implement getters for card fields (SWHR3-T-0092)
-- [ ] 10.5 Implement serialization support (SWHR3-T-0092)
-- [ ] 10.6 Validate card type enumeration (Java Card, Duke Express, Meow Card) (SWHR3-T-0092)
+- [x] 10.1 Create CreditCard class (SWHR3-T-0092)
+- [x] 10.2 Implement fields: cardNumber, cardType, expiryDate (SWHR3-T-0092)
+- [x] 10.3 Implement constructor with three string parameters (SWHR3-T-0092)
+- [x] 10.4 Implement getters for card fields (SWHR3-T-0092)
+- [x] 10.5 Implement serialization support (SWHR3-T-0092)
+- [x] 10.6 Validate card type enumeration (Java Card, Duke Express, Meow Card) (SWHR3-T-0092)
 
 ## 11. Form Validation Exceptions
 

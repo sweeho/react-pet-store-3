@@ -71,3 +71,20 @@ export function deleteItem(sessionToken: string | undefined, itemId: string, out
       .run();
   }, outer);
 }
+
+/**
+ * Sets an item's quantity. Zero or below removes it; a positive quantity
+ * upserts, which also adds an absent item (D5, SD14).
+ */
+export function updateItemQuantity(
+  sessionToken: string | undefined,
+  itemId: string,
+  quantity: number,
+  outer?: DbOrTx,
+): void {
+  if (quantity <= 0) {
+    deleteItem(sessionToken, itemId, outer);
+    return;
+  }
+  addItem(sessionToken, itemId, quantity, outer);
+}

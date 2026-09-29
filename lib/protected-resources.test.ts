@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { PROTECTED_API_PATHS, isProtectedApiPath } from "./protected-resources";
+import {
+  ADMIN_API_PREFIX,
+  PROTECTED_API_PATHS,
+  isAdminApiPath,
+  isProtectedApiPath,
+} from "./protected-resources";
 
 /**
  * UNIT TEST (server project)
@@ -32,5 +37,24 @@ describe("PROTECTED_API_PATHS / isProtectedApiPath", () => {
     expect(isProtectedApiPath("/api/hello")).toBe(false);
     expect(isProtectedApiPath("/api/users")).toBe(false);
     expect(isProtectedApiPath("/")).toBe(false);
+  });
+});
+
+describe("ADMIN_API_PREFIX / isAdminApiPath", () => {
+  it('is "/api/admin/"', () => {
+    expect(ADMIN_API_PREFIX).toBe("/api/admin/");
+  });
+
+  it("matches any path under the admin prefix", () => {
+    expect(isAdminApiPath("/api/admin/orders")).toBe(true);
+    expect(isAdminApiPath("/api/admin/orders/status")).toBe(true);
+    expect(isAdminApiPath("/api/admin/anything")).toBe(true);
+  });
+
+  it("does not match the bare prefix without a trailing path, or an unrelated path", () => {
+    expect(isAdminApiPath("/api/admin")).toBe(false);
+    expect(isAdminApiPath("/api/customers")).toBe(false);
+    expect(isAdminApiPath("/api/hello")).toBe(false);
+    expect(isAdminApiPath("/")).toBe(false);
   });
 });

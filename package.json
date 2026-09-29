@@ -23,6 +23,7 @@
     "verify:full": "bun run verify && bun run test:e2e",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
+    "admin:grant": "bun run db/grant-admin.ts",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },

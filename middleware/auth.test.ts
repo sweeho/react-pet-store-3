@@ -1,6 +1,10 @@
+import { eq } from "drizzle-orm";
 import { H3Event } from "nitro/h3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import getAdminOrders from "../routes/api/admin/orders/index.get";
+import { db } from "../db/client";
+import { accounts, orders } from "../db/schema";
 import { AUTH_CONFIG } from "../lib/auth-config";
 import { startSession } from "../lib/session";
 import authMiddleware from "./auth";
@@ -93,5 +97,117 @@ describe("auth middleware", () => {
     await authMiddleware(event);
 
     expect(event.context.user).toEqual(USER);
+  });
+});
+
+/**
+ * design.md D4/C6: /api/admin/** is admin-only by prefix. No session still
+ * gets the existing 401; a signed-in non-admin gets 403 FORBIDDEN; a role
+ * revoked mid-session is enforced on the very next request, with no
+ * sign-out required (the role is read from the db, never the cookie).
+ */
+function makeAccount(username: string, role?: "customer" | "admin") {
+  return db
+    .insert(accounts)
+    .values({ username, passwordHash: "not-a-real-hash", ...(role ? { role } : {}) })
+    .returning({ id: accounts.id })
+    .get();
+}
+
+async function signedInEvent(pathname: string, accountId: number, username: string) {
+  const started = makeEvent(pathname);
+  await startSession(started, { id: accountId, username });
+  const cookie = extractSessionCookieHeader(started);
+  return makeEvent(pathname, cookie);
+}
+
+describe("auth middleware — admin paths", () => {
+  it("throws 401 'Authentication required' on an admin path with no session", async () => {
+    const event = makeEvent("/api/admin/orders");
+
+    await expect(authMiddleware(event)).rejects.toMatchObject({
+      status: 401,
+      message: "Authentication required",
+    });
+  });
+
+  it("[SWHR3-C-0026] throws 403 FORBIDDEN for a signed-in non-admin, on the commit endpoint, leaving the order untouched", async () => {
+    const account = makeAccount("admin-mw-customer-1", "customer");
+    const order = db
+      .insert(orders)
+      .values({
+        accountId: account.id,
+        customerName: "Alice Anderson",
+        orderDate: new Date("2026-01-01T00:00:00.000Z"),
+        totalCents: 1999,
+        status: "PENDING",
+      })
+      .returning()
+      .get();
+    const event = await signedInEvent(
+      "/api/admin/orders/status",
+      account.id,
+      "admin-mw-customer-1",
+    );
+
+    await expect(authMiddleware(event)).rejects.toMatchObject({
+      status: 403,
+      message: "Administrator credentials required",
+      data: { code: "FORBIDDEN" },
+    });
+
+    const stillPending = db.select().from(orders).where(eq(orders.id, order.id)).get();
+    expect(stillPending?.status).toBe("PENDING");
+  });
+
+  it("passes through for a signed-in admin, without throwing", async () => {
+    const account = makeAccount("admin-mw-admin-1", "admin");
+    const event = await signedInEvent("/api/admin/orders", account.id, "admin-mw-admin-1");
+
+    await expect(authMiddleware(event)).resolves.toBeUndefined();
+    expect(event.context.user).toEqual({ id: account.id, username: "admin-mw-admin-1" });
+  });
+
+  it("[SWHR3-C-0029] lets an admin's session cookie reach GET /api/admin/orders (200), and rejects no cookie (401)", async () => {
+    const account = makeAccount("admin-mw-admin-2", "admin");
+    const withCookie = await signedInEvent("/api/admin/orders", account.id, "admin-mw-admin-2");
+
+    await authMiddleware(withCookie);
+    const result = (await getAdminOrders(withCookie)) as { orders: Record<string, unknown[]> };
+    expect(Object.keys(result.orders).sort()).toEqual([
+      "APPROVED",
+      "COMPLETED",
+      "DENIED",
+      "PENDING",
+    ]);
+
+    const withoutCookie = makeEvent("/api/admin/orders");
+    await expect(authMiddleware(withoutCookie)).rejects.toMatchObject({
+      status: 401,
+      message: "Authentication required",
+    });
+  });
+
+  it("enforces a revoked admin role on the very next request, without signing out", async () => {
+    const account = makeAccount("admin-mw-revoke-1", "admin");
+    const started = makeEvent("/api/admin/orders");
+    await startSession(started, { id: account.id, username: "admin-mw-revoke-1" });
+    const cookie = extractSessionCookieHeader(started);
+    await authMiddleware(makeEvent("/api/admin/orders", cookie));
+
+    db.update(accounts).set({ role: "customer" }).where(eq(accounts.id, account.id)).run();
+
+    await expect(authMiddleware(makeEvent("/api/admin/orders", cookie))).rejects.toMatchObject({
+      status: 403,
+    });
+  });
+
+  it("still enforces the existing exact-match customer paths under the admin prefix change", async () => {
+    const event = makeEvent("/api/customers");
+
+    await expect(authMiddleware(event)).rejects.toMatchObject({
+      status: 401,
+      message: "Authentication required",
+    });
   });
 });

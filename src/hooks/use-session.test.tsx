@@ -24,18 +24,16 @@ describe("useSession", () => {
   it("starts loading, then resolves to the signed-in user", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(
-            JSON.stringify({
-              user: { id: 1, username: "jgarrett" },
-              locale: "en_US",
-              expired: false,
-            }),
-            { status: 200, headers: { "Content-Type": "application/json" } },
-          ),
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            user: { id: 1, username: "jgarrett", role: "customer" },
+            locale: "en_US",
+            expired: false,
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
         ),
+      ),
     );
 
     const { result } = renderHook(() => useSession(), { wrapper });
@@ -46,10 +44,32 @@ describe("useSession", () => {
 
     expect(result.current).toEqual({
       loading: false,
-      user: { id: 1, username: "jgarrett" },
+      user: { id: 1, username: "jgarrett", role: "customer" },
       locale: "en_US",
       expired: false,
     });
+  });
+
+  it('resolves user.role: "admin" for an administrator session (design.md C6)', async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            user: { id: 2, username: "admin-user", role: "admin" },
+            locale: "en_US",
+            expired: false,
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+
+    const { result } = renderHook(() => useSession(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.user).toEqual({ id: 2, username: "admin-user", role: "admin" });
   });
 
   it("resolves to a null user and expired:true when the session has timed out", async () => {

@@ -13,6 +13,11 @@ import { accounts, creditCards, customers, orders, users } from "./schema";
 // (dev server, Nitro build, Vitest) transforms this module, so its
 // import.meta.url isn't a real file:// URL — cwd is always the project root
 // across dev/build/test.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- red-phase stub
+export function openDatabase(file: string): Database {
+  throw new Error("VortexNotImplemented");
+}
+
 const sqlite = new Database(
   process.env.VITEST ? ":memory:" : path.join(process.cwd(), "sqlite.db"),
 );

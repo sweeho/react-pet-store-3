@@ -85,9 +85,9 @@
 
 ## 11. Security Configuration
 
-- [ ] 11.1 Add method-permission with unchecked element to ejb-jar.xml (SWHR3-T-0068)
-- [ ] 11.2 Apply unchecked permission to all cart methods (SWHR3-T-0068)
-- [ ] 11.3 Test that all users can access cart operations without role restrictions (SWHR3-T-0068)
+- [x] 11.1 Add method-permission with unchecked element to ejb-jar.xml (SWHR3-T-0068)
+- [x] 11.2 Apply unchecked permission to all cart methods (SWHR3-T-0068)
+- [x] 11.3 Test that all users can access cart operations without role restrictions (SWHR3-T-0068)
 
 ## 12. Web Tier Action Handler
 

@@ -9,14 +9,14 @@
 
 ## 2. Supplier Order Entity Bean
 
-- [ ] 2.1 Create SupplierOrder CMP 2.x entity bean (SWHR3-T-0129)
-- [ ] 2.2 Declare poId field as primary key (String) (SWHR3-T-0129)
-- [ ] 2.3 Declare poDate field (long timestamp) (SWHR3-T-0129)
-- [ ] 2.4 Declare poStatus field (String: pending, processing, completed) (SWHR3-T-0129)
-- [ ] 2.5 Implement abstract getter/setter methods for all fields (SWHR3-T-0129)
-- [ ] 2.6 Configure ejb-jar.xml with entity declaration and CMP configuration (SWHR3-T-0129)
-- [ ] 2.7 Create SupplierOrderLocal interface (SWHR3-T-0129)
-- [ ] 2.8 Create SupplierOrderLocalHome interface (SWHR3-T-0129)
+- [x] 2.1 Create SupplierOrder CMP 2.x entity bean (SWHR3-T-0129)
+- [x] 2.2 Declare poId field as primary key (String) (SWHR3-T-0129)
+- [x] 2.3 Declare poDate field (long timestamp) (SWHR3-T-0129)
+- [x] 2.4 Declare poStatus field (String: pending, processing, completed) (SWHR3-T-0129)
+- [x] 2.5 Implement abstract getter/setter methods for all fields (SWHR3-T-0129)
+- [x] 2.6 Configure ejb-jar.xml with entity declaration and CMP configuration (SWHR3-T-0129)
+- [x] 2.7 Create SupplierOrderLocal interface (SWHR3-T-0129)
+- [x] 2.8 Create SupplierOrderLocalHome interface (SWHR3-T-0129)
 
 ## 3. Contact Information Entity
 

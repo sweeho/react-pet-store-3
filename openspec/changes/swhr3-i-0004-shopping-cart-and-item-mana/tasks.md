@@ -61,11 +61,11 @@
 
 ## 8. Locale Support
 
-- [ ] 8.1 Implement setLocale(Locale locale) method (SWHR3-T-0065)
-- [ ] 8.2 Add setLocale method to ShoppingCartLocal interface (SWHR3-T-0065)
-- [ ] 8.3 Declare container-transaction with trans-attribute=Required for setLocale (SWHR3-T-0065)
-- [ ] 8.4 Use stored locale in getItems() when calling catalog.getItem() (SWHR3-T-0065)
-- [ ] 8.5 Test locale propagation to catalog lookups (SWHR3-T-0065)
+- [x] 8.1 Implement setLocale(Locale locale) method (SWHR3-T-0065)
+- [x] 8.2 Add setLocale method to ShoppingCartLocal interface (SWHR3-T-0065)
+- [x] 8.3 Declare container-transaction with trans-attribute=Required for setLocale (SWHR3-T-0065)
+- [x] 8.4 Use stored locale in getItems() when calling catalog.getItem() (SWHR3-T-0065)
+- [x] 8.5 Test locale propagation to catalog lookups (SWHR3-T-0065)
 
 ## 9. Cart Clearing
 

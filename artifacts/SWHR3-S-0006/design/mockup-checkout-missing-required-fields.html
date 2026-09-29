@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Checkout — React Pet Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--background:oklch(1 0 0);--foreground:oklch(0.145 0 0);
+--card:oklch(1 0 0);--card-foreground:oklch(0.145 0 0);
+--primary:oklch(0.205 0 0);--primary-foreground:oklch(0.985 0 0);
+--secondary:oklch(0.97 0 0);--secondary-foreground:oklch(0.205 0 0);
+--muted:oklch(0.97 0 0);--muted-foreground:oklch(0.556 0 0);
+--accent:oklch(0.97 0 0);--destructive:oklch(0.577 0.245 27.325);
+--border:oklch(0.922 0 0);--input:oklch(0.922 0 0);--ring:oklch(0.87 0 0);
+--radius:0.625rem;
+--destructive-tint:color-mix(in oklab, var(--destructive) 7%, white);
+--destructive-line:color-mix(in oklab, var(--destructive) 35%, white);
+}
+html,body{background:var(--background);color:var(--foreground)}
+body{font-family:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 24px}
+.topbar{background:var(--muted);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:36px;font-size:12px;color:var(--muted-foreground)}
+.langs{display:flex;align-items:center;gap:14px}
+.langs b{color:var(--foreground);font-weight:500}
+.masthead .wrap{display:flex;align-items:center;gap:24px;height:74px}
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;letter-spacing:-.02em}
+.mark{width:34px;height:34px;border-radius:9px;background:var(--primary);color:var(--primary-foreground);display:flex;align-items:center;justify-content:center}
+.search{margin-left:auto;position:relative;width:296px}
+.search svg{position:absolute;left:11px;top:11px;color:var(--muted-foreground)}
+.search input{padding-left:34px;background:var(--muted);border-color:transparent}
+.acct{display:flex;align-items:center;gap:18px;font-size:13px;font-weight:500;white-space:nowrap}
+.cartchip{display:flex;align-items:center;gap:8px;height:38px;padding:0 13px 0 11px;border:1px solid var(--border);border-radius:9px}
+.cartchip .n{background:var(--primary);color:var(--primary-foreground);border-radius:99px;font-size:11px;font-weight:500;padding:1px 7px}
+.catnav{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--background)}
+.catnav .wrap{display:flex;align-items:center;gap:30px;height:44px;font-size:13px;font-weight:500;color:var(--muted-foreground)}
+.crumbs{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted-foreground);padding:22px 0 0}
+.crumbs .on{color:var(--foreground);font-weight:500}
+h1{font-size:30px;font-weight:700;letter-spacing:-.025em;margin:10px 0 4px}
+.sub{color:var(--muted-foreground);font-size:14px}
+.checkout{display:grid;grid-template-columns:minmax(0,1fr) 352px;gap:28px;align-items:start;padding:26px 0 44px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.card-h{display:flex;align-items:center;gap:11px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-h h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.card-h .step{width:24px;height:24px;border-radius:7px;background:var(--secondary);color:var(--secondary-foreground);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+.card-h .hint{margin-left:auto;font-size:12px;color:var(--muted-foreground)}
+.card-b{padding:20px}
+.row{display:grid;gap:16px;margin-bottom:16px}
+.row:last-child{margin-bottom:0}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1.3fr 1fr .9fr}
+.c3b{grid-template-columns:1fr 1.1fr 1.2fr}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+label{font-size:13px;font-weight:500;display:flex;gap:6px;align-items:baseline}
+label .opt{font-weight:400;color:var(--muted-foreground);font-size:12px}
+input,select{width:100%;height:40px;border:1px solid var(--input);border-radius:8px;padding:0 12px;font-family:inherit;font-size:14px;color:var(--foreground);background:var(--background)}
+input::placeholder{color:var(--muted-foreground)}
+select{appearance:none;padding-right:34px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 11px center}
+.err input,.err select{border-color:var(--destructive);background:var(--destructive-tint)}
+.emsg{font-size:12px;color:var(--destructive);display:flex;align-items:center;gap:5px}
+.note{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 14px;background:var(--muted);border-radius:10px;font-size:12.5px;color:var(--muted-foreground);line-height:1.5}
+.note svg{flex:none;margin-top:1px}
+.btn{height:40px;padding:0 16px;border-radius:8px;font-family:inherit;font-size:14px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;background:var(--primary);color:var(--primary-foreground);cursor:pointer}
+.btn-outline{background:var(--background);border-color:var(--input);color:var(--foreground)}
+.btn-lg{height:44px;padding:0 22px;font-size:14.5px}
+.btn-block{width:100%}
+.sum .card-b{padding:18px 20px}
+.line{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.line:first-child{padding-top:0}
+.thumb{width:44px;height:44px;flex:none;border-radius:8px;background:var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)}
+.line .txt{flex:1;min-width:0}
+.line .nm{display:block;font-size:13.5px;font-weight:500;line-height:1.3}
+.line .meta{display:block;font-size:12px;color:var(--muted-foreground);margin-top:3px}
+.line .amt{margin-left:auto;font-size:13.5px;font-weight:500;white-space:nowrap}
+.tot{display:flex;justify-content:space-between;align-items:baseline;padding-top:15px}
+.tot .l{font-size:14px;font-weight:600}
+.tot .v{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.banner{display:flex;gap:12px;padding:16px 18px;border:1px solid var(--destructive-line);background:var(--destructive-tint);border-radius:12px;margin-top:20px}
+.banner h3{font-size:14px;font-weight:600;color:var(--destructive)}
+.banner p{font-size:13px;color:var(--foreground);margin-top:4px}
+.banner ul{margin:9px 0 0 2px;display:flex;flex-wrap:wrap;gap:6px 8px;list-style:none}
+.banner li{font-size:12px;font-weight:500;color:var(--destructive);background:var(--background);border:1px solid var(--destructive-line);border-radius:7px;padding:3px 9px}
+footer{border-top:1px solid var(--border);background:var(--muted);margin-top:auto}
+footer .wrap{display:flex;align-items:center;justify-content:space-between;height:66px;font-size:12px;color:var(--muted-foreground)}
+footer .fl{display:flex;gap:20px}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div class="langs"><span>Language</span><b>English</b><span>·</span><span>日本語</span><span>·</span><span>中文</span></div>
+  <div>Signed in as <b style="color:var(--foreground);font-weight:500">sarah.chen</b> · Account · Sign out</div>
+</div></div>
+
+<div class="masthead"><div class="wrap">
+  <div class="brand">
+    <span class="mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.5 4.46 16.4a3.5 3.5 0 0 1 1.98-6.4"/></svg></span>
+    React Pet Store
+  </div>
+  <div class="search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input placeholder="Search pets and items" />
+  </div>
+  <div class="acct">
+    <span>My account</span>
+    <span class="cartchip">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+      Cart <span class="n">4</span>
+    </span>
+  </div>
+</div></div>
+
+<div class="catnav"><div class="wrap">
+  <span>Birds</span><span>Cats</span><span style="color:var(--foreground)">Dogs</span><span>Fish</span><span>Reptiles</span>
+</div></div>
+
+<div class="wrap">
+  <div class="crumbs"><span>Shopping cart</span><span>›</span><span>Sign in</span><span>›</span><span class="on">Checkout</span><span>›</span><span>Confirmation</span></div>
+  <h1>Checkout</h1>
+  <p class="sub">Confirm where the order is billed and shipped, then place it. All fields are required except the second address line.</p>
+  <div class="banner">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(0.577 0.245 27.325)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+    <div>
+      <h3>Your order was not placed — 4 required fields are missing</h3>
+      <p>Fill in the fields listed below, then choose Place order again. Your cart has not changed.</p>
+      <ul>
+        <li>Billing · City</li>
+        <li>Billing · Postal code</li>
+        <li>Shipping · Telephone</li>
+        <li>Payment · Card number</li>
+      </ul>
+    </div>
+  </div>
+  <div class="checkout">
+
+    <div class="stack">
+
+      <section class="card">
+        <div class="card-h"><span class="step">1</span><h2>Billing address</h2><span class="hint">Pre-filled from your account</span></div>
+        <div class="card-b">
+          <div class="row c2">
+            <div class="field"><label>Given name</label><input value="Sarah" /></div>
+            <div class="field"><label>Family name</label><input value="Chen" /></div>
+          </div>
+          <div class="row c2">
+            <div class="field"><label>Address line 1</label><input value="1247 Larkspur Avenue" /></div>
+            <div class="field"><label>Address line 2 <span class="opt">Optional</span></label><input value="Apt 3B" /></div>
+          </div>
+          <div class="row c3">
+            <div class="field err"><label>City</label><input value="" /><span class="emsg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Enter a city.</span></div>
+            <div class="field"><label>State or province</label><input value="CA" /></div>
+            <div class="field err"><label>Postal code</label><input value="   " /><span class="emsg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Spaces only — enter a code.</span></div>
+          </div>
+          <div class="row c3b">
+            <div class="field"><label>Country</label><input value="United States" /></div>
+            <div class="field"><label>Telephone</label><input value="+1 650 555 0134" /></div>
+            <div class="field"><label>Email</label><input value="sarah.chen@example.com" /></div>
+          </div>
+          <div class="note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            Order updates are sent to the email address in this billing section — approval, denial and completion.
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="step">2</span><h2>Shipping address</h2><span class="hint">Where the pets are delivered</span></div>
+        <div class="card-b">
+          <div class="row c2">
+            <div class="field"><label>Given name</label><input value="Sarah" /></div>
+            <div class="field"><label>Family name</label><input value="Chen" /></div>
+          </div>
+          <div class="row c2">
+            <div class="field"><label>Address line 1</label><input value="88 Market Street" /></div>
+            <div class="field"><label>Address line 2 <span class="opt">Optional</span></label><input placeholder="Apartment, suite, unit" /></div>
+          </div>
+          <div class="row c3">
+            <div class="field"><label>City</label><input value="San Francisco" /></div>
+            <div class="field"><label>State or province</label><input value="CA" /></div>
+            <div class="field"><label>Postal code</label><input value="94103" /></div>
+          </div>
+          <div class="row c3b">
+            <div class="field"><label>Country</label><input value="United States" /></div>
+            <div class="field err"><label>Telephone</label><input value="" /><span class="emsg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Enter a telephone number.</span></div>
+            <div class="field"><label>Email</label><input value="sarah.chen@example.com" /></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="step">3</span><h2>Payment</h2><span class="hint">One card is stored per account</span></div>
+        <div class="card-b">
+          <div class="row c2">
+            <div class="field"><label>Card type</label>
+              <select><option>Java Card</option><option>Duke Express</option><option>Meow Card</option></select>
+            </div>
+            <div class="field err"><label>Card number</label><input value="" /><span class="emsg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Enter a card number.</span></div>
+          </div>
+          <div class="row c2">
+            <div class="field"><label>Expiry month</label>
+              <select><option>01</option><option>02</option><option selected>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+            </div>
+            <div class="field"><label>Expiry year</label>
+              <select><option>2026</option><option>2027</option><option>2028</option><option selected>2029</option><option>2030</option><option>2031</option></select>
+            </div>
+          </div>
+          <div class="note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            Your card is saved with the order and shown back to you on the confirmation. No payment is taken and no card is charged.
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="card sum">
+      <div class="card-h"><h2>Order summary</h2><span class="hint">Edit cart</span></div>
+      <div class="card-b">
+        <div class="line">
+          <span class="thumb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.5 4.46 16.4a3.5 3.5 0 0 1 1.98-6.4"/></svg></span>
+          <span class="txt"><span class="nm">Male Adult Bulldog</span><span class="meta">EST-6 · $18.50 × 1</span></span>
+          <span class="amt">$18.50</span>
+        </div>
+        <div class="line">
+          <span class="thumb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.5 4.46 16.4a3.5 3.5 0 0 1 1.98-6.4"/></svg></span>
+          <span class="txt"><span class="nm">Adult Female Persian</span><span class="meta">EST-16 · $93.50 × 1</span></span>
+          <span class="amt">$93.50</span>
+        </div>
+        <div class="line">
+          <span class="thumb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.5 4.46 16.4a3.5 3.5 0 0 1 1.98-6.4"/></svg></span>
+          <span class="txt"><span class="nm">Venomless Rattlesnake</span><span class="meta">EST-11 · $18.50 × 2</span></span>
+          <span class="amt">$37.00</span>
+        </div>
+        <div class="tot"><span class="l">Order total</span><span class="v">$149.00</span></div>
+        <button class="btn btn-lg btn-block" style="margin-top:18px">Place order</button>
+        <button class="btn btn-outline btn-block" style="margin-top:10px">Back to shopping cart</button>
+        <p style="margin-top:14px;font-size:12px;color:var(--muted-foreground);line-height:1.5">The addresses above are saved with this order. Later changes to your account profile do not change it.</p>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <span>© 2026 React Pet Store</span>
+  <span class="fl"><span>Help</span><span>Privacy</span><span>Terms</span></span>
+</div></footer>
+</body>
+</html>

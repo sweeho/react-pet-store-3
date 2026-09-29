@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;background:#f4f4f5;color:#3f3f46}
+  .nav{background:#fff;border-bottom:1px solid #e4e4e7;padding:10px 16px;display:flex;align-items:center;gap:14px}
+  .logo{width:92px;height:22px;background:#d4d4d8;border:1px solid #c4c4c8;border-radius:4px;font-size:9px;color:#52525b;display:flex;align-items:center;justify-content:center}
+  .navlinks{display:flex;gap:10px;flex:1}
+  .navlink{height:9px;width:46px;background:#d4d4d8;border-radius:2px}
+  .searchbox{width:120px;height:24px;border:1px solid #d4d4d8;border-radius:6px;background:#fafafa;font-size:10px;color:#a1a1aa;padding:5px 8px}
+  .cart{height:24px;padding:0 10px;border:1px solid #d4d4d8;border-radius:6px;display:flex;align-items:center;font-size:10px;color:#52525b}
+  .page{max-width:688px;margin:0 auto;padding:16px}
+  h1{font-size:19px;color:#27272a;font-weight:600}
+  .card{background:#fff;border:1px solid #e4e4e7;border-radius:8px;padding:28px;margin-top:14px;text-align:center}
+  .icon{width:44px;height:44px;margin:0 auto 12px;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;display:flex;align-items:center;justify-content:center;font-size:9px;color:#a1a1aa}
+  .msg{font-size:14px;font-weight:600;color:#27272a}
+  .sub{font-size:11px;color:#71717a;margin-top:6px}
+  .btnrow{display:flex;gap:8px;justify-content:center;margin-top:16px}
+  .btn{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;padding:0 16px}
+  .primary{background:#3f3f46;color:#fff}
+  .outline{border:1px solid #d4d4d8;background:#fff;color:#52525b}
+  .note{max-width:420px;margin:14px auto 0;font-size:10px;color:#a1a1aa}
+</style></head>
+<body>
+  <div class="nav">
+    <div class="logo">Pet Store</div>
+    <div class="navlinks"><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div><div class="navlink"></div></div>
+    <div class="searchbox">Search</div>
+    <div class="cart">Cart (0)</div>
+  </div>
+
+  <div class="page">
+    <h1>Checkout</h1>
+    <div class="card">
+      <div class="icon">Cart</div>
+      <div class="msg">Shopping cart is empty</div>
+      <div class="sub">No order was created. Add an item to your cart, then check out again.</div>
+      <div class="btnrow">
+        <div class="btn outline">View cart</div>
+        <div class="btn primary">Continue shopping</div>
+      </div>
+      <div class="note">Shown both when checkout is opened with an empty cart and when the cart empties before the order finishes processing.</div>
+    </div>
+  </div>
+</body>
+</html>

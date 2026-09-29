@@ -33,14 +33,14 @@
 
 ## 4. Order Creation Action
 
-- [ ] 4.1 Create OrderHTMLAction.perform() method (SWHR3-T-0086)
-- [ ] 4.2 Extract billing address via extractContactInfo(request, "\_a") (SWHR3-T-0086)
-- [ ] 4.3 Extract shipping address via extractContactInfo(request, "\_b") (SWHR3-T-0086)
-- [ ] 4.4 Extract credit card via extractCreditCard(request) (SWHR3-T-0086)
-- [ ] 4.5 Handle address suffix parameter variation (SWHR3-T-0086)
-- [ ] 4.6 Create OrderEvent with shipper, receiver, and credit card (SWHR3-T-0086)
-- [ ] 4.7 Forward OrderEvent to EJB tier for processing (SWHR3-T-0086)
-- [ ] 4.8 Implement error handling and form redisplay on validation failure (SWHR3-T-0086)
+- [x] 4.1 Create OrderHTMLAction.perform() method (SWHR3-T-0086)
+- [x] 4.2 Extract billing address via extractContactInfo(request, "\_a") (SWHR3-T-0086)
+- [x] 4.3 Extract shipping address via extractContactInfo(request, "\_b") (SWHR3-T-0086)
+- [x] 4.4 Extract credit card via extractCreditCard(request) (SWHR3-T-0086)
+- [x] 4.5 Handle address suffix parameter variation (SWHR3-T-0086)
+- [x] 4.6 Create OrderEvent with shipper, receiver, and credit card (SWHR3-T-0086)
+- [x] 4.7 Forward OrderEvent to EJB tier for processing (SWHR3-T-0086)
+- [x] 4.8 Implement error handling and form redisplay on validation failure (SWHR3-T-0086)
 
 ## 5. EJB Order Processing
 

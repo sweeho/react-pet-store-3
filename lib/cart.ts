@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { cartItems } from "../db/schema";
 import { ValidationError } from "./errors";
@@ -60,9 +60,14 @@ export function addItem(
   }, outer);
 }
 
+/** Removes one item from the cart; a no-op when it is absent. */
 export function deleteItem(sessionToken: string | undefined, itemId: string, outer?: DbOrTx): void {
-  void sessionToken;
-  void itemId;
-  void outer;
-  throw new Error("VortexNotImplemented");
+  if (sessionToken === undefined) {
+    return;
+  }
+  withTransaction((tx) => {
+    tx.delete(cartItems)
+      .where(and(eq(cartItems.sessionToken, sessionToken), eq(cartItems.itemId, itemId)))
+      .run();
+  }, outer);
 }

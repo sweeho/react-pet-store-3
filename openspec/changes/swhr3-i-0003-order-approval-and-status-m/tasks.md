@@ -84,11 +84,11 @@
 
 ## 11. Integration with Admin Interface
 
-- [ ] 11.1 Integrate OrdersApprovePanel into PetStoreAdminClient tabbed interface (SWHR3-T-0046)
-- [ ] 11.2 Add to AdminClent alongside OrdersViewPanel in ordersTabbedPane (SWHR3-T-0046)
-- [ ] 11.3 Share DataSource for server communication (SWHR3-T-0046)
-- [ ] 11.4 Share session ID from JNLP for authenticated requests (SWHR3-T-0046)
-- [ ] 11.5 Handle authentication failures and session timeouts (SWHR3-T-0046)
+- [x] 11.1 Integrate OrdersApprovePanel into PetStoreAdminClient tabbed interface (SWHR3-T-0046)
+- [x] 11.2 Add to AdminClent alongside OrdersViewPanel in ordersTabbedPane (SWHR3-T-0046)
+- [x] 11.3 Share DataSource for server communication (SWHR3-T-0046)
+- [x] 11.4 Share session ID from JNLP for authenticated requests (SWHR3-T-0046)
+- [x] 11.5 Handle authentication failures and session timeouts (SWHR3-T-0046)
 
 ## 12. Testing and Validation
 

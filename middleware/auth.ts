@@ -11,11 +11,15 @@
  * plus a 403 ForbiddenError for an active session whose role (read fresh
  * from the db via lib/roles.ts, never the cookie — D3) is not "admin", so a
  * revoked role takes effect on the very next request with no sign-out.
+ *
+ * A supplier path (design.md D1 of supplier-portal-and-inventory) works the
+ * same way but requires the "supplier" role, so store administrators are
+ * refused with 403 too.
  */
 import { createError, defineHandler, getRequestURL } from "nitro/h3";
 
 import { ForbiddenError, toHttpError } from "../lib/errors";
-import { isAdminApiPath, isProtectedApiPath } from "../lib/protected-resources";
+import { isAdminApiPath, isProtectedApiPath, isSupplierApiPath } from "../lib/protected-resources";
 import { getAccountRole } from "../lib/roles";
 import { type SessionUser, readSession } from "../lib/session";
 
@@ -38,10 +42,14 @@ export default defineHandler(async (event) => {
       throw toHttpError(new ForbiddenError());
     }
 
+    if (isSupplierApiPath(pathname) && getAccountRole(session.user.id) !== "supplier") {
+      throw toHttpError(new ForbiddenError("Supplier administrator credentials required"));
+    }
+
     return;
   }
 
-  if (isProtectedApiPath(pathname) || isAdminApiPath(pathname)) {
+  if (isProtectedApiPath(pathname) || isAdminApiPath(pathname) || isSupplierApiPath(pathname)) {
     throw createError({
       status: 401,
       message: session.status === "expired" ? "Session timed out" : "Authentication required",

@@ -108,7 +108,14 @@ describe("/checkout guards", () => {
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent(EMPTY_CART_CHECKOUT_MESSAGE);
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/cart");
+    expect(
+      screen.getByRole("heading", { name: "Your shopping cart is empty" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Continue shopping" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Back to shopping cart" })).toHaveAttribute(
+      "href",
+      "/cart",
+    );
     expect(screen.queryByRole("heading", { name: "Enter Order Information" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Billing address" })).toBeNull();
   });
@@ -347,5 +354,128 @@ describe("/checkout submit", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Your order could not be placed");
     expect(screen.queryByText("Confirmation screen")).toBeNull();
+  });
+});
+
+describe("/checkout refused orders", () => {
+  it("[SWHR3-C-0102] lists missing billing fields, shows inline errors and keeps typed values", async () => {
+    mockLoad("none");
+    vi.mocked(placeOrder).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        message: "Validation failed",
+        code: "VALIDATION_FAILED",
+        fieldErrors: { city_a: "Enter a city.", postal_code_a: "Spaces only — enter a code." },
+        missingFields: ["city_a", "postal_code_a"],
+      }),
+    );
+
+    renderCheckout();
+    await findForm();
+    await userEvent.type(section("Billing address").getByLabelText(/^Given name/), "Sarah");
+    await userEvent.type(screen.getByLabelText("Card number"), "4111 1111 1111 4412");
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Your order was not placed — 2 required fields are missing");
+    expect(
+      within(alert)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent),
+    ).toEqual(["Billing · City", "Billing · Postal code"]);
+    const billing = section("Billing address");
+    expect(billing.getByLabelText(/^City/)).toHaveAccessibleDescription("Enter a city.");
+    expect(billing.getByLabelText(/^Postal code/)).toHaveAccessibleDescription(
+      "Spaces only — enter a code.",
+    );
+    expect(billing.getByLabelText(/^Given name/)).toHaveValue("Sarah");
+    expect(screen.getByLabelText("Card number")).toHaveValue("4111 1111 1111 4412");
+    expect(alert).toHaveFocus();
+  });
+
+  it("shows a payment field error beside the payment field", async () => {
+    mockLoad("none");
+    vi.mocked(placeOrder).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        message: "Validation failed",
+        code: "VALIDATION_FAILED",
+        fieldErrors: { credit_card_number: "Enter a card number." },
+        missingFields: ["credit_card_number"],
+      }),
+    );
+
+    renderCheckout();
+    await findForm();
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    await screen.findByRole("alert");
+    expect(screen.getByLabelText("Card number")).toHaveAccessibleDescription(
+      "Enter a card number.",
+    );
+  });
+
+  it("[SWHR3-C-0117] replaces the form with the empty-cart state on a 409", async () => {
+    mockLoad();
+    vi.mocked(placeOrder).mockRejectedValue(
+      new ApiError({
+        status: 409,
+        message: "Shopping cart is empty",
+        code: "SHOPPING_CART_EMPTY",
+      }),
+    );
+
+    renderCheckout();
+    await findForm();
+    await userEvent.type(screen.getByLabelText("Card number"), "4111 1111 1111 4412");
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Your shopping cart is empty" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(EMPTY_CART_CHECKOUT_MESSAGE);
+    expect(screen.getByRole("link", { name: "Continue shopping" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to shopping cart" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Billing address" })).toBeNull();
+    expect(screen.queryByText("Confirmation screen")).toBeNull();
+  });
+
+  it("any other error shows a generic alert, logs it and keeps the form", async () => {
+    mockLoad();
+    const error = new ApiError({ status: 500, message: "boom" });
+    vi.mocked(placeOrder).mockRejectedValue(error);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    renderCheckout();
+    await findForm();
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Your order could not be placed");
+    expect(screen.getByRole("heading", { name: "Billing address" })).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalledWith(error);
+    consoleError.mockRestore();
+  });
+
+  it("clears the summary when the order is resubmitted", async () => {
+    mockLoad("none");
+    vi.mocked(placeOrder)
+      .mockRejectedValueOnce(
+        new ApiError({
+          status: 422,
+          message: "Validation failed",
+          code: "VALIDATION_FAILED",
+          fieldErrors: { city_a: "Enter a city." },
+          missingFields: ["city_a"],
+        }),
+      )
+      .mockReturnValueOnce(new Promise(() => undefined));
+
+    renderCheckout();
+    await findForm();
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+    await screen.findByRole("alert");
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });

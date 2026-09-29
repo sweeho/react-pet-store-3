@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { db } from "../db/client";
@@ -40,6 +40,23 @@ beforeAll(() => {
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+/** Removes PENDING POs left by an earlier test, so each test sees only its own. */
+function clearPendingPos(): void {
+  const ids = db
+    .select({ id: supplierPurchaseOrders.id })
+    .from(supplierPurchaseOrders)
+    .where(eq(supplierPurchaseOrders.status, "PENDING"))
+    .all()
+    .map((row) => row.id);
+  if (ids.length > 0) {
+    db.update(lineItems)
+      .set({ supplierPoId: null })
+      .where(inArray(lineItems.supplierPoId, ids))
+      .run();
+    db.delete(supplierPurchaseOrders).where(inArray(supplierPurchaseOrders.id, ids)).run();
+  }
+}
 
 /** An APPROVED order at CONFIRMED with one line and one PENDING PO. */
 function waitingOrder(itemId: string, quantity: number): { orderId: number; poId: number } {
@@ -97,6 +114,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("[SWHR3-C-0208] zero and positive quantities are accepted and saved", () => {
+    clearPendingPos();
     setInventory("EST-1", 40);
     setInventory("EST-2", 7);
 
@@ -111,6 +129,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("an update that covers a waiting PO fulfils it in the same call", () => {
+    clearPendingPos();
     const { orderId, poId } = waitingOrder("EST-3", 4);
     setInventory("EST-3", 0);
 
@@ -123,6 +142,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("an empty update list changes nothing but still reprocesses", () => {
+    clearPendingPos();
     const { poId } = waitingOrder("EST-3", 9);
     setInventory("EST-3", 9);
 
@@ -134,6 +154,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("logs each item's quantity before and after", () => {
+    clearPendingPos();
     const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
     setInventory("EST-1", 6);
 
@@ -146,6 +167,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("is one immediate transaction, or joins the caller's", () => {
+    clearPendingPos();
     setInventory("EST-1", 1);
     const spy = vi.spyOn(db, "transaction");
 
@@ -159,6 +181,7 @@ describe("applyInventoryUpdate", () => {
   });
 
   it("a failing update rolls back every quantity it set", () => {
+    clearPendingPos();
     setInventory("EST-1", 10);
     setInventory("EST-2", 10);
 

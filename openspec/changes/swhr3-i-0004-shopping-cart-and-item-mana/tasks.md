@@ -121,18 +121,18 @@
 
 ## 15. Cart Display View
 
-- [ ] 15.1 Create cart.jsp page rendering shopping cart (SWHR3-T-0072)
-- [ ] 15.2 Use JSTL <c:choose> for empty vs populated cart states (SWHR3-T-0072)
-- [ ] 15.3 Display "Your Shopping Cart is Empty" message when cart.count == 0 (SWHR3-T-0072)
-- [ ] 15.4 Create table structure for cart items (SWHR3-T-0072)
-- [ ] 15.5 Add columns: item name/attribute, remove link, quantity input, unit price, line total (SWHR3-T-0072)
-- [ ] 15.6 Use <c:forEach> to iterate cart.items (SWHR3-T-0072)
-- [ ] 15.7 Create quantity input fields with name pattern itemQuantity\_<itemId> (SWHR3-T-0072)
-- [ ] 15.8 Display line totals calculated from quantity and unit price (SWHR3-T-0072)
-- [ ] 15.9 Display cart subtotal row with total currency formatting (SWHR3-T-0072)
-- [ ] 15.10 Add "Update Cart" form submit button (SWHR3-T-0072)
-- [ ] 15.11 Add "Check Out" link pointing to order entry page (SWHR3-T-0072)
-- [ ] 15.12 Apply petstore CSS styling to cart display (SWHR3-T-0072)
+- [x] 15.1 Create cart.jsp page rendering shopping cart (SWHR3-T-0072)
+- [x] 15.2 Use JSTL <c:choose> for empty vs populated cart states (SWHR3-T-0072)
+- [x] 15.3 Display "Your Shopping Cart is Empty" message when cart.count == 0 (SWHR3-T-0072)
+- [x] 15.4 Create table structure for cart items (SWHR3-T-0072)
+- [x] 15.5 Add columns: item name/attribute, remove link, quantity input, unit price, line total (SWHR3-T-0072)
+- [x] 15.6 Use <c:forEach> to iterate cart.items (SWHR3-T-0072)
+- [x] 15.7 Create quantity input fields with name pattern itemQuantity\_<itemId> (SWHR3-T-0072)
+- [x] 15.8 Display line totals calculated from quantity and unit price (SWHR3-T-0072)
+- [x] 15.9 Display cart subtotal row with total currency formatting (SWHR3-T-0072)
+- [x] 15.10 Add "Update Cart" form submit button (SWHR3-T-0072)
+- [x] 15.11 Add "Check Out" link pointing to order entry page (SWHR3-T-0072)
+- [x] 15.12 Apply petstore CSS styling to cart display (SWHR3-T-0072)
 
 ## 16. Struts Configuration
 

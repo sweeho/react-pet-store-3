@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 
 import { cartItems } from "../db/schema";
 import { type CartItem, cartItemTotalCostCents, createCartItem } from "./cart-item";
@@ -134,5 +134,21 @@ export function getSubTotalCents(
   return getItems(sessionToken, locale, outer).reduce(
     (sum, item) => sum + cartItemTotalCostCents(item),
     0,
+  );
+}
+
+/** Number of distinct items in the cart, not the sum of quantities. */
+export function getCount(sessionToken: string | undefined, outer?: DbOrTx): number {
+  if (sessionToken === undefined) {
+    return 0;
+  }
+  return withTransaction(
+    (tx) =>
+      tx
+        .select({ n: count() })
+        .from(cartItems)
+        .where(eq(cartItems.sessionToken, sessionToken))
+        .get()?.n ?? 0,
+    outer,
   );
 }

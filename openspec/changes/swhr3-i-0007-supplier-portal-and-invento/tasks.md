@@ -98,14 +98,14 @@
 
 ## 10. Pending Order Reprocessing
 
-- [ ] 10.1 Implement processPendingPO() in RcvrRequestProcessor (SWHR3-T-0137)
-- [ ] 10.2 Query for all SupplierOrder with status "pending" (SWHR3-T-0137)
-- [ ] 10.3 For each pending order, attempt fulfillment based on new inventory (SWHR3-T-0137)
-- [ ] 10.4 Update order status to "processing" when item quantity sufficient (SWHR3-T-0137)
-- [ ] 10.5 Update order status to "completed" when fully fulfilled (SWHR3-T-0137)
-- [ ] 10.6 Trigger invoice generation for completed orders (SWHR3-T-0137)
-- [ ] 10.7 Handle fulfillment failures gracefully (SWHR3-T-0137)
-- [ ] 10.8 Log reprocessing attempts (SWHR3-T-0137)
+- [x] 10.1 Implement processPendingPO() in RcvrRequestProcessor (SWHR3-T-0137)
+- [x] 10.2 Query for all SupplierOrder with status "pending" (SWHR3-T-0137)
+- [x] 10.3 For each pending order, attempt fulfillment based on new inventory (SWHR3-T-0137)
+- [x] 10.4 Update order status to "processing" when item quantity sufficient (SWHR3-T-0137)
+- [x] 10.5 Update order status to "completed" when fully fulfilled (SWHR3-T-0137)
+- [x] 10.6 Trigger invoice generation for completed orders (SWHR3-T-0137)
+- [x] 10.7 Handle fulfillment failures gracefully (SWHR3-T-0137)
+- [x] 10.8 Log reprocessing attempts (SWHR3-T-0137)
 
 ## 11. Invoice Generation
 

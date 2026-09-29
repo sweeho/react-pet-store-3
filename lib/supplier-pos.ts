@@ -19,7 +19,7 @@ export interface SupplierPoLine {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Creates one OPEN PO per supplier, links each line to it, and returns the PO ids. */
+/** Creates one PROCESSING PO per supplier, links each line to it, and returns the PO ids. */
 export function createSupplierPOs(
   tx: DbOrTx,
   orderId: number,
@@ -42,7 +42,7 @@ export function createSupplierPOs(
   for (const [supplierId, group] of bySupplier) {
     const { id } = tx
       .insert(supplierPurchaseOrders)
-      .values({ orderId, supplierId, status: "OPEN", expectedDeliveryDate, createdAt: now })
+      .values({ orderId, supplierId, status: "PROCESSING", expectedDeliveryDate, createdAt: now })
       .returning({ id: supplierPurchaseOrders.id })
       .get();
     for (const line of group) {
@@ -56,7 +56,7 @@ export function createSupplierPOs(
   return ids;
 }
 
-/** Marks an OPEN PO SHIPPED with the supplier's tracking number. */
+/** Marks a PROCESSING PO COMPLETED with the supplier's tracking number. */
 export function markPoShipped(tx: DbOrTx, supplierPoId: number, trackingNumber: string): void {
   const po = tx
     .select()
@@ -66,12 +66,12 @@ export function markPoShipped(tx: DbOrTx, supplierPoId: number, trackingNumber: 
   if (!po) {
     throw new NotFoundError(`Supplier PO ${supplierPoId} not found`);
   }
-  if (po.status !== "OPEN") {
+  if (po.status !== "PROCESSING") {
     // InvalidTransitionError's message names an "Order"; here the id is the PO's.
     throw new InvalidTransitionError(supplierPoId, po.status);
   }
   tx.update(supplierPurchaseOrders)
-    .set({ status: "SHIPPED", trackingNumber, shippedAt: new Date() })
+    .set({ status: "COMPLETED", trackingNumber, shippedAt: new Date() })
     .where(eq(supplierPurchaseOrders.id, supplierPoId))
     .run();
 }

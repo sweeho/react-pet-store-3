@@ -53,7 +53,8 @@ CREATE TABLE `__new_supplier_purchase_orders` (
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-INSERT INTO `__new_supplier_purchase_orders`("id", "order_id", "supplier_id", "status", "expected_delivery_date", "tracking_number", "created_at", "shipped_at") SELECT "id", "order_id", "supplier_id", "status", "expected_delivery_date", "tracking_number", "created_at", "shipped_at" FROM `supplier_purchase_orders`;--> statement-breakpoint
+-- Data mapping (design.md D2): OPEN (stock already reserved) -> PROCESSING, SHIPPED -> COMPLETED.
+INSERT INTO `__new_supplier_purchase_orders`("id", "order_id", "supplier_id", "status", "expected_delivery_date", "tracking_number", "created_at", "shipped_at") SELECT "id", "order_id", "supplier_id", CASE "status" WHEN 'OPEN' THEN 'PROCESSING' WHEN 'SHIPPED' THEN 'COMPLETED' ELSE "status" END, "expected_delivery_date", "tracking_number", "created_at", "shipped_at" FROM `supplier_purchase_orders`;--> statement-breakpoint
 DROP TABLE `supplier_purchase_orders`;--> statement-breakpoint
 ALTER TABLE `__new_supplier_purchase_orders` RENAME TO `supplier_purchase_orders`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;

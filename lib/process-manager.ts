@@ -90,7 +90,7 @@ export function recordShipment(
         .from(supplierPurchaseOrders)
         .where(eq(supplierPurchaseOrders.orderId, po.orderId))
         .all();
-      if (!all.every((p) => p.status === "SHIPPED")) {
+      if (!all.every((p) => p.status === "COMPLETED")) {
         return { orderCompleted: false };
       }
 

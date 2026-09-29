@@ -151,7 +151,7 @@ describe("recordShipment", () => {
 
     expect(result).toEqual({ orderCompleted: true });
     const po = pos(id)[0];
-    expect(po).toMatchObject({ status: "SHIPPED", trackingNumber: "TRK-123" });
+    expect(po).toMatchObject({ status: "COMPLETED", trackingNumber: "TRK-123" });
     expect(po.shippedAt).toBeInstanceOf(Date);
     expect(orderRow(id)).toMatchObject({ workflowStage: "SHIPPED", status: "COMPLETED" });
   });
@@ -164,7 +164,7 @@ describe("recordShipment", () => {
       .values({
         orderId: id,
         supplierId: "OTHER-SUPPLIER",
-        status: "OPEN",
+        status: "PROCESSING",
         expectedDeliveryDate: new Date("2026-02-01T00:00:00.000Z"),
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
       })
@@ -174,8 +174,8 @@ describe("recordShipment", () => {
     const result = recordShipment(poIds[0], "TRK-1");
 
     expect(result).toEqual({ orderCompleted: false });
-    expect(pos(id).find((p) => p.id === poIds[0])?.status).toBe("SHIPPED");
-    expect(pos(id).find((p) => p.id === second)?.status).toBe("OPEN");
+    expect(pos(id).find((p) => p.id === poIds[0])?.status).toBe("COMPLETED");
+    expect(pos(id).find((p) => p.id === second)?.status).toBe("PROCESSING");
     expect(orderRow(id)).toMatchObject({ workflowStage: "ALLOCATED", status: "APPROVED" });
   });
 });

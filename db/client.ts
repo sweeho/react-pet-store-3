@@ -19,6 +19,10 @@ import {
   orderStageHistory,
   orders,
   paymentAuthorizations,
+  supplierFulfilmentAttempts,
+  supplierInvoices,
+  supplierPoAddresses,
+  supplierPoContacts,
   supplierPurchaseOrders,
   users,
 } from "./schema";
@@ -71,6 +75,10 @@ export const db = drizzle(sqlite, {
     inventory,
     inventoryReservations,
     supplierPurchaseOrders,
+    supplierPoContacts,
+    supplierPoAddresses,
+    supplierInvoices,
+    supplierFulfilmentAttempts,
   },
 });
 

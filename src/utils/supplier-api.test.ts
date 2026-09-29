@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { InventoryUpdateResult } from "@/types/supplier";
-import { getInventory, updateInventory } from "./supplier-api";
+import { getInventory, signOutSupplier, updateInventory } from "./supplier-api";
 
 /**
  * UNIT TEST (client project). design.md C10, C11: one typed binding per
@@ -63,5 +63,15 @@ describe("supplier-api", () => {
     );
 
     await expect(getInventory()).rejects.toMatchObject({ status: 403, code: "FORBIDDEN" });
+  });
+
+  it("signOutSupplier POSTs /api/auth/signout and resolves even when it fails", async () => {
+    const fetchMock = stubFetch({ message: "boom" }, 500);
+
+    await expect(signOutSupplier()).resolves.toBeUndefined();
+
+    const [path, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe("/api/auth/signout");
+    expect(init.method).toBe("POST");
   });
 });

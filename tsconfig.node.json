@@ -24,6 +24,7 @@
     "e2e",
     "src/constants/auth.ts",
     "src/constants/order-status.ts",
+    "src/constants/supplier.ts",
     "src/types/cart.ts",
     "src/types/checkout.ts",
     "src/types/customer-profile.ts",

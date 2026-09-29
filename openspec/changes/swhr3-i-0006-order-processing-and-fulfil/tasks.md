@@ -72,11 +72,11 @@
 
 ## 10. Process Manager
 
-- [ ] 10.1 Create ProcessManager state machine (SWHR3-T-0118)
-- [ ] 10.2 Implement order status state transitions (SWHR3-T-0118)
-- [ ] 10.3 Validate state transition rules (SWHR3-T-0118)
-- [ ] 10.4 Implement status change notifications (SWHR3-T-0118)
-- [ ] 10.5 Coordinate subprocess execution per state (SWHR3-T-0118)
+- [x] 10.1 Create ProcessManager state machine (SWHR3-T-0118)
+- [x] 10.2 Implement order status state transitions (SWHR3-T-0118)
+- [x] 10.3 Validate state transition rules (SWHR3-T-0118)
+- [x] 10.4 Implement status change notifications (SWHR3-T-0118)
+- [x] 10.5 Coordinate subprocess execution per state (SWHR3-T-0118)
 
 ## 11. EJB Transaction Management
 

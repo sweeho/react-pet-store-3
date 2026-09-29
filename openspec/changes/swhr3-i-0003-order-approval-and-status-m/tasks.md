@@ -8,13 +8,13 @@
 
 ## 2. Rich Client UI - Orders Approval Panel
 
-- [ ] 2.1 Create OrdersApprovePanel Swing panel with JTable for orders display (SWHR3-T-0037)
-- [ ] 2.2 Define table model columns: OrderId, CustomerName, OrderDate, OrderTotal, OrderStatus (SWHR3-T-0037)
-- [ ] 2.3 Implement OrderStatus column (index 4) as editable JComboBox with APPROVED/DENIED options (SWHR3-T-0037)
-- [ ] 2.4 Create TableSorter proxy model to wrap and provide sorting capability (SWHR3-T-0037)
-- [ ] 2.5 Implement approve button listener to set selected row statuses to APPROVED (SWHR3-T-0037)
-- [ ] 2.6 Implement deny button listener to set selected row statuses to DENIED (SWHR3-T-0037)
-- [ ] 2.7 Implement commit button listener to call tableModel.commit() (SWHR3-T-0037)
+- [x] 2.1 Create OrdersApprovePanel Swing panel with JTable for orders display (SWHR3-T-0037)
+- [x] 2.2 Define table model columns: OrderId, CustomerName, OrderDate, OrderTotal, OrderStatus (SWHR3-T-0037)
+- [x] 2.3 Implement OrderStatus column (index 4) as editable JComboBox with APPROVED/DENIED options (SWHR3-T-0037)
+- [x] 2.4 Create TableSorter proxy model to wrap and provide sorting capability (SWHR3-T-0037)
+- [x] 2.5 Implement approve button listener to set selected row statuses to APPROVED (SWHR3-T-0037)
+- [x] 2.6 Implement deny button listener to set selected row statuses to DENIED (SWHR3-T-0037)
+- [x] 2.7 Implement commit button listener to call tableModel.commit() (SWHR3-T-0037)
 
 ## 3. Client-Side Change Tracking
 

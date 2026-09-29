@@ -152,3 +152,13 @@ export function getCount(sessionToken: string | undefined, outer?: DbOrTx): numb
     outer,
   );
 }
+
+/** Removes every item of the cart in one statement; a no-op when it is empty. */
+export function empty(sessionToken: string | undefined, outer?: DbOrTx): void {
+  if (sessionToken === undefined) {
+    return;
+  }
+  withTransaction((tx) => {
+    tx.delete(cartItems).where(eq(cartItems.sessionToken, sessionToken)).run();
+  }, outer);
+}

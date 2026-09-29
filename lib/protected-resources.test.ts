@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   ADMIN_API_PREFIX,
   PROTECTED_API_PATHS,
+  SUPPLIER_API_PREFIX,
   isAdminApiPath,
   isProtectedApiPath,
+  isSupplierApiPath,
 } from "./protected-resources";
 
 /**
@@ -57,5 +59,22 @@ describe("ADMIN_API_PREFIX / isAdminApiPath", () => {
     expect(isAdminApiPath("/api/customers")).toBe(false);
     expect(isAdminApiPath("/api/hello")).toBe(false);
     expect(isAdminApiPath("/")).toBe(false);
+  });
+});
+
+describe("SUPPLIER_API_PREFIX / isSupplierApiPath", () => {
+  it('is "/api/supplier/"', () => {
+    expect(SUPPLIER_API_PREFIX).toBe("/api/supplier/");
+  });
+
+  it("matches any path under the supplier prefix", () => {
+    expect(isSupplierApiPath("/api/supplier/inventory")).toBe(true);
+    expect(isSupplierApiPath("/api/supplier/orders/1")).toBe(true);
+  });
+
+  it("does not match the bare prefix, the admin prefix or an unrelated path", () => {
+    expect(isSupplierApiPath("/api/supplier")).toBe(false);
+    expect(isSupplierApiPath("/api/admin/orders")).toBe(false);
+    expect(isSupplierApiPath("/api/hello")).toBe(false);
   });
 });

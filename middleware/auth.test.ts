@@ -106,7 +106,7 @@ describe("auth middleware", () => {
  * revoked mid-session is enforced on the very next request, with no
  * sign-out required (the role is read from the db, never the cookie).
  */
-function makeAccount(username: string, role?: "customer" | "admin") {
+function makeAccount(username: string, role?: "customer" | "admin" | "supplier") {
   return db
     .insert(accounts)
     .values({ username, passwordHash: "not-a-real-hash", ...(role ? { role } : {}) })
@@ -208,6 +208,66 @@ describe("auth middleware — admin paths", () => {
     await expect(authMiddleware(event)).rejects.toMatchObject({
       status: 401,
       message: "Authentication required",
+    });
+  });
+});
+
+/**
+ * design.md D1: /api/supplier/** is for the supplier role only, store
+ * administrators included. The role is read from the db on every request.
+ */
+describe("auth middleware — supplier paths", () => {
+  const PATH = "/api/supplier/inventory";
+  const ADMIN_PATH = "/api/admin/orders";
+
+  it("[SWHR3-C-0224] answers 401 with no session", async () => {
+    await expect(authMiddleware(makeEvent(PATH))).rejects.toMatchObject({
+      status: 401,
+      message: "Authentication required",
+    });
+  });
+
+  it.each(["customer", "admin"] as const)(
+    "[SWHR3-C-0224] answers 403 FORBIDDEN for a %s",
+    async (role) => {
+      const name = `supplier-mw-${role}`;
+      const account = makeAccount(name, role);
+      const event = await signedInEvent(PATH, account.id, name);
+
+      await expect(authMiddleware(event)).rejects.toMatchObject({
+        status: 403,
+        message: "Supplier administrator credentials required",
+        data: { code: "FORBIDDEN" },
+      });
+    },
+  );
+
+  it("[SWHR3-C-0224] lets a supplier through, and refuses the supplier on an admin path", async () => {
+    const account = makeAccount("supplier-mw-supplier", "supplier");
+    const allowed = await signedInEvent(PATH, account.id, "supplier-mw-supplier");
+
+    await expect(authMiddleware(allowed)).resolves.toBeUndefined();
+    expect(allowed.context.user).toEqual({ id: account.id, username: "supplier-mw-supplier" });
+
+    const onAdmin = await signedInEvent(ADMIN_PATH, account.id, "supplier-mw-supplier");
+    await expect(authMiddleware(onAdmin)).rejects.toMatchObject({
+      status: 403,
+      data: { code: "FORBIDDEN" },
+    });
+  });
+
+  it("[SWHR3-C-0225] a revoked supplier role takes effect on the next request", async () => {
+    const account = makeAccount("supplier-mw-revoke", "supplier");
+    const started = makeEvent(PATH);
+    await startSession(started, { id: account.id, username: "supplier-mw-revoke" });
+    const cookie = extractSessionCookieHeader(started);
+    await expect(authMiddleware(makeEvent(PATH, cookie))).resolves.toBeUndefined();
+
+    db.update(accounts).set({ role: "customer" }).where(eq(accounts.id, account.id)).run();
+
+    await expect(authMiddleware(makeEvent(PATH, cookie))).rejects.toMatchObject({
+      status: 403,
+      data: { code: "FORBIDDEN" },
     });
   });
 });

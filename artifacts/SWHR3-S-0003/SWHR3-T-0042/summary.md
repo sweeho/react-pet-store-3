@@ -25,6 +25,7 @@ closes the dialog and keeps everything; "Refresh anyway" clears staging and relo
 - `src/components/admin/refresh-orders-control.test.tsx` (new) — component tests.
 - `src/pages/admin/orders.tsx` — replaced the plain Refresh `Button` with `RefreshOrdersControl`, wired to `load()` and `staging.clear`.
 - `src/pages/admin/orders.test.tsx` — extended with the discard-confirm and discard-cancel flows; cited the existing no-staged-refresh test to the matching linked case.
+- `AGENTS.md` — documented that `bun run dev` can hit the same `bun:sqlite`/Node-ESM issue as `test`, and that `bun --bun run dev` avoids it (found while trying to verify this ticket's UI in a browser, see Notes).
 
 ## AC coverage
 
@@ -44,10 +45,12 @@ Test Files  71 passed (71)
 
 `bun run verify:full` was attempted; its E2E preflight reports Chromium is not installed in this
 container and directs engineer containers to `bun run verify` instead (E2E runs in the QA-phase/CI
-containers). `bun run dev` also fails in this container with an unrelated `bun:` ESM-scheme error
-in Nitro's dev sub-process (pre-existing; `server.ts`/`vite.config.ts` are untouched by this
-ticket), so a real-browser check was not possible here — the Testing Library suite is the available
-verification evidence. Full detail and the red→green proof: `tdd-test-result.md`.
+containers). `bun run dev` (the declared `start` command) also fails in this container with an
+unrelated `bun:` ESM-scheme error in Nitro's dev sub-process — fixed the gotcha into `AGENTS.md`
+(`bun --bun run dev` avoids it, same underlying cause as the existing `test` gotcha); with that,
+the dev server serves `/admin/orders` with a `200`, but no Chromium remains to actually render and
+click through it, so pixel-level verification was not possible — the Testing Library suite is the
+verification evidence in its place. Full detail: `tdd-test-result.md`.
 
 ## Notes
 

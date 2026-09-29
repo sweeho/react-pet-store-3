@@ -62,12 +62,18 @@ installed in this container (`[test:e2e] Playwright's Chromium browser is not in
 explicitly directs engineer containers to `bun run verify` instead, deferring E2E to the
 QA-phase/CI containers.
 
-**Manual browser verification was not possible in this container**: `bun run dev` (the project's
-declared `start` command) itself fails here with `ERR_UNSUPPORTED_ESM_URL_SCHEME` on a `bun:`
-import inside Nitro's dev sub-process — pre-existing to this container, unrelated to any file this
-ticket touches (`server.ts`/`vite.config.ts` are untouched), and Playwright has no Chromium to fall
-back to either. The Testing Library suite (14 tests across the two files, asserting the dialog's
-exact title/body/button text and DOM structure against `design.md` D11's copy) is the verification
-evidence in place of a screenshot.
+**Manual browser verification was partially possible in this container.** `bun run dev` (the
+project's declared `start` command) itself fails here with `ERR_UNSUPPORTED_ESM_URL_SCHEME` on a
+`bun:` import inside Nitro's dev sub-process — the same underlying cause AGENTS.md already
+documents for `test` (Vitest's worker pool spawning plain-Node children), just not yet documented
+for `dev`. `bun --bun run dev` avoids it; fixed the gotcha into AGENTS.md's Build & run section
+(pre-existing to this container, unrelated to any file this ticket owns —
+`server.ts`/`vite.config.ts` are untouched). With that, the dev server serves `/admin/orders`'s SPA
+shell at `curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/admin/orders` → `200`,
+confirming no server-side crash on this route. Playwright still has no Chromium in this container
+to render and interact with the page, so pixel-level visual verification was not possible; the
+Testing Library suite (14 tests across the two files, asserting the dialog's exact title/body/
+button text and DOM structure against `design.md` D11's copy) is the verification evidence in
+place of a screenshot.
 
 TDD-RESULT: 438 passed, 0 failed

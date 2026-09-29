@@ -147,13 +147,13 @@
 
 ## 15. Error Handling and Recovery
 
-- [ ] 15.1 Implement form redisplay on address validation failure (SWHR3-T-0097)
-- [ ] 15.2 Implement error message display for missing fields (SWHR3-T-0097)
-- [ ] 15.3 Implement cart validation error handling (SWHR3-T-0097)
-- [ ] 15.4 Implement database error handling during order persistence (SWHR3-T-0097)
-- [ ] 15.5 Implement exception logging for debugging (SWHR3-T-0097)
-- [ ] 15.6 Implement user-friendly error messages (SWHR3-T-0097)
-- [ ] 15.7 Implement session rollback on order creation failure (SWHR3-T-0097)
+- [x] 15.1 Implement form redisplay on address validation failure (SWHR3-T-0097)
+- [x] 15.2 Implement error message display for missing fields (SWHR3-T-0097)
+- [x] 15.3 Implement cart validation error handling (SWHR3-T-0097)
+- [x] 15.4 Implement database error handling during order persistence (SWHR3-T-0097)
+- [x] 15.5 Implement exception logging for debugging (SWHR3-T-0097)
+- [x] 15.6 Implement user-friendly error messages (SWHR3-T-0097)
+- [x] 15.7 Implement session rollback on order creation failure (SWHR3-T-0097)
 
 ## 16. Security and Validation
 

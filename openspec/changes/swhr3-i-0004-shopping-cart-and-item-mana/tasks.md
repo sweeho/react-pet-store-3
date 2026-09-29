@@ -35,12 +35,12 @@
 
 ## 5. Cart Retrieval and Enrichment
 
-- [ ] 5.1 Implement getDetails() method returning HashMap copy (SWHR3-T-0062)
-- [ ] 5.2 Implement getItems() method using CatalogHelper for enrichment (SWHR3-T-0062)
-- [ ] 5.3 Create CartItem value object from catalog Item and cart quantity (SWHR3-T-0062)
-- [ ] 5.4 Handle CatalogException with logging and item skip (SWHR3-T-0062)
-- [ ] 5.5 Return collection of CartItem objects for display (SWHR3-T-0062)
-- [ ] 5.6 Add getItems method to ShoppingCartLocal interface (SWHR3-T-0062)
+- [x] 5.1 Implement getDetails() method returning HashMap copy (SWHR3-T-0062)
+- [x] 5.2 Implement getItems() method using CatalogHelper for enrichment (SWHR3-T-0062)
+- [x] 5.3 Create CartItem value object from catalog Item and cart quantity (SWHR3-T-0062)
+- [x] 5.4 Handle CatalogException with logging and item skip (SWHR3-T-0062)
+- [x] 5.5 Return collection of CartItem objects for display (SWHR3-T-0062)
+- [x] 5.6 Add getItems method to ShoppingCartLocal interface (SWHR3-T-0062)
 
 ## 6. Cart Calculations
 

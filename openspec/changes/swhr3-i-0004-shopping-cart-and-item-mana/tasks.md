@@ -11,11 +11,11 @@
 
 ## 2. Item Addition Operations
 
-- [ ] 2.1 Implement addItem(String itemId) method with quantity 1 default (SWHR3-T-0059)
-- [ ] 2.2 Implement addItem(String itemId, int qty) overload for explicit quantity (SWHR3-T-0059)
-- [ ] 2.3 Add both method signatures to ShoppingCartLocal interface (SWHR3-T-0059)
-- [ ] 2.4 Declare container-transaction with trans-attribute=Required for addItem (SWHR3-T-0059)
-- [ ] 2.5 Test item addition with default and explicit quantities (SWHR3-T-0059)
+- [x] 2.1 Implement addItem(String itemId) method with quantity 1 default (SWHR3-T-0059)
+- [x] 2.2 Implement addItem(String itemId, int qty) overload for explicit quantity (SWHR3-T-0059)
+- [x] 2.3 Add both method signatures to ShoppingCartLocal interface (SWHR3-T-0059)
+- [x] 2.4 Declare container-transaction with trans-attribute=Required for addItem (SWHR3-T-0059)
+- [x] 2.5 Test item addition with default and explicit quantities (SWHR3-T-0059)
 
 ## 3. Item Removal Operations
 

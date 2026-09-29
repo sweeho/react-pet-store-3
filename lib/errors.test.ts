@@ -12,6 +12,7 @@ import {
   ServiceError,
   ServiceUnavailableError,
   ShoppingCartEmptyError,
+  UnsupportedMediaTypeError,
   ValidationError,
   toHttpError,
 } from "./errors";
@@ -98,6 +99,16 @@ describe("ServiceError subclasses", () => {
     const http = toHttpError(error);
     expect(http.status).toBe(409);
     expect(http.data).toEqual({ code: "SHOPPING_CART_EMPTY" });
+  });
+
+  it("UnsupportedMediaTypeError is a 415 UNSUPPORTED_MEDIA_TYPE", () => {
+    const error = new UnsupportedMediaTypeError();
+    expect(error.status).toBe(415);
+    expect(error.code).toBe("UNSUPPORTED_MEDIA_TYPE");
+    expect(error.message).toBe("Request body must be JSON");
+    const http = toHttpError(error);
+    expect(http.status).toBe(415);
+    expect(http.data).toEqual({ code: "UNSUPPORTED_MEDIA_TYPE" });
   });
 
   it("ServiceUnavailableError is a 503 SERVICE_UNAVAILABLE (AC-3)", () => {

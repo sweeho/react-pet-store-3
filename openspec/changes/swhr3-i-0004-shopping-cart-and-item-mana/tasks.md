@@ -53,11 +53,11 @@
 
 ## 7. Item and Cart Counts
 
-- [ ] 7.1 Implement getCount() method returning HashMap.size() (SWHR3-T-0064)
-- [ ] 7.2 Implement getDetails() to return internal HashMap copy (SWHR3-T-0064)
-- [ ] 7.3 Add getCount method to ShoppingCartLocal interface (SWHR3-T-0064)
-- [ ] 7.4 Add getDetails method to ShoppingCartLocal interface (SWHR3-T-0064)
-- [ ] 7.5 Test count retrieval with empty, single, and multiple items (SWHR3-T-0064)
+- [x] 7.1 Implement getCount() method returning HashMap.size() (SWHR3-T-0064)
+- [x] 7.2 Implement getDetails() to return internal HashMap copy (SWHR3-T-0064)
+- [x] 7.3 Add getCount method to ShoppingCartLocal interface (SWHR3-T-0064)
+- [x] 7.4 Add getDetails method to ShoppingCartLocal interface (SWHR3-T-0064)
+- [x] 7.5 Test count retrieval with empty, single, and multiple items (SWHR3-T-0064)
 
 ## 8. Locale Support
 

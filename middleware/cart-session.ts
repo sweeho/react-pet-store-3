@@ -1,6 +1,6 @@
 /**
  * Resolves the anonymous cart token into event.context.cartSession for
- * /api/cart* paths (design.md D1, C8). The token lives in its own httpOnly
+ * /api/cart* paths (design.md D1, C8) and, read-only, /api/orders* (D8). The token lives in its own httpOnly
  * cookie, separate from the sign-in session. A first GET/HEAD leaves it
  * unset and sets no cookie; a write with no valid cookie mints a UUID. A
  * cookie value that is not a UUID reads as absent.
@@ -17,10 +17,14 @@ declare module "h3" {
 }
 
 const CART_PATH_PREFIX = "/api/cart";
+// design.md D8: /api/orders reads the cart cookie but never mints one.
+const ORDERS_PATH_PREFIX = "/api/orders";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default defineHandler((event) => {
-  if (!getRequestURL(event).pathname.startsWith(CART_PATH_PREFIX)) {
+  const pathname = getRequestURL(event).pathname;
+  const isCartPath = pathname.startsWith(CART_PATH_PREFIX);
+  if (!isCartPath && !pathname.startsWith(ORDERS_PATH_PREFIX)) {
     return;
   }
 
@@ -30,7 +34,7 @@ export default defineHandler((event) => {
     return;
   }
 
-  if (event.req.method === "GET" || event.req.method === "HEAD") {
+  if (!isCartPath || event.req.method === "GET" || event.req.method === "HEAD") {
     return;
   }
 

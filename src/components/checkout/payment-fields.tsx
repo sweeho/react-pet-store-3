@@ -1,8 +1,6 @@
 import { FormField, Input, Select } from "@/components/ui";
+import { CHECKOUT_CARD_TYPES as CARD_TYPES } from "@/types/checkout";
 
-// Client mirror of lib/credit-card.ts CHECKOUT_CARD_TYPES (design.md C3, D6);
-// SWHR3-T-0095 moves it to src/types/checkout.ts.
-const CARD_TYPES = ["Java Card", "Duke Express", "Meow Card"] as const;
 const YEARS_AHEAD = 5;
 
 export interface PaymentFieldsProps {

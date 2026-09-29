@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Commit staged decisions</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff;color:#3f3f46}
+.shell{max-width:940px;margin:0 auto;padding:18px}
+.stage{position:relative;border:1px solid #e4e4e7;border-radius:10px;overflow:hidden;height:330px;background:#fff}
+.bg{padding:14px;filter:grayscale(1);opacity:.35}
+.bgrow{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #f4f4f5}
+.bar{background:#d4d4d8;border-radius:3px;height:9px;display:inline-block}
+.scrim{position:absolute;inset:0;background:rgba(63,63,70,.35)}
+.dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:440px;background:#fff;border:1px solid #d4d4d8;border-radius:12px;padding:18px}
+.dialog h2{font-size:16px;color:#27272a;margin:0 0 6px}
+.dialog p{font-size:13px;color:#71717a;margin:0 0 12px}
+.list{border:1px solid #e4e4e7;border-radius:8px;overflow:hidden;margin-bottom:12px}
+.li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #f4f4f5;font-size:13px}
+.li:last-child{border-bottom:none}
+.li .id{width:52px;color:#27272a}
+.li .arrow{color:#a1a1aa}
+.chip{display:inline-block;padding:2px 8px;border:1px solid #d4d4d8;border-radius:999px;font-size:11px;letter-spacing:.04em;color:#52525b;background:#fafafa}
+.chip.solid{background:#e4e4e7;color:#3f3f46}
+.actions{display:flex;justify-content:flex-end;gap:8px}
+.btn{display:inline-flex;align-items:center;height:32px;padding:0 13px;border:1px solid #d4d4d8;border-radius:8px;background:#fff;color:#3f3f46;font-size:13px;font-weight:500}
+.btn.primary{background:#27272a;color:#fff;border-color:#27272a}
+.note{font-size:12px;color:#a1a1aa}
+.caption{font-size:12px;color:#a1a1aa;margin:16px 0 8px}
+.states{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.state{border:1px solid #e4e4e7;border-radius:10px;padding:14px}
+.state h3{font-size:13px;color:#27272a;margin:0 0 6px}
+.state p{font-size:12px;color:#71717a;margin:0 0 10px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#52525b;background:#fafafa;border:1px solid #e4e4e7;border-radius:6px;padding:7px 9px;display:block;margin-bottom:10px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:999px;background:#a1a1aa;margin-right:7px;vertical-align:1px}
+.dot.err{background:#52525b;border-radius:2px}
+</style></head>
+<body><div class="shell">
+
+  <div class="stage">
+    <div class="bg">
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:120px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:96px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:132px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:88px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+      <div class="bgrow"><span class="bar" style="width:44px"></span><span class="bar" style="width:110px"></span><span class="bar" style="width:80px"></span><span class="bar" style="width:70px;margin-left:auto"></span></div>
+    </div>
+    <div class="scrim"></div>
+
+    <div class="dialog">
+      <h2>Commit 3 status changes?</h2>
+      <p>These decisions become permanent and cannot be reversed.</p>
+      <div class="list">
+        <div class="li"><span class="id">1001</span><span class="chip">PENDING</span><span class="arrow">→</span><span class="chip solid">APPROVED</span></div>
+        <div class="li"><span class="id">1002</span><span class="chip">PENDING</span><span class="arrow">→</span><span class="chip solid">DENIED</span></div>
+        <div class="li"><span class="id">1005</span><span class="chip">PENDING</span><span class="arrow">→</span><span class="chip solid">APPROVED</span></div>
+      </div>
+      <p class="note" style="margin-bottom:14px">All three are sent as one update. If any one fails, none are applied.</p>
+      <div class="actions"><span class="btn">Cancel</span><span class="btn primary">Commit changes</span></div>
+    </div>
+  </div>
+
+  <p class="caption">Result states after commit</p>
+  <div class="states">
+    <div class="state">
+      <h3><span class="dot"></span>Committed</h3>
+      <p>3 orders updated. Customers are notified by email.</p>
+      <span class="mono">Status: SUCCESS — 3 orders updated</span>
+      <span class="btn">Back to pending queue</span>
+    </div>
+    <div class="state">
+      <h3><span class="dot err"></span>Commit failed — nothing was changed</h3>
+      <p>All 3 decisions are still staged. Try committing again.</p>
+      <span class="mono">Error: &lt;server message shown here&gt;</span>
+      <span class="btn">Try again</span>
+    </div>
+  </div>
+
+</div></body></html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Decided orders</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff;color:#3f3f46}
+.shell{max-width:940px;margin:0 auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;border:1px solid #e4e4e7;border-radius:10px;padding:10px 14px;background:#fafafa}
+.brand{font-weight:600;color:#27272a}
+.right{display:flex;align-items:center;gap:10px}
+.nav{display:flex;gap:6px;margin:14px 0 18px}
+.navitem{padding:6px 12px;border:1px solid #e4e4e7;border-radius:8px;color:#71717a;font-size:13px}
+.navitem.active{background:#27272a;color:#fff;border-color:#27272a}
+.bar{background:#d4d4d8;border-radius:3px;height:9px;display:inline-block}
+.btn{display:inline-flex;align-items:center;height:32px;padding:0 13px;border:1px solid #d4d4d8;border-radius:8px;background:#fff;color:#3f3f46;font-size:13px;font-weight:500}
+.btn.sm{height:27px;padding:0 10px;font-size:12px}
+h1{font-size:20px;color:#27272a;margin:0}
+.head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.sub{font-size:12px;color:#a1a1aa;margin:0 0 14px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #e4e4e7}
+.tab{padding:8px 14px;font-size:13px;color:#71717a;border:1px solid transparent;border-bottom:none}
+.tab.active{color:#27272a;font-weight:600;border-color:#e4e4e7;border-radius:8px 8px 0 0;background:#fff;margin-bottom:-1px}
+.tab span{color:#a1a1aa;font-weight:400}
+.banner{border:1px solid #e4e4e7;border-top:none;background:#fafafa;padding:9px 12px;font-size:12px;color:#52525b}
+table{width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e4e4e7;border-top:none}
+th{text-align:left;font-weight:600;color:#71717a;padding:9px 10px;border-bottom:1px solid #e4e4e7;font-size:11px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+th .s{color:#d4d4d8;font-weight:400}
+th .a{color:#52525b}
+td{padding:9px 10px;border-bottom:1px solid #f4f4f5}
+td.num,th.num{text-align:right}
+.chip{display:inline-block;padding:2px 8px;border:1px solid #d4d4d8;border-radius:999px;font-size:11px;letter-spacing:.04em;color:#52525b;background:#fafafa}
+.chip.solid{background:#e4e4e7;border-color:#d4d4d8;color:#3f3f46}
+.foot{display:flex;justify-content:space-between;font-size:12px;color:#a1a1aa;padding:9px 2px}
+</style></head>
+<body><div class="shell">
+
+  <div class="topbar">
+    <span class="brand">Pet Store — Admin</span>
+    <div class="right"><span class="bar" style="width:90px"></span><span class="btn sm">Sign out</span></div>
+  </div>
+
+  <div class="nav"><span class="navitem">Home</span><span class="navitem active">Order review</span><span class="navitem">Reports</span></div>
+
+  <div class="head">
+    <div>
+      <h1>Order review</h1>
+      <p class="sub">Decided orders, for reference only.</p>
+    </div>
+    <div class="right"><span class="btn">Refresh</span></div>
+  </div>
+
+  <div class="tabs">
+    <span class="tab">Pending <span>12</span></span>
+    <span class="tab active">Approved <span>8</span></span>
+    <span class="tab">Denied <span>3</span></span>
+    <span class="tab">Completed <span>24</span></span>
+  </div>
+
+  <div class="banner">Read-only — a decided order cannot be changed, reopened or cancelled.</div>
+
+  <table>
+    <tr>
+      <th>Order # <span class="s">⇅</span></th>
+      <th>Customer <span class="s">⇅</span></th>
+      <th>Date <span class="a">▼</span></th>
+      <th class="num">Amount <span class="s">⇅</span></th>
+      <th style="width:150px">Status <span class="s">⇅</span></th>
+    </tr>
+    <tr><td>0987</td><td><span class="bar" style="width:104px"></span></td><td>2026-09-18</td><td class="num">$3,090.00</td><td><span class="chip solid">APPROVED</span></td></tr>
+    <tr><td>0984</td><td><span class="bar" style="width:78px"></span></td><td>2026-09-18</td><td class="num">$640.00</td><td><span class="chip solid">APPROVED</span></td></tr>
+    <tr><td>0979</td><td><span class="bar" style="width:118px"></span></td><td>2026-09-17</td><td class="num">$1,505.00</td><td><span class="chip solid">APPROVED</span></td></tr>
+    <tr><td>0977</td><td><span class="bar" style="width:92px"></span></td><td>2026-09-17</td><td class="num">$820.00</td><td><span class="chip solid">APPROVED</span></td></tr>
+    <tr><td>0971</td><td><span class="bar" style="width:66px"></span></td><td>2026-09-16</td><td class="num">$4,410.00</td><td><span class="chip solid">APPROVED</span></td></tr>
+  </table>
+
+  <div class="foot">
+    <span>Showing 5 of 8 approved orders</span>
+    <span>Fulfilment happens automatically after approval.</span>
+  </div>
+
+</div></body></html>

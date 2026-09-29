@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Pending orders queue</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff;color:#3f3f46}
+.shell{max-width:940px;margin:0 auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;border:1px solid #e4e4e7;border-radius:10px;padding:10px 14px;background:#fafafa}
+.brand{font-weight:600;color:#27272a}
+.right{display:flex;align-items:center;gap:10px}
+.nav{display:flex;gap:6px;margin:14px 0 18px}
+.navitem{padding:6px 12px;border:1px solid #e4e4e7;border-radius:8px;color:#71717a;font-size:13px}
+.navitem.active{background:#27272a;color:#fff;border-color:#27272a}
+.bar{background:#d4d4d8;border-radius:3px;height:9px;display:inline-block}
+.btn{display:inline-flex;align-items:center;height:32px;padding:0 13px;border:1px solid #d4d4d8;border-radius:8px;background:#fff;color:#3f3f46;font-size:13px;font-weight:500}
+.btn.sm{height:27px;padding:0 10px;font-size:12px}
+.btn.primary{background:#27272a;color:#fff;border-color:#27272a}
+.btn.danger{border-color:#a1a1aa;color:#52525b}
+h1{font-size:20px;color:#27272a;margin:0}
+.head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.sub{font-size:12px;color:#a1a1aa;margin:0 0 14px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #e4e4e7;margin-bottom:0}
+.tab{padding:8px 14px;font-size:13px;color:#71717a;border:1px solid transparent;border-bottom:none}
+.tab.active{color:#27272a;font-weight:600;border-color:#e4e4e7;border-radius:8px 8px 0 0;background:#fff;margin-bottom:-1px}
+.tab span{color:#a1a1aa;font-weight:400}
+.bulk{display:flex;align-items:center;gap:10px;border:1px solid #e4e4e7;border-top:none;padding:9px 12px;background:#fafafa;font-size:13px}
+.bulk .lbl{color:#52525b}
+.gap{flex:1}
+table{width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e4e4e7;border-top:none}
+th{text-align:left;font-weight:600;color:#71717a;padding:9px 10px;border-bottom:1px solid #e4e4e7;font-size:11px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+th .s{color:#d4d4d8;font-weight:400}
+th .a{color:#52525b}
+td{padding:9px 10px;border-bottom:1px solid #f4f4f5;vertical-align:middle}
+td.num,th.num{text-align:right}
+tr.staged td{background:#fafafa}
+tr.staged td:first-child{box-shadow:inset 3px 0 0 #71717a}
+.box{display:inline-block;width:13px;height:13px;border:1px solid #a1a1aa;border-radius:3px;vertical-align:-2px}
+.box.on{background:#27272a;border-color:#27272a;position:relative}
+.box.on:after{content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.chip{display:inline-block;padding:2px 8px;border:1px solid #d4d4d8;border-radius:999px;font-size:11px;letter-spacing:.04em;color:#52525b;background:#fafafa}
+.select{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;min-width:126px;height:28px;padding:0 8px;border:1px solid #71717a;border-radius:6px;background:#fff;font-size:12px;color:#27272a}
+.staged-tag{font-size:11px;color:#a1a1aa;margin-left:8px}
+.menucell{position:relative}
+.menu{position:absolute;z-index:5;left:10px;top:34px;width:140px;border:1px solid #a1a1aa;border-radius:8px;background:#fff;box-shadow:0 2px 0 rgba(0,0,0,.04);padding:4px}
+.menu div{padding:6px 8px;font-size:12px;border-radius:5px}
+.menu div.hi{background:#f4f4f5}
+.menu .cap{font-size:10px;color:#a1a1aa;padding:4px 8px 2px}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#a1a1aa;padding:9px 2px}
+.warn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#52525b;border:1px dashed #a1a1aa;border-radius:6px;padding:3px 9px}
+</style></head>
+<body><div class="shell">
+
+  <div class="topbar">
+    <span class="brand">Pet Store — Admin</span>
+    <div class="right"><span class="bar" style="width:90px"></span><span class="btn sm">Sign out</span></div>
+  </div>
+
+  <div class="nav"><span class="navitem">Home</span><span class="navitem active">Order review</span><span class="navitem">Reports</span></div>
+
+  <div class="head">
+    <div>
+      <h1>Order review</h1>
+      <p class="sub">Orders of $500 and above are held here for a decision. Changes are staged locally until you commit them.</p>
+    </div>
+    <div class="right">
+      <span class="warn">2 uncommitted changes</span>
+      <span class="btn">Refresh</span>
+      <span class="btn primary">Commit 2 changes</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <span class="tab active">Pending <span>12</span></span>
+    <span class="tab">Approved <span>8</span></span>
+    <span class="tab">Denied <span>3</span></span>
+    <span class="tab">Completed <span>24</span></span>
+  </div>
+
+  <div class="bulk">
+    <span class="box on"></span>
+    <span class="lbl">2 orders selected</span>
+    <span class="btn sm">Approve selected</span>
+    <span class="btn sm danger">Deny selected</span>
+    <span class="gap"></span>
+    <span class="btn sm">Clear selection</span>
+  </div>
+
+  <table>
+    <tr>
+      <th style="width:34px"><span class="box"></span></th>
+      <th>Order # <span class="a">▲</span></th>
+      <th>Customer <span class="s">⇅</span></th>
+      <th>Date <span class="s">⇅</span></th>
+      <th class="num">Amount <span class="s">⇅</span></th>
+      <th style="width:210px">Status <span class="s">⇅</span></th>
+    </tr>
+
+    <tr class="staged">
+      <td><span class="box on"></span></td>
+      <td>1001</td>
+      <td><span class="bar" style="width:104px"></span></td>
+      <td>2026-09-21</td>
+      <td class="num">$1,240.00</td>
+      <td><span class="select">APPROVED <span style="color:#a1a1aa">▾</span></span><span class="staged-tag">staged</span></td>
+    </tr>
+
+    <tr class="staged">
+      <td><span class="box on"></span></td>
+      <td>1002</td>
+      <td><span class="bar" style="width:86px"></span></td>
+      <td>2026-09-21</td>
+      <td class="num">$890.00</td>
+      <td><span class="select">DENIED <span style="color:#a1a1aa">▾</span></span><span class="staged-tag">staged</span></td>
+    </tr>
+
+    <tr>
+      <td><span class="box"></span></td>
+      <td>1003</td>
+      <td><span class="bar" style="width:120px"></span></td>
+      <td>2026-09-20</td>
+      <td class="num">$5,410.00</td>
+      <td class="menucell">
+        <span class="select">PENDING <span style="color:#a1a1aa">▾</span></span>
+        <div class="menu">
+          <div class="cap">SET STATUS TO</div>
+          <div class="hi">APPROVED</div>
+          <div>DENIED</div>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><span class="box"></span></td>
+      <td>1004</td>
+      <td><span class="bar" style="width:70px"></span></td>
+      <td>2026-09-20</td>
+      <td class="num">$512.00</td>
+      <td><span class="chip">PENDING</span></td>
+    </tr>
+
+    <tr>
+      <td><span class="box"></span></td>
+      <td>1005</td>
+      <td><span class="bar" style="width:98px"></span></td>
+      <td>2026-09-19</td>
+      <td class="num">$2,180.00</td>
+      <td><span class="chip">PENDING</span></td>
+    </tr>
+
+    <tr>
+      <td><span class="box"></span></td>
+      <td>1006</td>
+      <td><span class="bar" style="width:112px"></span></td>
+      <td>2026-09-19</td>
+      <td class="num">$745.00</td>
+      <td><span class="chip">PENDING</span></td>
+    </tr>
+  </table>
+
+  <div class="foot">
+    <span>Showing 6 of 12 pending orders</span>
+    <span>Only APPROVED and DENIED can be set here. Orders cannot be modified or reopened.</span>
+  </div>
+
+</div></body></html>

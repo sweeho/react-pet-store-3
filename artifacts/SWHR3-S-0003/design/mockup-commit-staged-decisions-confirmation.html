@@ -1,0 +1,92 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Pet Store Admin — Commit decisions</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet"><style>
+:root{--background:oklch(1 0 0);--foreground:oklch(0.145 0 0);--card:oklch(1 0 0);--primary:oklch(0.205 0 0);--primary-foreground:oklch(0.985 0 0);--secondary:oklch(0.97 0 0);--muted:oklch(0.97 0 0);--muted-foreground:oklch(0.556 0 0);--destructive:oklch(0.577 0.245 27.325);--border:oklch(0.922 0 0);--ring:oklch(0.87 0 0);--sidebar:oklch(0.985 0 0);--radius:0.625rem}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px}
+body{background:var(--sidebar);color:var(--foreground);font-family:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+svg{display:block}
+.topbar{height:60px;background:var(--card);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1280px;margin:0 auto;height:100%;padding:0 40px;display:flex;align-items:center;gap:40px}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--primary);color:var(--primary-foreground);display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:16px;font-weight:700;letter-spacing:-0.01em}
+.chip{height:20px;padding:0 8px;border-radius:999px;background:var(--secondary);border:1px solid var(--border);color:var(--muted-foreground);font-size:11px;font-weight:500;letter-spacing:.06em;display:inline-flex;align-items:center}
+.nav{display:flex;align-items:center;gap:4px;flex:1}
+.nav-link{height:34px;padding:0 12px;border-radius:8px;display:inline-flex;align-items:center;font-size:14px;font-weight:500;color:var(--muted-foreground);text-decoration:none}
+.nav-link.is-active{background:var(--secondary);color:var(--foreground)}
+.session{display:flex;align-items:center;gap:14px}
+.who{text-align:right;line-height:1.25}
+.who-name{display:block;font-size:13px;font-weight:500}
+.who-role{display:block;font-size:11px;color:var(--muted-foreground);letter-spacing:.04em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:500;border:1px solid transparent;font-family:inherit;white-space:nowrap}
+.btn-sm{height:36px;padding:0 12px;font-size:13px}
+.btn-primary{background:var(--primary);color:var(--primary-foreground)}
+.btn-outline{background:var(--background);border-color:var(--border);color:var(--foreground)}
+.btn-deny{color:oklch(0.52 0.19 27.3)}
+.btn-destructive{background:var(--destructive);color:oklch(0.985 0 0)}
+.page{max-width:1280px;margin:0 auto;padding:30px 40px}
+.head{display:flex;align-items:flex-end;justify-content:space-between}
+h1{font-size:26px;font-weight:700;letter-spacing:-0.02em}
+.sub{margin-top:5px;color:var(--muted-foreground);font-size:14.5px}
+.tabs{margin-top:22px;display:flex;gap:26px;border-bottom:1px solid var(--border)}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:0 2px 12px;font-size:14.5px;font-weight:500;color:var(--muted-foreground);border-bottom:2px solid transparent;margin-bottom:-1px;text-decoration:none}
+.tab.is-active{color:var(--foreground);font-weight:600;border-bottom-color:var(--foreground)}
+.tab-n{height:20px;min-width:20px;padding:0 6px;border-radius:999px;background:var(--secondary);border:1px solid var(--border);font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.tab.is-active .tab-n{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
+.card{margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.05);overflow:hidden}
+.toolbar{height:64px;padding:0 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.sel{font-size:13.5px;color:var(--muted-foreground)}
+.sel b{color:var(--foreground);font-weight:600}
+.tb-spacer{flex:1}
+.table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.table th{height:42px;background:oklch(0.985 0 0);border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted-foreground);text-align:left;padding:0 18px;white-space:nowrap}
+.th-sort{display:inline-flex;align-items:center;gap:5px;color:var(--foreground)}
+.table td{height:60px;border-bottom:1px solid oklch(0.958 0 0);padding:0 18px;font-size:14px;vertical-align:middle}
+.c-cb{width:52px;padding-right:0}
+.c-order{width:112px;font-weight:600}
+.c-date{width:196px;color:var(--muted-foreground);font-size:13.5px}
+.c-amt{width:132px;text-align:right;font-weight:600}
+.c-status{width:236px}
+.cust{font-weight:500}
+.row-sel{background:oklch(0.985 0 0)}
+.row-staged{background:oklch(0.986 0 0);box-shadow:inset 3px 0 0 0 var(--foreground)}
+.cb{width:18px;height:18px;border:1.5px solid oklch(0.8 0 0);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:transparent}
+.cb.is-checked{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
+.select{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;width:172px;height:36px;padding:0 10px 0 12px;border:1px solid var(--border);border-radius:8px;background:var(--background);font-size:13px;font-weight:500;color:var(--muted-foreground)}
+.select .chev{color:var(--muted-foreground)}
+.select.is-staged{border:1px dashed var(--foreground);background:oklch(0.98 0 0);color:var(--foreground)}
+.sv{display:inline-flex;align-items:center;gap:8px}
+.sv .dot{width:7px;height:7px;border-radius:50%}
+.dot-approved{background:oklch(0.6 0.118 184.704)}
+.dot-denied{background:var(--destructive)}
+.badge{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:999px;font-size:11.5px;font-weight:600;letter-spacing:.05em;border:1px solid}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-approved{background:oklch(0.966 0.035 184);color:oklch(0.45 0.08 184);border-color:oklch(0.885 0.055 184)}
+.badge-denied{background:oklch(0.966 0.03 27);color:oklch(0.52 0.19 27.3);border-color:oklch(0.9 0.055 27)}
+.commitbar{height:64px;background:var(--primary);color:var(--primary-foreground);display:flex;align-items:center;gap:14px;padding:0 18px}
+.cb-title{font-size:14px;font-weight:600}
+.cb-sub{font-size:13px;color:oklch(0.78 0 0)}
+.btn-onDark{background:var(--primary-foreground);color:var(--primary)}
+.overlay{position:fixed;inset:0;background:oklch(0.145 0 0 / .55);display:flex;align-items:center;justify-content:center;z-index:50}
+.dialog{width:520px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.28);padding:26px 28px 22px}
+.dlg-head{display:flex;gap:14px}
+.dlg-icon{width:40px;height:40px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.ic-neutral{background:var(--secondary);border:1px solid var(--border);color:var(--foreground)}
+.dlg-title{font-size:18px;font-weight:600;letter-spacing:-0.01em}
+.dlg-body{margin-top:6px;font-size:14px;color:var(--muted-foreground)}
+.dlg-list{margin-top:18px;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.dlg-row{display:flex;align-items:center;gap:12px;height:46px;padding:0 14px;font-size:13.5px;font-variant-numeric:tabular-nums}
+.dlg-row + .dlg-row{border-top:1px solid oklch(0.958 0 0)}
+.dlg-row .oid{font-weight:600;width:52px}
+.dlg-row .cust{flex:1;color:var(--muted-foreground);font-weight:400}
+.dlg-row .badge{min-width:116px;justify-content:center}
+.arrow{color:var(--muted-foreground);flex:none}
+.from{color:var(--muted-foreground);font-size:12px;letter-spacing:.05em;font-weight:600;width:62px;text-align:right}
+.note{margin-top:16px;display:flex;gap:9px;font-size:12.5px;color:var(--muted-foreground);background:oklch(0.985 0 0);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.dlg-actions{margin-top:22px;display:flex;justify-content:flex-end;gap:10px}
+</style></head><body><header class="topbar"><div class="topbar-inner"><div class="brand"><div class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="9" r="2.1"/><circle cx="12" cy="6.9" r="2.3"/><circle cx="17" cy="9" r="2.1"/><path d="M12 11.6c-3 0-5.5 2.2-5.5 4.6 0 1.7 1.3 2.7 3 2.7.9 0 1.7-.4 2.5-.4s1.6.4 2.5.4c1.7 0 3-1 3-2.7 0-2.4-2.5-4.6-5.5-4.6Z"/></svg></div><span class="brand-name">Pet Store</span><span class="chip">ADMIN</span></div><nav class="nav"><a class="nav-link is-active" href="#">Orders</a><a class="nav-link" href="#">Reports</a></nav><div class="session"><div class="who"><span class="who-name">adminuser</span><span class="who-role">ADMINISTRATOR</span></div><button class="btn btn-outline btn-sm">Sign out</button></div></div></header><main class="page"><div class="head"><div><h1>Order review</h1><p class="sub">Orders of $500.00 and above wait here until an administrator approves or denies them.</p></div></div><nav class="tabs"><a class="tab is-active" href="#">Pending review <span class="tab-n">7</span></a><a class="tab" href="#">Decided <span class="tab-n">481</span></a></nav><section class="card"><div class="toolbar"><span class="sel"><b>2</b> of 7 selected</span><button class="btn btn-outline btn-sm"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+Approve
+</button><button class="btn btn-outline btn-sm btn-deny"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+Deny
+</button><div class="tb-spacer"></div><button class="btn btn-outline btn-sm"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+Refresh
+</button></div><table class="table"><thead><tr><th class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></th><th class="c-order">Order</th><th>Customer</th><th class="c-date"><span class="th-sort">Date<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 15 7-7 7 7"/></svg></span></th><th class="c-amt" style="text-align:right">Amount</th><th class="c-status">Status</th></tr></thead><tbody><tr class="row-staged"><td class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1001</td><td class="cust">Marion Delacroix</td><td class="c-date">21 Sep 2026, 16:40</td><td class="c-amt">$1,245.00</td><td class="c-status"><span class="select is-staged"><span class="sv"><span class="dot dot-approved"></span>APPROVED</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr class="row-sel"><td class="c-cb"><span class="cb is-checked"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1002</td><td class="cust">Kenji Watanabe</td><td class="c-date">21 Sep 2026, 18:02</td><td class="c-amt">$829.50</td><td class="c-status"><span class="select"><span class="sv">Set status…</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr class="row-staged"><td class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1003</td><td class="cust">Liu Wei</td><td class="c-date">22 Sep 2026, 08:15</td><td class="c-amt">$12,400.00</td><td class="c-status"><span class="select is-staged"><span class="sv"><span class="dot dot-denied"></span>DENIED</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr><td class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1004</td><td class="cust">Priya Raghunathan</td><td class="c-date">22 Sep 2026, 09:47</td><td class="c-amt">$500.00</td><td class="c-status"><span class="select"><span class="sv">Set status…</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr class="row-sel"><td class="c-cb"><span class="cb is-checked"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1005</td><td class="cust">Tomás Oliveira</td><td class="c-date">22 Sep 2026, 11:23</td><td class="c-amt">$3,150.75</td><td class="c-status"><span class="select"><span class="sv">Set status…</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr class="row-staged"><td class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1006</td><td class="cust">Astrid Lindqvist</td><td class="c-date">22 Sep 2026, 13:58</td><td class="c-amt">$675.00</td><td class="c-status"><span class="select is-staged"><span class="sv"><span class="dot dot-approved"></span>APPROVED</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr><tr><td class="c-cb"><span class="cb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></td><td class="c-order">1007</td><td class="cust">Daniel Okafor</td><td class="c-date">23 Sep 2026, 07:31</td><td class="c-amt">$2,090.00</td><td class="c-status"><span class="select"><span class="sv">Set status…</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></td></tr></tbody></table><div class="commitbar"><div><div class="cb-title">3 decisions staged, not yet sent</div><div class="cb-sub">2 to approve · 1 to deny — they are committed together, or not at all.</div></div><div class="tb-spacer"></div><button class="btn btn-onDark btn-sm">Commit 3 decisions</button></div></section></main><div class="overlay"><div class="dialog"><div class="dlg-head"><div class="dlg-icon ic-neutral"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></div><div><div class="dlg-title">Commit 3 decisions?</div><div class="dlg-body">These orders are sent to the server in a single update.</div></div></div><div class="dlg-list"><div class="dlg-row"><span class="oid">1001</span><span class="cust">Marion Delacroix</span><span class="from">PENDING</span><svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span class="badge badge-approved"><span class="dot"></span>APPROVED</span></div><div class="dlg-row"><span class="oid">1003</span><span class="cust">Liu Wei</span><span class="from">PENDING</span><svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span class="badge badge-denied"><span class="dot"></span>DENIED</span></div><div class="dlg-row"><span class="oid">1006</span><span class="cust">Astrid Lindqvist</span><span class="from">PENDING</span><svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span class="badge badge-approved"><span class="dot"></span>APPROVED</span></div></div><div class="note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>All three are saved together. If one of them fails, none of the decisions are saved.</span></div><div class="dlg-actions"><button class="btn btn-outline btn-sm">Cancel</button><button class="btn btn-primary btn-sm">Commit 3 decisions</button></div></div></div></body></html>

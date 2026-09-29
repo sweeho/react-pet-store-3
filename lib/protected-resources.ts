@@ -10,3 +10,11 @@ const PROTECTED_API_PATH_SET = new Set<string>(PROTECTED_API_PATHS);
 export function isProtectedApiPath(pathname: string): boolean {
   return PROTECTED_API_PATH_SET.has(pathname);
 }
+
+// design.md D4: a prefix, not an exact-match list, so a future admin route
+// cannot be added unprotected.
+export const ADMIN_API_PREFIX = "/api/admin/";
+
+export function isAdminApiPath(pathname: string): boolean {
+  return pathname.startsWith(ADMIN_API_PREFIX);
+}

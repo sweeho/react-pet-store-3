@@ -1,10 +1,20 @@
-## ADDED Requirements
+# order-approval Specification
+
+## Purpose
+
+TBD - created by archiving change swhr3-i-0003-order-approval-and-status-m. Update Purpose after archive.
+
+## Requirements
 
 ### Requirement: Order status enumeration
+
+ID: SWHR3-R-0001
 
 The system SHALL support exactly four order status values: PENDING, APPROVED, DENIED, and COMPLETED.
 
 #### Scenario: Status values are available in approval interface
+
+ID: SWHR3-R-0001.01
 
 - **GIVEN** an administrator accessing the order approval panel
 - **WHEN** viewing the order status options
@@ -12,15 +22,21 @@ The system SHALL support exactly four order status values: PENDING, APPROVED, DE
 
 #### Scenario: Orders are queryable by status
 
+ID: SWHR3-R-0001.02
+
 - **GIVEN** orders in the system with different status values
 - **WHEN** the admin client queries for orders
 - **THEN** the system SHALL return orders grouped by all four status types: PENDING orders, APPROVED orders, DENIED orders, and COMPLETED orders
 
 ### Requirement: Order approval via inline status editing
 
+ID: SWHR3-R-0002
+
 The system SHALL allow administrators to select one or more orders and change their status to APPROVED or DENIED directly in the approval interface.
 
 #### Scenario: Single order status is changed to APPROVED
+
+ID: SWHR3-R-0002.01
 
 - **GIVEN** an order displayed in the approval panel with PENDING status
 - **WHEN** the administrator selects the order row and clicks the approve button
@@ -28,15 +44,21 @@ The system SHALL allow administrators to select one or more orders and change th
 
 #### Scenario: Multiple orders are denied in batch
 
+ID: SWHR3-R-0002.02
+
 - **GIVEN** multiple orders selected in the approval panel
 - **WHEN** the administrator clicks the deny button
 - **THEN** the system SHALL update all selected order statuses to DENIED in the local interface
 
 ### Requirement: Batch order status updates
 
+ID: SWHR3-R-0003
+
 The system SHALL collect multiple order status changes locally and send them to the server in a single atomic update when the administrator clicks commit.
 
 #### Scenario: Changes are batched and sent on commit
+
+ID: SWHR3-R-0003.01
 
 - **GIVEN** an administrator with one or more pending order status changes
 - **WHEN** the administrator clicks the commit button
@@ -44,15 +66,21 @@ The system SHALL collect multiple order status changes locally and send them to 
 
 #### Scenario: Order changes are serialized to XML format
 
+ID: SWHR3-R-0003.02
+
 - **GIVEN** pending order status changes (e.g., OrderId 1001 to APPROVED, OrderId 1002 to DENIED)
 - **WHEN** the commit operation packages the changes
 - **THEN** the system SHALL serialize to XML containing Order elements with OrderId and OrderStatus sub-elements
 
 ### Requirement: Uncommitted changes detection
 
+ID: SWHR3-R-0004
+
 The system SHALL warn the administrator if uncommitted order status changes exist when attempting to refresh orders, and SHALL require explicit confirmation to proceed.
 
 #### Scenario: Warning is displayed for pending changes
+
+ID: SWHR3-R-0004.01
 
 - **GIVEN** an order with status changed from PENDING to APPROVED but not yet committed
 - **WHEN** the administrator clicks the refresh button
@@ -60,11 +88,15 @@ The system SHALL warn the administrator if uncommitted order status changes exis
 
 #### Scenario: Refresh requires confirmation
 
+ID: SWHR3-R-0004.02
+
 - **GIVEN** uncommitted order changes and confirmation dialog displayed
 - **WHEN** the administrator clicks OK to confirm
 - **THEN** the system SHALL proceed with refresh and reload orders from server
 
 #### Scenario: Refresh is canceled
+
+ID: SWHR3-R-0004.03
 
 - **GIVEN** uncommitted order changes and confirmation dialog displayed
 - **WHEN** the administrator clicks Cancel
@@ -72,9 +104,13 @@ The system SHALL warn the administrator if uncommitted order status changes exis
 
 ### Requirement: Server-side order update processing
 
+ID: SWHR3-R-0005
+
 The system SHALL receive XML-serialized order approval messages from the client, parse the order changes, and persist them via business logic components with atomic transaction semantics.
 
 #### Scenario: UPDATESTATUS request is processed
+
+ID: SWHR3-R-0005.01
 
 - **GIVEN** XML message with RequestType UPDATESTATUS containing order status changes
 - **WHEN** the ApplRequestProcessor servlet receives the request
@@ -82,11 +118,15 @@ The system SHALL receive XML-serialized order approval messages from the client,
 
 #### Scenario: Order changes are parsed from XML
 
+ID: SWHR3-R-0005.02
+
 - **GIVEN** XML OrderApproval message with Order elements
 - **WHEN** updateOrders() processes the message
 - **THEN** the system SHALL extract OrderId and OrderStatus from each Order element and create ChangedOrder objects
 
 #### Scenario: All changes are persisted or all rolled back
+
+ID: SWHR3-R-0005.03
 
 - **GIVEN** multiple orders with status changes and one order fails to update
 - **WHEN** the batch update is processed
@@ -94,9 +134,13 @@ The system SHALL receive XML-serialized order approval messages from the client,
 
 ### Requirement: XML OrderApproval message format
 
+ID: SWHR3-R-0006
+
 The system SHALL serialize order status changes to XML format containing OrderId and OrderStatus elements for each modified order.
 
 #### Scenario: OrderApproval XML is correctly formatted
+
+ID: SWHR3-R-0006.01
 
 - **GIVEN** changes to multiple orders in the approval panel
 - **WHEN** commit is called and changes are serialized
@@ -104,9 +148,13 @@ The system SHALL serialize order status changes to XML format containing OrderId
 
 ### Requirement: Successful update response
 
+ID: SWHR3-R-0007
+
 The system SHALL return an XML response confirming successful order status updates or indicating an error.
 
 #### Scenario: Success response is returned
+
+ID: SWHR3-R-0007.01
 
 - **GIVEN** valid order updates received by ApplRequestProcessor
 - **WHEN** all order updates succeed
@@ -114,15 +162,21 @@ The system SHALL return an XML response confirming successful order status updat
 
 #### Scenario: Error response includes exception message
 
+ID: SWHR3-R-0007.02
+
 - **GIVEN** an AdminBDException thrown during order update
 - **WHEN** the exception is caught by ApplRequestProcessor
 - **THEN** the system SHALL return XML error response with exception message
 
 ### Requirement: Transaction atomicity for order updates
 
+ID: SWHR3-R-0008
+
 The system SHALL enforce container-managed transactions on all order update operations, ensuring that either all changes in a batch commit or none of them persist.
 
 #### Scenario: Multiple orders are updated in single transaction
+
+ID: SWHR3-R-0008.01
 
 - **GIVEN** a batch of three order status changes in one commit request
 - **WHEN** AdminRequestBD.updateOrders() processes the batch
@@ -130,15 +184,21 @@ The system SHALL enforce container-managed transactions on all order update oper
 
 #### Scenario: Partial batch failure triggers rollback
 
+ID: SWHR3-R-0008.02
+
 - **GIVEN** a batch of three order updates where the second update fails
 - **WHEN** the transaction is active and failure occurs
 - **THEN** the system SHALL rollback all three updates, leaving no partial updates persisted
 
 ### Requirement: Status change restrictions
 
+ID: SWHR3-R-0009
+
 The system SHALL restrict which status values administrators can assign to orders, allowing only APPROVED or DENIED assignments through the approval interface.
 
 #### Scenario: Only APPROVED or DENIED options are available
+
+ID: SWHR3-R-0009.01
 
 - **GIVEN** the order status combo box in approval panel
 - **WHEN** the administrator opens the dropdown
@@ -146,9 +206,13 @@ The system SHALL restrict which status values administrators can assign to order
 
 ### Requirement: Administrator role restriction
 
+ID: SWHR3-R-0010
+
 The system SHALL restrict order approval operations to users with the administrator role.
 
 #### Scenario: Only administrators can access approval functions
+
+ID: SWHR3-R-0010.01
 
 - **GIVEN** an authenticated user without administrator role
 - **WHEN** attempting to modify order statuses
@@ -156,9 +220,13 @@ The system SHALL restrict order approval operations to users with the administra
 
 ### Requirement: Session persistence through JNLP deployment
 
+ID: SWHR3-R-0011
+
 The system SHALL embed the user's session ID in the JNLP file delivered to the client, enabling authenticated requests from the rich client application.
 
 #### Scenario: Session ID is passed in JNLP arguments
+
+ID: SWHR3-R-0011.01
 
 - **GIVEN** an administrator launching the rich client via Java WebStart
 - **WHEN** the JNLP file is generated by AdminRequestProcessor.buildJNLP()
@@ -166,15 +234,21 @@ The system SHALL embed the user's session ID in the JNLP file delivered to the c
 
 #### Scenario: Session ID is used for authenticated requests
 
+ID: SWHR3-R-0011.02
+
 - **GIVEN** a rich client application running with embedded session ID
 - **WHEN** the client sends order update requests
 - **THEN** the system SHALL use the embedded session ID for request authentication
 
 ### Requirement: XML Request Type identification
 
+ID: SWHR3-R-0012
+
 The system SHALL route order approval requests based on RequestType element value UPDATESTATUS in the XML request.
 
 #### Scenario: UPDATESTATUS route is evaluated
+
+ID: SWHR3-R-0012.01
 
 - **GIVEN** XML message with RequestType element
 - **WHEN** ApplRequestProcessor.updateOrders() checks request type
@@ -182,9 +256,13 @@ The system SHALL route order approval requests based on RequestType element valu
 
 ### Requirement: Order data object creation and transfer
 
+ID: SWHR3-R-0013
+
 The system SHALL create ChangedOrder objects containing orderId and orderStatus for each modified order, packaging them into OrderApproval container for batch processing.
 
 #### Scenario: ChangedOrder is created from XML
+
+ID: SWHR3-R-0013.01
 
 - **GIVEN** XML Order element with OrderId and OrderStatus sub-elements
 - **WHEN** the element is parsed in updateOrders()
@@ -192,15 +270,21 @@ The system SHALL create ChangedOrder objects containing orderId and orderStatus 
 
 #### Scenario: OrderApproval collects all changes
 
+ID: SWHR3-R-0013.02
+
 - **GIVEN** multiple ChangedOrder objects from XML parsing
 - **WHEN** all orders are extracted from the XML message
 - **THEN** the system SHALL aggregate into single OrderApproval object containing all changes
 
 ### Requirement: Client-side order table model refresh
 
+ID: SWHR3-R-0014
+
 The system SHALL reload all orders from the server, aggregating PENDING, APPROVED, DENIED, and COMPLETED status groups into a single refreshed order list.
 
 #### Scenario: All status groups are retrieved on refresh
+
+ID: SWHR3-R-0014.01
 
 - **GIVEN** a refresh action initiated by the administrator
 - **WHEN** the client calls getOrders() on the server

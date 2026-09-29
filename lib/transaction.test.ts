@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
 import { accounts } from "../db/schema";
-import type { DbOrTx } from "./transaction";
+import type { DbOrTx, TransactionOptions } from "./transaction";
 import { withTransaction } from "./transaction";
 
 /**
@@ -67,5 +67,52 @@ describe("withTransaction", () => {
 
     expect(accountExists("tx-nested-a")).toBe(false);
     expect(accountExists("tx-nested-b")).toBe(false);
+  });
+
+  // design.md C8: the optional third `options` argument. Existing call
+  // sites (above) are unchanged and still pass.
+  const behaviors: TransactionOptions["behavior"][] = ["deferred", "immediate", "exclusive"];
+
+  it.each(behaviors)("commits a standalone write under behavior %s (C8)", (behavior) => {
+    withTransaction(
+      (tx) => {
+        insertAccount(tx, `tx-behavior-${behavior}`);
+      },
+      undefined,
+      { behavior },
+    );
+
+    expect(accountExists(`tx-behavior-${behavior}`)).toBe(true);
+  });
+
+  it("rolls back a standalone write under immediate mode when fn throws (C8)", () => {
+    expect(() =>
+      withTransaction(
+        (tx) => {
+          insertAccount(tx, "tx-immediate-thrown");
+          throw new Error("boom");
+        },
+        undefined,
+        { behavior: "immediate" },
+      ),
+    ).toThrow("boom");
+
+    expect(accountExists("tx-immediate-thrown")).toBe(false);
+  });
+
+  it("ignores a behavior option when joining an outer transaction (C8)", () => {
+    withTransaction((outer) => {
+      insertAccount(outer, "tx-outer-with-behavior");
+      withTransaction(
+        (inner) => {
+          insertAccount(inner, "tx-outer-with-behavior-inner");
+        },
+        outer,
+        { behavior: "immediate" },
+      );
+    });
+
+    expect(accountExists("tx-outer-with-behavior")).toBe(true);
+    expect(accountExists("tx-outer-with-behavior-inner")).toBe(true);
   });
 });

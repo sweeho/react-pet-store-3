@@ -28,7 +28,10 @@ server never collides with a test run and never silently absorbs one.
 
 Everything runs under **bun**, including the test runners. `db/client.ts` imports the
 `bun:sqlite` builtin, so a script that reaches it under plain Node fails at import —
-which is why `test` is `bun --bun vitest run` and not `vitest`.
+which is why `test` is `bun --bun vitest run` and not `vitest`. The same applies to
+`start`: in some containers, plain `bun run dev` crashes a Nitro dev sub-process with
+`ERR_UNSUPPORTED_ESM_URL_SCHEME` on a `bun:` import — run `bun --bun run dev` instead
+when that happens.
 
 `auto-imports.d.ts` does not exist on a fresh clone. The `prebuild` and `pretypecheck`
 hooks generate it. Give any new tsc-only script the same hook or it fails on a clean

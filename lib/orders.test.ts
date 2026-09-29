@@ -3,7 +3,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
 import { accounts, orders } from "../db/schema";
-import { getOrdersGroupedByStatus, listOrdersByStatus, updateOrderStatus } from "./orders";
+import {
+  completeOrder,
+  getOrdersGroupedByStatus,
+  listOrdersByStatus,
+  updateOrderStatus,
+} from "./orders";
 import { InvalidTransitionError, NotFoundError } from "./errors";
 import type { OrderStatus } from "./order-status";
 
@@ -172,5 +177,26 @@ describe("updateOrderStatus", () => {
 
     const row = db.select().from(orders).where(eq(orders.id, order.id)).get();
     expect(row?.status).toBe("APPROVED");
+  });
+});
+
+describe("completeOrder", () => {
+  it("moves an APPROVED order to COMPLETED", () => {
+    const account = makeAccount("complete-order-1");
+    const order = insertOrder(account.id, { status: "APPROVED" });
+
+    db.transaction((tx) => completeOrder(tx, order.id));
+
+    expect(db.select().from(orders).where(eq(orders.id, order.id)).get()?.status).toBe("COMPLETED");
+  });
+
+  it("refuses a PENDING order and an unknown order", () => {
+    const account = makeAccount("complete-order-2");
+    const order = insertOrder(account.id);
+
+    expect(() => db.transaction((tx) => completeOrder(tx, order.id))).toThrow(
+      InvalidTransitionError,
+    );
+    expect(() => db.transaction((tx) => completeOrder(tx, 999999))).toThrow(NotFoundError);
   });
 });

@@ -9,6 +9,7 @@
  * row instead of lost-updating it.
  */
 import { updateOrderStatus } from "./orders";
+import { allocateOrder } from "./process-manager";
 import type { AssignableStatus } from "./order-status";
 import { withTransaction } from "./transaction";
 
@@ -20,6 +21,10 @@ export function updateOrders(approval: OrderApproval): { updated: number } {
     (tx) => {
       for (const change of approval.changes) {
         updateOrderStatus(tx, change.orderId, change.status);
+        // D8: a WAITING result never fails the batch; denied orders are not allocated.
+        if (change.status === "APPROVED") {
+          allocateOrder(tx, change.orderId);
+        }
       }
     },
     undefined,

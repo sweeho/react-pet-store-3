@@ -29,3 +29,13 @@ export function assertTransition(orderId: number, from: OrderStatus, to: OrderSt
     throw new InvalidTransitionError(orderId, from);
   }
 }
+
+// System transitions (design.md D7): made by the process manager, never
+// assignable by an administrator.
+const SYSTEM_TRANSITIONS = new Set<string>(["APPROVED->COMPLETED"]);
+
+export function assertSystemTransition(orderId: number, from: OrderStatus, to: OrderStatus): void {
+  if (!SYSTEM_TRANSITIONS.has(`${from}->${to}`)) {
+    throw new InvalidTransitionError(orderId, from);
+  }
+}

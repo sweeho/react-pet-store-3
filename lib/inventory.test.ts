@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
@@ -14,7 +14,14 @@ import {
 import { placeOrder } from "./checkout";
 import type { ContactInfo } from "./contact-info";
 import { createCreditCard } from "./credit-card";
-import { reserveInventory, setInventory } from "./inventory";
+import {
+  getInventory,
+  getInventoryItem,
+  reserveInventory,
+  setInventory,
+  updateQuantity,
+} from "./inventory";
+import { NotFoundError } from "./errors";
 import { withTransaction } from "./transaction";
 
 /**
@@ -187,5 +194,54 @@ describe("setInventory", () => {
     expect(stock("INV-2")).toBe(7);
     setInventory("INV-2", 2);
     expect(stock("INV-2")).toBe(2);
+  });
+});
+
+describe("inventory listing and updates", () => {
+  const LIST_ITEMS = ["LST-1", "LST-2", "LST-3"];
+
+  beforeAll(() => {
+    db.insert(catalogItems)
+      .values(
+        LIST_ITEMS.map((itemId) => ({
+          itemId,
+          productId: "FI-SW-01",
+          category: "FISH",
+          unitCostCents: 1000,
+        })),
+      )
+      .onConflictDoNothing()
+      .run();
+    db.delete(inventory).where(inArray(inventory.itemId, LIST_ITEMS)).run();
+    setInventory("LST-1", 5);
+    setInventory("LST-2", 0);
+  });
+
+  it("[SWHR3-C-0200] lists every catalogue item in item order, a missing row reading 0", () => {
+    expect(getInventory().filter((row) => row.itemId.startsWith("LST-"))).toEqual([
+      { itemId: "LST-1", quantity: 5 },
+      { itemId: "LST-2", quantity: 0 },
+      { itemId: "LST-3", quantity: 0 },
+    ]);
+  });
+
+  it("[SWHR3-C-0200] reads one item, and refuses a non-catalogue item", () => {
+    expect(getInventoryItem("LST-3")).toEqual({ itemId: "LST-3", quantity: 0 });
+    expect(getInventoryItem("LST-1")).toEqual({ itemId: "LST-1", quantity: 5 });
+    expect(() => getInventoryItem("NOPE")).toThrow(NotFoundError);
+  });
+
+  it("[SWHR3-C-0201] updateQuantity sets the quantity and reports before and after", () => {
+    expect(withTransaction((tx) => updateQuantity(tx, "LST-1", 12))).toEqual({
+      before: 5,
+      after: 12,
+    });
+    expect(withTransaction((tx) => updateQuantity(tx, "LST-3", 4))).toEqual({
+      before: 0,
+      after: 4,
+    });
+
+    expect(stock("LST-1")).toBe(12);
+    expect(stock("LST-3")).toBe(4);
   });
 });

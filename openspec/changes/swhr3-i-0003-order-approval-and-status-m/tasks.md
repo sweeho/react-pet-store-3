@@ -60,11 +60,11 @@
 
 ## 8. Client-Server Integration
 
-- [ ] 8.1 Implement HTTP POST communication to ApplRequestProcessor (SWHR3-T-0043)
-- [ ] 8.2 Handle session ID persistence through JNLP embedding (SWHR3-T-0043)
-- [ ] 8.3 Support session-based authentication and authorization (SWHR3-T-0043)
-- [ ] 8.4 Implement XML request/response marshalling and serialization (SWHR3-T-0043)
-- [ ] 8.5 Handle network errors and connection timeouts gracefully (SWHR3-T-0043)
+- [x] 8.1 Implement HTTP POST communication to ApplRequestProcessor (SWHR3-T-0043)
+- [x] 8.2 Handle session ID persistence through JNLP embedding (SWHR3-T-0043)
+- [x] 8.3 Support session-based authentication and authorization (SWHR3-T-0043)
+- [x] 8.4 Implement XML request/response marshalling and serialization (SWHR3-T-0043)
+- [x] 8.5 Handle network errors and connection timeouts gracefully (SWHR3-T-0043)
 
 ## 9. EJB Transaction Management
 

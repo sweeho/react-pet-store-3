@@ -48,10 +48,10 @@
 
 ## 7. Inventory Integration
 
-- [ ] 7.1 Reserve inventory items for ordered products (SWHR3-T-0115)
-- [ ] 7.2 Update inventory availability counts (SWHR3-T-0115)
-- [ ] 7.3 Handle out-of-stock items (backorder or cancel) (SWHR3-T-0115)
-- [ ] 7.4 Track inventory reservations by order ID (SWHR3-T-0115)
+- [x] 7.1 Reserve inventory items for ordered products (SWHR3-T-0115)
+- [x] 7.2 Update inventory availability counts (SWHR3-T-0115)
+- [x] 7.3 Handle out-of-stock items (backorder or cancel) (SWHR3-T-0115)
+- [x] 7.4 Track inventory reservations by order ID (SWHR3-T-0115)
 
 ## 8. Supplier PO Generation
 

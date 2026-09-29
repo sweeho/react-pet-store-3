@@ -26,6 +26,7 @@ Change: `swhr3-i-0007-supplier-portal-and-invento`, tasks.md group 12. Requireme
 ## File/module ownership
 
 - `lib/supplier-pos.ts, lib/supplier-pos.test.ts`
+- `lib/process-manager.ts` (the `createSupplierPOs` call only, C12)
 
 Anything outside this list belongs to another ticket. If you need to change it, stop and ask planning.
 

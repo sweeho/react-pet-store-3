@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { db } from "../db/client";
 import { cartItems } from "../db/schema";
-import { addItem, getDetails } from "./cart";
+import { addItem, deleteItem, getDetails } from "./cart";
 import { ValidationError } from "./errors";
 
 /**
@@ -78,5 +78,33 @@ describe("addItem", () => {
   it("writes nothing for an undefined token", () => {
     expect(() => addItem(undefined, "EST-1")).not.toThrow();
     expect(getDetails(undefined)).toEqual({});
+  });
+});
+
+describe("deleteItem", () => {
+  it("[SWHR3-C-0061] removes only the named item", () => {
+    const token = randomUUID();
+    addItem(token, "EST-1", 1);
+    addItem(token, "EST-2", 2);
+    deleteItem(token, "EST-1");
+    expect(getDetails(token)).toEqual({ "EST-2": 2 });
+  });
+
+  it("is a no-op when the item is absent", () => {
+    const token = randomUUID();
+    addItem(token, "EST-1");
+    expect(() => deleteItem(token, "EST-9")).not.toThrow();
+    expect(() => deleteItem(undefined, "EST-1")).not.toThrow();
+    expect(getDetails(token)).toEqual({ "EST-1": 1 });
+  });
+
+  it("leaves another token's identical item untouched", () => {
+    const a = randomUUID();
+    const b = randomUUID();
+    addItem(a, "EST-1", 3);
+    addItem(b, "EST-1", 4);
+    deleteItem(a, "EST-1");
+    expect(getDetails(a)).toEqual({});
+    expect(getDetails(b)).toEqual({ "EST-1": 4 });
   });
 });

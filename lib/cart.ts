@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { cartItems } from "../db/schema";
 import { ValidationError } from "./errors";
@@ -56,6 +56,18 @@ export function addItem(
         target: [cartItems.sessionToken, cartItems.itemId],
         set: { quantity },
       })
+      .run();
+  }, outer);
+}
+
+/** Removes one item from the cart; a no-op when it is absent. */
+export function deleteItem(sessionToken: string | undefined, itemId: string, outer?: DbOrTx): void {
+  if (sessionToken === undefined) {
+    return;
+  }
+  withTransaction((tx) => {
+    tx.delete(cartItems)
+      .where(and(eq(cartItems.sessionToken, sessionToken), eq(cartItems.itemId, itemId)))
       .run();
   }, outer);
 }

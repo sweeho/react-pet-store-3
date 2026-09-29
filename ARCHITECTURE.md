@@ -70,7 +70,7 @@ Cross-cutting: every capability that needs to know who is calling uses this, and
 
 ## Errors
 
-Services in `lib/` throw typed errors from `lib/errors.ts`, each with an HTTP status and a stable `code`. Route handlers convert anything thrown with `toHttpError`, so a response body always has the shape `{ message, data: { code, fieldErrors? } }`. An unexpected error becomes a logged, generic 500 that never carries the original message or stack. The client reads that shape through `apiFetch` in `src/utils/api.ts`. Render errors land in `AppErrorBoundary`, mounted in `src/main.tsx`.
+Services in `lib/` throw typed errors from `lib/errors.ts`, each with an HTTP status and a stable `code`. Route handlers convert anything thrown with `toHttpError`, so a response body always has the shape `{ message, data: { code, fieldErrors?, missingFields? } }`. `missingFields` accompanies a 422 that lists every missing form field in order (checkout). An unexpected error becomes a logged, generic 500 that never carries the original message or stack. The client reads that shape through `apiFetch` in `src/utils/api.ts`. Render errors land in `AppErrorBoundary`, mounted in `src/main.tsx`.
 
 ## Data flow example
 

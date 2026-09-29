@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  CatalogItemNotFoundError,
   DuplicateAccountError,
   DuplicateEmailError,
   ForbiddenError,
@@ -53,6 +54,14 @@ describe("ServiceError subclasses", () => {
     const error = new NotFoundError();
     expect(error.status).toBe(404);
     expect(error.code).toBe("NOT_FOUND");
+  });
+
+  it("CatalogItemNotFoundError is a 404 CATALOG_ITEM_NOT_FOUND naming the item (C4)", () => {
+    const error = new CatalogItemNotFoundError("EST-9");
+    expect(error.status).toBe(404);
+    expect(error.code).toBe("CATALOG_ITEM_NOT_FOUND");
+    expect(error.message).toContain("EST-9");
+    expect(toHttpError(error).data).toEqual({ code: "CATALOG_ITEM_NOT_FOUND" });
   });
 
   it("ServiceUnavailableError is a 503 SERVICE_UNAVAILABLE (AC-3)", () => {

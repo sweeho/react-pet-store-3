@@ -440,6 +440,49 @@ describe("/checkout refused orders", () => {
     expect(screen.queryByText("Confirmation screen")).toBeNull();
   });
 
+  it("[SWHR3-C-0167] tells the shopper the card was declined and keeps every entered value", async () => {
+    mockLoad();
+    vi.mocked(placeOrder).mockRejectedValue(
+      new ApiError({
+        status: 402,
+        message: "Your card was declined. No order was placed.",
+        code: "PAYMENT_DECLINED",
+      }),
+    );
+
+    renderCheckout();
+    await findForm();
+    await userEvent.type(screen.getByLabelText("Card number"), "4000 0000 0000 0002");
+    await userEvent.type(section("Shipping address").getByLabelText(/^City/), "San Francisco");
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Your card was declined. No order was placed.");
+    expect(alert).toHaveTextContent("Check your card details or use another card.");
+    expect(screen.getByLabelText("Card number")).toHaveValue("4000 0000 0000 0002");
+    expect(section("Shipping address").getByLabelText(/^City/)).toHaveValue("San Francisco");
+    expect(section("Billing address").getByLabelText(/^Given name/)).toHaveValue("Sarah");
+    expect(screen.queryByText("Confirmation screen")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Your shopping cart is empty" })).toBeNull();
+  });
+
+  it("clears the declined alert when the order is resubmitted", async () => {
+    mockLoad();
+    vi.mocked(placeOrder)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 402, message: "declined", code: "PAYMENT_DECLINED" }),
+      )
+      .mockReturnValueOnce(new Promise(() => undefined));
+
+    renderCheckout();
+    await findForm();
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+    await screen.findByRole("alert");
+    await userEvent.click(screen.getByRole("button", { name: "Place order" }));
+
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+  });
+
   it("any other error shows a generic alert, logs it and keeps the form", async () => {
     mockLoad();
     const error = new ApiError({ status: 500, message: "boom" });

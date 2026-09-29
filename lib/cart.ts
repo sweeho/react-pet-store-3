@@ -31,3 +31,16 @@ export function getDetails(sessionToken: string | undefined, outer?: DbOrTx): Ca
     return details;
   }, outer);
 }
+
+export function addItem(
+  sessionToken: string | undefined,
+  itemId: string,
+  quantity = 1,
+  outer?: DbOrTx,
+): void {
+  void sessionToken;
+  void itemId;
+  void quantity;
+  void outer;
+  throw new Error("VortexNotImplemented");
+}

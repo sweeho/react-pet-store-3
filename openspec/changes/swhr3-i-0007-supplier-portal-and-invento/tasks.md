@@ -85,16 +85,16 @@
 
 ## 9. Inventory Update Handler
 
-- [ ] 9.1 Implement updateinventory screen handling (SWHR3-T-0136)
-- [ ] 9.2 Check currentScreen equals "updateinventory" (SWHR3-T-0136)
-- [ ] 9.3 Begin container-managed transaction (SWHR3-T-0136)
-- [ ] 9.4 Implement updateInventory() to parse form parameters (SWHR3-T-0136)
-- [ ] 9.5 Extract qty_itemId parameters for quantities (SWHR3-T-0136)
-- [ ] 9.6 Extract item_itemId checkbox parameters for selection (SWHR3-T-0136)
-- [ ] 9.7 Update inventory quantities via InventoryLocal (SWHR3-T-0136)
-- [ ] 9.8 Call processPendingPO() for order reprocessing (SWHR3-T-0136)
-- [ ] 9.9 Commit transaction (SWHR3-T-0136)
-- [ ] 9.10 Test inventory update workflow (SWHR3-T-0136)
+- [x] 9.1 Implement updateinventory screen handling (SWHR3-T-0136)
+- [x] 9.2 Check currentScreen equals "updateinventory" (SWHR3-T-0136)
+- [x] 9.3 Begin container-managed transaction (SWHR3-T-0136)
+- [x] 9.4 Implement updateInventory() to parse form parameters (SWHR3-T-0136)
+- [x] 9.5 Extract qty_itemId parameters for quantities (SWHR3-T-0136)
+- [x] 9.6 Extract item_itemId checkbox parameters for selection (SWHR3-T-0136)
+- [x] 9.7 Update inventory quantities via InventoryLocal (SWHR3-T-0136)
+- [x] 9.8 Call processPendingPO() for order reprocessing (SWHR3-T-0136)
+- [x] 9.9 Commit transaction (SWHR3-T-0136)
+- [x] 9.10 Test inventory update workflow (SWHR3-T-0136)
 
 ## 10. Pending Order Reprocessing
 

@@ -7,6 +7,7 @@ import {
   addItem,
   deleteItem,
   getDetails,
+  getCount,
   getItems,
   getSubTotalCents,
   updateItemQuantity,
@@ -234,5 +235,34 @@ describe("getSubTotalCents", () => {
     } finally {
       warn.mockRestore();
     }
+  });
+});
+
+describe("getCount", () => {
+  it("[SWHR3-C-0072] counts distinct items, not the total quantity", () => {
+    const token = randomUUID();
+    db.insert(cartItems)
+      .values([
+        { sessionToken: token, itemId: "EST-1", quantity: 1 },
+        { sessionToken: token, itemId: "EST-2", quantity: 4 },
+        { sessionToken: token, itemId: "EST-3", quantity: 7 },
+      ])
+      .run();
+
+    expect(getCount(token)).toBe(3);
+  });
+
+  it("[SWHR3-C-0073] an empty cart counts 0", () => {
+    expect(getCount(randomUUID())).toBe(0);
+    expect(getCount(undefined)).toBe(0);
+  });
+
+  it("one item counts 1, and another token's rows are not counted", () => {
+    const a = randomUUID();
+    const b = randomUUID();
+    db.insert(cartItems).values({ sessionToken: a, itemId: "EST-1", quantity: 9 }).run();
+    db.insert(cartItems).values({ sessionToken: b, itemId: "EST-2", quantity: 1 }).run();
+
+    expect(getCount(a)).toBe(1);
   });
 });

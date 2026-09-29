@@ -49,6 +49,17 @@ async function addToCart(page: Page, itemId: string, quantity?: number): Promise
   expect(response.ok()).toBe(true);
 }
 
+// /checkout requires a signed-in customer (design.md D7). Registering signs the
+// context in, and the cart cookie is independent of the session, so it survives.
+async function signIn(page: Page): Promise<void> {
+  const username = `cart${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`.slice(0, 25);
+  const password = "correct-horse-1";
+  const response = await page.request.post("/api/auth/register", {
+    data: { j_username: username, j_password: password, j_password_confirm: password },
+  });
+  expect(response.ok()).toBe(true);
+}
+
 function line(page: Page, attribute: string) {
   return page.getByTestId("cart-line").filter({ hasText: attribute });
 }
@@ -59,6 +70,7 @@ async function seedTwoItems(page: Page): Promise<void> {
 }
 
 test("[SWHR3-C-0090] full cart journey from add to checkout", async ({ page }) => {
+  await signIn(page);
   await page.goto("/cart");
   await expect(page.getByText(EMPTY_MESSAGE)).toBeVisible();
 
@@ -136,6 +148,7 @@ test("[SWHR3-C-0045] emptying the cart through the API shows the empty message",
 });
 
 test("[SWHR3-C-0092] /checkout with an empty cart is blocked", async ({ page }) => {
+  await signIn(page);
   await page.goto("/");
   await seedTwoItems(page);
   const response = await page.request.delete("/api/cart");

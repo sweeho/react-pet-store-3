@@ -70,4 +70,21 @@ describe("cart-session middleware", () => {
     expect(event.context.cartSession).toBeUndefined();
     expect(cartCookie(event)).toBeUndefined();
   });
+
+  it("resolves the cookie for /api/orders without ever minting one", async () => {
+    const token = randomUUID();
+    const withCookie = makeEvent("/api/orders", "POST", `${CART_COOKIE_NAME}=${token}`);
+    await cartSession(withCookie);
+    expect(withCookie.context.cartSession).toBe(token);
+    expect(cartCookie(withCookie)).toBeUndefined();
+
+    const without = makeEvent("/api/orders", "POST");
+    await cartSession(without);
+    expect(without.context.cartSession).toBeUndefined();
+    expect(cartCookie(without)).toBeUndefined();
+
+    const malformed = makeEvent("/api/orders", "POST", `${CART_COOKIE_NAME}=nope`);
+    await cartSession(malformed);
+    expect(malformed.context.cartSession).toBeUndefined();
+  });
 });

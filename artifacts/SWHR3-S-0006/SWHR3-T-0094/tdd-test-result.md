@@ -21,7 +21,7 @@ ticket: SWHR3-T-0094
 
 ## Red run
 
-`bun run test` over the lib, page and route tests against `VortexNotImplemented` stubs: 12 failed in the lib and page files (the route file was not selected by that run's path filter, so its red was not observed; it was written and run first against the stub only in the sense that the stub throws for every request, and it passed once implemented). `a2a_run_tests` is refused on this project (no testEvidence block).
+`bun run test` over `lib/order-confirmation.test.ts` and `src/pages/orders` against `VortexNotImplemented` stubs: 12 failed. The route test (`routes/api/orders/[id].get.test.ts`) was not included in that run's path filter, so its red was NOT observed; it was first run after the implementation and passed. `a2a_run_tests` is refused on this project (no testEvidence block).
 
 ## Green run
 

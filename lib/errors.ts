@@ -90,6 +90,14 @@ export class ShoppingCartEmptyError extends ServiceError {
   }
 }
 
+// Bugfix SWHR3-T-0100 (D2, C1): a JSON-only route received another media type.
+export class UnsupportedMediaTypeError extends ServiceError {
+  constructor() {
+    super("UNSUPPORTED_MEDIA_TYPE", "Request body must be JSON", 415);
+    this.name = "UnsupportedMediaTypeError";
+  }
+}
+
 export class ServiceUnavailableError extends ServiceError {
   constructor(message = "Service unavailable") {
     super("SERVICE_UNAVAILABLE", message, 503);

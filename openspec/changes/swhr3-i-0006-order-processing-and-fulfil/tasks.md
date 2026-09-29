@@ -33,11 +33,11 @@
 
 ## 5. Order Status Management
 
-- [ ] 5.1 Define order status enumeration (PENDING, PAID, CONFIRMED, ALLOCATED, SHIPPED, DELIVERED, COMPLETED) (SWHR3-T-0113)
-- [ ] 5.2 Implement status transition validation in ProcessManager (SWHR3-T-0113)
-- [ ] 5.3 Implement status update methods on PurchaseOrder (SWHR3-T-0113)
-- [ ] 5.4 Persist status changes to database (SWHR3-T-0113)
-- [ ] 5.5 Track status change timestamps (SWHR3-T-0113)
+- [x] 5.1 Define order status enumeration (PENDING, PAID, CONFIRMED, ALLOCATED, SHIPPED, DELIVERED, COMPLETED) (SWHR3-T-0113)
+- [x] 5.2 Implement status transition validation in ProcessManager (SWHR3-T-0113)
+- [x] 5.3 Implement status update methods on PurchaseOrder (SWHR3-T-0113)
+- [x] 5.4 Persist status changes to database (SWHR3-T-0113)
+- [x] 5.5 Track status change timestamps (SWHR3-T-0113)
 
 ## 6. Order Notifications
 

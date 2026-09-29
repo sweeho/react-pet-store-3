@@ -26,12 +26,12 @@
 
 ## 4. Server Communication Protocol
 
-- [ ] 4.1 Implement ApplRequestProcessor servlet to receive order approval requests (SWHR3-T-0039)
-- [ ] 4.2 Add request type routing for UPDATESTATUS request type (SWHR3-T-0039)
-- [ ] 4.3 Implement updateOrders() method to parse XML OrderApproval message (SWHR3-T-0039)
-- [ ] 4.4 Extract OrderId and OrderStatus from XML elements (SWHR3-T-0039)
-- [ ] 4.5 Call AdminRequestBD.updateOrders() to process changes (SWHR3-T-0039)
-- [ ] 4.6 Return XML response with status=SUCCESS or error message (SWHR3-T-0039)
+- [x] 4.1 Implement ApplRequestProcessor servlet to receive order approval requests (SWHR3-T-0039)
+- [x] 4.2 Add request type routing for UPDATESTATUS request type (SWHR3-T-0039)
+- [x] 4.3 Implement updateOrders() method to parse XML OrderApproval message (SWHR3-T-0039)
+- [x] 4.4 Extract OrderId and OrderStatus from XML elements (SWHR3-T-0039)
+- [x] 4.5 Call AdminRequestBD.updateOrders() to process changes (SWHR3-T-0039)
+- [x] 4.6 Return XML response with status=SUCCESS or error message (SWHR3-T-0039)
 
 ## 5. Business Delegate Implementation
 

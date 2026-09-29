@@ -69,10 +69,10 @@
 
 ## 9. Cart Clearing
 
-- [ ] 9.1 Implement empty() method calling HashMap.clear() (SWHR3-T-0066)
-- [ ] 9.2 Add empty method to ShoppingCartLocal interface (SWHR3-T-0066)
-- [ ] 9.3 Declare container-transaction with trans-attribute=Required for empty (SWHR3-T-0066)
-- [ ] 9.4 Test cart clearing operation (SWHR3-T-0066)
+- [x] 9.1 Implement empty() method calling HashMap.clear() (SWHR3-T-0066)
+- [x] 9.2 Add empty method to ShoppingCartLocal interface (SWHR3-T-0066)
+- [x] 9.3 Declare container-transaction with trans-attribute=Required for empty (SWHR3-T-0066)
+- [x] 9.4 Test cart clearing operation (SWHR3-T-0066)
 
 ## 10. CartItem Value Object
 

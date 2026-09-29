@@ -16,31 +16,52 @@ export interface PlaceOrderInput {
   event: OrderEventInput;
 }
 
-export function placeOrder(
+export interface PlacedOrderDetails {
+  orderId: number;
+  orderDate: string;
+  email: string;
+  lineCount: number;
+  totalCents: number;
+}
+
+/**
+ * The transaction body of placeOrder (design.md C8, order-processing-and-
+ * fulfilment): reads the cart, writes the order and its snapshots, empties
+ * the cart. It does not log; the caller logs once the transaction commits.
+ */
+export function placeOrderInTx(
+  tx: DbOrTx,
   { accountId, cartToken, locale, event }: PlaceOrderInput,
-  outer?: DbOrTx,
-): { orderId: number; orderDate: string; email: string } {
-  const placed = withTransaction(
-    (tx) => {
-      const lines = getCheckoutLines(cartToken, locale, tx);
-      const purchaseOrder = toPurchaseOrder(accountId, event, lines);
-      const orderId = insertPurchaseOrder(tx, purchaseOrder);
-      empty(cartToken, tx);
-      return {
-        orderId,
-        orderDate: purchaseOrder.orderDate.toISOString(),
-        email: purchaseOrder.emailId,
-        lineCount: lines.length,
-        totalCents: purchaseOrder.totalCents,
-      };
-    },
-    outer,
-    { behavior: "immediate" },
-  );
-  // D11: logged once the transaction has committed (or, given an outer
-  // transaction, once this work is done), so a rolled-back order never logs.
+): PlacedOrderDetails {
+  const lines = getCheckoutLines(cartToken, locale, tx);
+  const purchaseOrder = toPurchaseOrder(accountId, event, lines);
+  const orderId = insertPurchaseOrder(tx, purchaseOrder);
+  empty(cartToken, tx);
+  return {
+    orderId,
+    orderDate: purchaseOrder.orderDate.toISOString(),
+    email: purchaseOrder.emailId,
+    lineCount: lines.length,
+    totalCents: purchaseOrder.totalCents,
+  };
+}
+
+/** D11: one log line per order, carrying no card data. */
+export function logOrderPlaced(accountId: number, placed: PlacedOrderDetails): void {
   console.info(
     `checkout: order ${placed.orderId} placed by account ${accountId}, ${placed.lineCount} lines, ${placed.totalCents} cents`,
   );
+}
+
+export function placeOrder(
+  input: PlaceOrderInput,
+  outer?: DbOrTx,
+): { orderId: number; orderDate: string; email: string } {
+  const placed = withTransaction((tx) => placeOrderInTx(tx, input), outer, {
+    behavior: "immediate",
+  });
+  // D11: logged once the transaction has committed (or, given an outer
+  // transaction, once this work is done), so a rolled-back order never logs.
+  logOrderPlaced(input.accountId, placed);
   return { orderId: placed.orderId, orderDate: placed.orderDate, email: placed.email };
 }

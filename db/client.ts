@@ -11,9 +11,15 @@ import {
   catalogItems,
   creditCards,
   customers,
+  inventory,
+  inventoryReservations,
   lineItems,
+  notificationOutbox,
   orderContacts,
+  orderStageHistory,
   orders,
+  paymentAuthorizations,
+  supplierPurchaseOrders,
   users,
 } from "./schema";
 
@@ -59,6 +65,12 @@ export const db = drizzle(sqlite, {
     catalogItemDetails,
     lineItems,
     orderContacts,
+    orderStageHistory,
+    paymentAuthorizations,
+    notificationOutbox,
+    inventory,
+    inventoryReservations,
+    supplierPurchaseOrders,
   },
 });
 

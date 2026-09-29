@@ -13,7 +13,7 @@ import {
   orders,
 } from "../db/schema";
 import { getDetails } from "./cart";
-import { placeOrder } from "./checkout";
+import { placeOrder, placeOrderInTx } from "./checkout";
 import type { ContactInfo } from "./contact-info";
 import { createCreditCard } from "./credit-card";
 import { ShoppingCartEmptyError } from "./errors";
@@ -114,6 +114,18 @@ describe("placeOrder", () => {
     expect(getDetails(token)).toEqual({});
     expect(info).toHaveBeenCalledWith(expect.stringContaining(`order ${result.orderId} placed`));
     expect(info.mock.calls.flat().join(" ")).not.toContain("4111");
+  });
+
+  it("placeOrderInTx writes the order through the caller's transaction and does not log", () => {
+    const token = fillCart();
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const placed = withTransaction((tx) => placeOrderInTx(tx, input(token)));
+
+    expect(placed).toMatchObject({ email: "sarah.chen@example.com", lineCount: 2 });
+    expect(placed.totalCents).toBe(2 * 1650 + 5000);
+    expect(getDetails(token)).toEqual({});
+    expect(info).not.toHaveBeenCalled();
   });
 
   it("[SWHR3-C-0139] joins an outer transaction instead of starting one", () => {

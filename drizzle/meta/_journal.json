@@ -43,6 +43,13 @@
       "when": 1790704604752,
       "tag": "0005_slow_nick_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1790709094520,
+      "tag": "0006_wild_captain_cross",
+      "breakpoints": true
     }
   ]
 }

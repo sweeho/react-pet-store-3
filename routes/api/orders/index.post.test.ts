@@ -10,8 +10,10 @@ import {
   catalogItemDetails,
   catalogItems,
   lineItems,
+  notificationOutbox,
   orderContacts,
   orders,
+  paymentAuthorizations,
 } from "../../../db/schema";
 import { getDetails } from "../../../lib/cart";
 import { AUTH_CONFIG } from "../../../lib/auth-config";
@@ -371,5 +373,48 @@ describe("POST /api/orders accepts only JSON (SWHR3-T-0100)", () => {
     expect(orderCount()).toBe(before);
     expect(getDetails(token)).toEqual(CART_LINES);
     expect(info).not.toHaveBeenCalledWith(expect.stringMatching(/^checkout: order/));
+  });
+});
+
+describe("POST /api/orders processes the order (order-processing-and-fulfilment)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("[SWHR3-C-0171] a successful post leaves stage CONFIRMED with one payment and one outbox row", async () => {
+    const result = (await send(body(), { cartToken: fillCart() })) as { orderId: number };
+
+    const order = db.select().from(orders).where(eq(orders.id, result.orderId)).get();
+    expect(order?.workflowStage).toBe("CONFIRMED");
+    expect(
+      db
+        .select()
+        .from(paymentAuthorizations)
+        .where(eq(paymentAuthorizations.orderId, result.orderId))
+        .all(),
+    ).toHaveLength(1);
+    expect(
+      db
+        .select()
+        .from(notificationOutbox)
+        .where(eq(notificationOutbox.orderId, result.orderId))
+        .all(),
+    ).toHaveLength(1);
+  });
+
+  it("a declined card answers 402 PAYMENT_DECLINED and creates nothing", async () => {
+    const token = fillCart();
+    const before = orderCount();
+
+    await expect(
+      send(body({ credit_card_number: "4000 0000 0000 0002" }), { cartToken: token }),
+    ).rejects.toMatchObject({
+      status: 402,
+      message: "Your card was declined. No order was placed.",
+      data: { code: "PAYMENT_DECLINED" },
+    });
+
+    expect(orderCount()).toBe(before);
+    expect(getDetails(token)).toEqual({ "ORD-1": 2, "ORD-2": 1 });
   });
 });

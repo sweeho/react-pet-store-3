@@ -6,20 +6,24 @@
  * (a 404 means none); shipping starts blank, with "Same as billing address"
  * copying billing into it. The form sets noValidate so the server reports
  * every missing field at once (D13). On success it navigates to /orders/:id.
+ * A 422 shows the missing-fields summary and inline errors, keeping every entered
+ * value; a 409 SHOPPING_CART_EMPTY (or an empty cart on load) shows the
+ * empty-cart state (D9, SD7).
  */
 import { Link } from "react-router";
 
 import { AddressFields, type AddressValues } from "@/components/checkout/address-fields";
+import { CheckoutErrors, EmptyCartState } from "@/components/checkout/checkout-errors";
 import { PaymentFields } from "@/components/checkout/payment-fields";
 import { Alert, AlertDescription, Button, Checkbox } from "@/components/ui";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { CART_PATH, EMPTY_CART_CHECKOUT_MESSAGE } from "@/constants/cart";
+import { CART_PATH } from "@/constants/cart";
 import { ORDER_CONFIRMATION_PATH } from "@/constants/checkout";
 import type { CartView } from "@/types/cart";
 import type { CustomerProfile } from "@/types/customer-profile";
 import { CONTACT_INFO_FIELDS, type ContactInfo } from "@/types/checkout";
 import { cn } from "@/utils";
-import { apiFetch } from "@/utils/api";
+import { ApiError, apiFetch } from "@/utils/api";
 import { getCart } from "@/utils/cart-api";
 import { placeOrder } from "@/utils/orders-api";
 
@@ -74,6 +78,12 @@ export default function Checkout() {
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitFailed, setSubmitFailed] = useState(false);
+  const [refusal, setRefusal] = useState<{
+    fieldErrors: Record<string, string>;
+    missingFields: string[];
+  } | null>(null);
+  const [orderRefusedEmpty, setOrderRefusedEmpty] = useState(false);
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([getCart(), loadProfile()])
@@ -86,6 +96,12 @@ export default function Checkout() {
       })
       .catch(() => setLoadFailed(true));
   }, []);
+
+  useEffect(() => {
+    if (refusal !== null) {
+      summaryRef.current?.focus();
+    }
+  }, [refusal]);
 
   if (loadFailed) {
     return (
@@ -101,17 +117,8 @@ export default function Checkout() {
     return <main className="mx-auto max-w-3xl p-6" aria-busy="true" />;
   }
 
-  if (cart.count === 0) {
-    return (
-      <main className="mx-auto max-w-3xl space-y-4 p-6">
-        <Alert variant="destructive">
-          <AlertDescription>{EMPTY_CART_CHECKOUT_MESSAGE}</AlertDescription>
-        </Alert>
-        <Link to={CART_PATH} className="underline">
-          Return to your shopping cart
-        </Link>
-      </main>
-    );
+  if (cart.count === 0 || orderRefusedEmpty) {
+    return <EmptyCartState />;
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -130,11 +137,22 @@ export default function Checkout() {
     }
     setSubmitting(true);
     setSubmitFailed(false);
+    setRefusal(null);
     placeOrder(fields)
       .then((placed) => navigate(ORDER_CONFIRMATION_PATH(placed.orderId)))
-      .catch(() => {
-        setSubmitFailed(true);
+      .catch((error: unknown) => {
         setSubmitting(false);
+        if (error instanceof ApiError && error.status === 422) {
+          setRefusal({
+            fieldErrors: error.fieldErrors ?? {},
+            missingFields: error.missingFields ?? [],
+          });
+        } else if (error instanceof ApiError && error.code === "SHOPPING_CART_EMPTY") {
+          setOrderRefusedEmpty(true);
+        } else {
+          console.error(error);
+          setSubmitFailed(true);
+        }
       });
   }
 
@@ -154,6 +172,13 @@ export default function Checkout() {
         className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
       >
         <div className="space-y-5">
+          {refusal !== null && (
+            <CheckoutErrors
+              ref={summaryRef}
+              missingFields={refusal.missingFields}
+              fieldErrors={refusal.fieldErrors}
+            />
+          )}
           {submitFailed && (
             <Alert variant="destructive">
               <AlertDescription>
@@ -166,6 +191,7 @@ export default function Checkout() {
             title="Billing address"
             hint={prefilled ? "Pre-filled from your account" : undefined}
             suffix="_a"
+            errors={refusal?.fieldErrors}
             values={billing}
             onChange={(key: keyof ContactInfo, value) =>
               setBilling((current) => ({ ...current, [key]: value }))
@@ -182,6 +208,7 @@ export default function Checkout() {
             title="Shipping address"
             hint="Where the pets are delivered"
             suffix="_b"
+            errors={refusal?.fieldErrors}
             values={shippingValues}
             disabled={sameAsBilling}
             onChange={(key: keyof ContactInfo, value) =>
@@ -197,7 +224,7 @@ export default function Checkout() {
               </div>
             }
           />
-          <PaymentFields />
+          <PaymentFields errors={refusal?.fieldErrors} />
         </div>
 
         <aside className="border-border bg-card rounded-lg border shadow-sm lg:sticky lg:top-6">

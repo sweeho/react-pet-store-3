@@ -3,14 +3,14 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { EMPTY_CART_CHECKOUT_MESSAGE } from "@/constants/cart";
-import { CheckoutErrors, EmptyCartState, checkoutFieldLabel } from "./checkout-errors";
+import { CheckoutErrors, EmptyCartState } from "./checkout-errors";
 
 /**
  * UI / COMPONENT TEST. Builds mockup-checkout-missing-required-fields.html's
  * summary banner and mockup-checkout-blocked-shopping-cart-is-empty.html
  * (main content only, SD12).
  */
-describe("checkoutFieldLabel", () => {
+describe("CheckoutErrors field labels", () => {
   it.each([
     ["city_a", "Billing · City"],
     ["postal_code_a", "Billing · Postal code"],
@@ -20,12 +20,11 @@ describe("checkoutFieldLabel", () => {
     ["credit_card_type", "Payment · Card type"],
     ["expiration_month", "Payment · Expiry month"],
     ["expiration_year", "Payment · Expiry year"],
+    ["mystery", "mystery"],
   ])("labels %s as %s", (param, label) => {
-    expect(checkoutFieldLabel(param)).toBe(label);
-  });
+    render(<CheckoutErrors missingFields={[param]} fieldErrors={{}} />);
 
-  it("falls back to the raw name for an unknown field", () => {
-    expect(checkoutFieldLabel("mystery")).toBe("mystery");
+    expect(screen.getByRole("listitem")).toHaveTextContent(label);
   });
 });
 

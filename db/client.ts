@@ -82,7 +82,17 @@ export const db = drizzle(sqlite, {
   },
 });
 
+// A table rebuild (drop + rename, as in 0007) fails on a database whose child
+// rows still reference the dropped parent, and SQLite ignores
+// `PRAGMA foreign_keys` inside the migrator's transaction. Turn enforcement
+// off around migrate() and verify the result instead.
+sqlite.exec("PRAGMA foreign_keys = OFF");
 migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+const orphans = sqlite.query("PRAGMA foreign_key_check").all();
+if (orphans.length > 0) {
+  throw new Error(`Migrations left ${orphans.length} foreign key violation(s)`);
+}
+sqlite.exec("PRAGMA foreign_keys = ON");
 
 // Seed the same two users the mock API used to hardcode, so the demo data
 // (and the existing route tests) keep working out of the box.

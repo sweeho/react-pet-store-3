@@ -149,8 +149,8 @@ test("[SWHR3-C-0186] a supplier signs in and sees the inventory table", async ({
   await expect(page.getByRole("heading", { name: "Inventory" })).toBeVisible();
   await expect(inventoryRow(page, a)).toContainText("7");
   await expect(inventoryRow(page, b)).toContainText("0");
-  await expect(page.getByRole("columnheader", { name: "Item ID" })).toBeVisible();
-  await expect(page.getByRole("columnheader", { name: "Current quantity" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "Item ID" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "Current quantity" })).toBeVisible();
   await expect(page.getByText("Supplier administrator")).toBeVisible();
 });
 

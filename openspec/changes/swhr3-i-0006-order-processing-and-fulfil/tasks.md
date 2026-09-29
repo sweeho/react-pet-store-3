@@ -55,12 +55,12 @@
 
 ## 8. Supplier PO Generation
 
-- [ ] 8.1 Determine which items require supplier fulfillment (SWHR3-T-0116)
-- [ ] 8.2 Group items by supplier (SWHR3-T-0116)
-- [ ] 8.3 Create SupplierPO entity for each supplier (SWHR3-T-0116)
-- [ ] 8.4 Add line items to supplier POs (SWHR3-T-0116)
-- [ ] 8.5 Set delivery date expectations (SWHR3-T-0116)
-- [ ] 8.6 Persist supplier POs (SWHR3-T-0116)
+- [x] 8.1 Determine which items require supplier fulfillment (SWHR3-T-0116)
+- [x] 8.2 Group items by supplier (SWHR3-T-0116)
+- [x] 8.3 Create SupplierPO entity for each supplier (SWHR3-T-0116)
+- [x] 8.4 Add line items to supplier POs (SWHR3-T-0116)
+- [x] 8.5 Set delivery date expectations (SWHR3-T-0116)
+- [x] 8.6 Persist supplier POs (SWHR3-T-0116)
 
 ## 9. Order Processing Facade
 

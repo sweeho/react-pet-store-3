@@ -44,12 +44,12 @@
 
 ## 6. Cart Calculations
 
-- [ ] 6.1 Implement getSubTotal() method iterating through CartItems (SWHR3-T-0063)
-- [ ] 6.2 Calculate subtotal as sum of (quantity × unitCost) per item (SWHR3-T-0063)
-- [ ] 6.3 Handle null items collection gracefully (SWHR3-T-0063)
-- [ ] 6.4 Return Double for subtotal value (SWHR3-T-0063)
-- [ ] 6.5 Add getSubTotal method to ShoppingCartLocal interface (SWHR3-T-0063)
-- [ ] 6.6 Test subtotal calculation with multiple items (SWHR3-T-0063)
+- [x] 6.1 Implement getSubTotal() method iterating through CartItems (SWHR3-T-0063)
+- [x] 6.2 Calculate subtotal as sum of (quantity × unitCost) per item (SWHR3-T-0063)
+- [x] 6.3 Handle null items collection gracefully (SWHR3-T-0063)
+- [x] 6.4 Return Double for subtotal value (SWHR3-T-0063)
+- [x] 6.5 Add getSubTotal method to ShoppingCartLocal interface (SWHR3-T-0063)
+- [x] 6.6 Test subtotal calculation with multiple items (SWHR3-T-0063)
 
 ## 7. Item and Cart Counts
 

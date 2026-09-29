@@ -5,14 +5,15 @@
  * (useStagedDecisions, SWHR3-T-0038), sorting (sortOrders,
  * SWHR3-T-0041) and the commit flow (CommitDecisionsDialog,
  * SWHR3-T-0043). The wireframe's four top-level tabs replace the hi-fi
- * mockup's two-tab "Pending / Decided" layout (D10, SD14). Refresh here is
- * a plain reload; SWHR3-T-0042 adds the discard-uncommitted-changes
- * warning on top of it.
+ * mockup's two-tab "Pending / Decided" layout (D10, SD14). Refresh goes
+ * through RefreshOrdersControl (SWHR3-T-0042), which warns before
+ * discarding staged decisions.
  */
 import { AdminShell } from "@/components/admin/admin-shell";
 import { CommitDecisionsDialog } from "@/components/admin/commit-decisions-dialog";
 import { OrdersTable } from "@/components/admin/orders-table";
 import type { OrdersTableSort } from "@/components/admin/orders-table";
+import { RefreshOrdersControl } from "@/components/admin/refresh-orders-control";
 import { RequireAdmin } from "@/components/admin/require-admin";
 import { Button } from "@/components/ui";
 import { ORDER_STATUSES } from "@/constants/order-status";
@@ -116,9 +117,11 @@ export default function AdminOrders() {
               {isPending ? "Select rows or use the status column, then commit." : READ_ONLY_NOTE}
             </span>
             <div className="flex-1" />
-            <Button type="button" variant="outline" size="sm" onClick={() => void load()}>
-              Refresh
-            </Button>
+            <RefreshOrdersControl
+              staged={staging.staged}
+              onRefresh={() => void load()}
+              onDiscard={staging.clear}
+            />
           </div>
           {orders ? (
             <OrdersTable

@@ -43,11 +43,11 @@
 
 ## 6. Data Retrieval and Filtering
 
-- [ ] 6.1 Implement getOrders() method to retrieve orders by status (SWHR3-T-0041)
-- [ ] 6.2 Query all four status types: PENDING, APPROVED, DENIED, COMPLETED (SWHR3-T-0041)
-- [ ] 6.3 Aggregate results into single order list for display (SWHR3-T-0041)
-- [ ] 6.4 Implement order sorting capability in TableSorter (SWHR3-T-0041)
-- [ ] 6.5 Support refresh operation to reload orders from server (SWHR3-T-0041)
+- [x] 6.1 Implement getOrders() method to retrieve orders by status (SWHR3-T-0041)
+- [x] 6.2 Query all four status types: PENDING, APPROVED, DENIED, COMPLETED (SWHR3-T-0041)
+- [x] 6.3 Aggregate results into single order list for display (SWHR3-T-0041)
+- [x] 6.4 Implement order sorting capability in TableSorter (SWHR3-T-0041)
+- [x] 6.5 Support refresh operation to reload orders from server (SWHR3-T-0041)
 
 ## 7. Uncommitted Changes Detection
 

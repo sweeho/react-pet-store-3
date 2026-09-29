@@ -124,13 +124,13 @@
 
 ## 13. Struts Configuration
 
-- [ ] 13.1 Map order checkout action in struts-config.xml (SWHR3-T-0095)
-- [ ] 13.2 Map OrderHTMLAction to order submission endpoint (SWHR3-T-0095)
-- [ ] 13.3 Configure forward to confirmation screen on success (SWHR3-T-0095)
-- [ ] 13.4 Configure forward to form on validation error (SWHR3-T-0095)
-- [ ] 13.5 Map OrderEJBAction for order processing (SWHR3-T-0095)
-- [ ] 13.6 Configure exception handler for MissingFormDataException (SWHR3-T-0095)
-- [ ] 13.7 Configure exception handler for ShoppingCartEmptyOrderException (SWHR3-T-0095)
+- [x] 13.1 Map order checkout action in struts-config.xml (SWHR3-T-0095)
+- [x] 13.2 Map OrderHTMLAction to order submission endpoint (SWHR3-T-0095)
+- [x] 13.3 Configure forward to confirmation screen on success (SWHR3-T-0095)
+- [x] 13.4 Configure forward to form on validation error (SWHR3-T-0095)
+- [x] 13.5 Map OrderEJBAction for order processing (SWHR3-T-0095)
+- [x] 13.6 Configure exception handler for MissingFormDataException (SWHR3-T-0095)
+- [x] 13.7 Configure exception handler for ShoppingCartEmptyOrderException (SWHR3-T-0095)
 
 ## 14. Integration Testing
 

@@ -19,11 +19,11 @@
 
 ## 3. Item Removal Operations
 
-- [ ] 3.1 Implement deleteItem(String itemId) method (SWHR3-T-0060)
-- [ ] 3.2 Add deleteItem method to ShoppingCartLocal interface (SWHR3-T-0060)
-- [ ] 3.3 Declare container-transaction with trans-attribute=Required for deleteItem (SWHR3-T-0060)
-- [ ] 3.4 Implement item removal via HashMap.remove() (SWHR3-T-0060)
-- [ ] 3.5 Test single item removal from cart (SWHR3-T-0060)
+- [x] 3.1 Implement deleteItem(String itemId) method (SWHR3-T-0060)
+- [x] 3.2 Add deleteItem method to ShoppingCartLocal interface (SWHR3-T-0060)
+- [x] 3.3 Declare container-transaction with trans-attribute=Required for deleteItem (SWHR3-T-0060)
+- [x] 3.4 Implement item removal via HashMap.remove() (SWHR3-T-0060)
+- [x] 3.5 Test single item removal from cart (SWHR3-T-0060)
 
 ## 4. Quantity Update Operations
 

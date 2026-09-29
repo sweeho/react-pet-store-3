@@ -76,12 +76,12 @@
 
 ## 10. CartItem Value Object
 
-- [ ] 10.1 Create CartItem class with fields: itemId, productId, category, name, attribute, quantity, unitCost (SWHR3-T-0067)
-- [ ] 10.2 Implement constructor with all seven parameters (SWHR3-T-0067)
-- [ ] 10.3 Implement getter methods for all fields (SWHR3-T-0067)
-- [ ] 10.4 Implement getTotalCost() calculated property (quantity × unitCost) (SWHR3-T-0067)
-- [ ] 10.5 Implement Serializable interface for EJB transport (SWHR3-T-0067)
-- [ ] 10.6 Test CartItem creation and calculations (SWHR3-T-0067)
+- [x] 10.1 Create CartItem class with fields: itemId, productId, category, name, attribute, quantity, unitCost (SWHR3-T-0067)
+- [x] 10.2 Implement constructor with all seven parameters (SWHR3-T-0067)
+- [x] 10.3 Implement getter methods for all fields (SWHR3-T-0067)
+- [x] 10.4 Implement getTotalCost() calculated property (quantity × unitCost) (SWHR3-T-0067)
+- [x] 10.5 Implement Serializable interface for EJB transport (SWHR3-T-0067)
+- [x] 10.6 Test CartItem creation and calculations (SWHR3-T-0067)
 
 ## 11. Security Configuration
 
